@@ -1,0 +1,3018 @@
+/* === PER-SLIDE LAYOUTS ===
+ * Styles for individual slide layouts: bio, AI tools grid, active
+ * boot sequence, title-slide hero, Claude Code reveal, image slide,
+ * VS battle (DisclaimerSlide), timeline (git log),
+ * blurred-background, mobile slide refinements.
+ *
+ * These live OUTSIDE the design system because they apply to a
+ * single slide. If you find yourself reusing one across slides,
+ * promote it to design-system/components.css. */
+
+/* === BIO SLIDE LAYOUT === */
+.bio-slide {
+  display: flex;
+  align-items: flex-start; /* text stays top-aligned under the title */
+  justify-content: center;
+  gap: var(--space-3xl);
+  text-align: left;
+  width: 100%;
+  flex: 1; /* fill the content area so the photo can center vertically */
+  min-height: 0;
+  padding-bottom: var(--space-xl); /* Clear timer/progress bar */
+}
+
+.bio-slide-content {
+  flex: 1;
+}
+
+.bio-slide-content h1 {
+  text-align: left;
+  margin-bottom: var(--space-xl);
+}
+
+.bio-slide-content h3 {
+  text-align: left;
+  color: var(--terminal-white-dim);
+  font-weight: 400;
+  margin-bottom: var(--space-lg);
+}
+
+.bio-item {
+  font-size: var(--font-size-body);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: var(--space-md);
+}
+
+.bio-item__prefix {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.bio-sub-items {
+  padding-left: 3rem;
+  margin-top: var(--space-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.bio-sub-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-md);
+  font-size: var(--slide-text-dense);
+  opacity: 0.72;
+  line-height: 1.4;
+}
+
+.bio-sub-item__prefix {
+  color: var(--terminal-white-dim);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bio-subtitle {
+  color: var(--terminal-orange);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-shadow: 0 0 16px rgba(240, 136, 62, 0.35);
+}
+
+.bio-slide-content a {
+  color: var(--terminal-blue);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--terminal-blue);
+  transition: all var(--transition-fast);
+}
+
+.bio-slide-content a:hover {
+  color: var(--terminal-cyan);
+  border-color: var(--terminal-cyan);
+  text-shadow: 0 0 8px var(--terminal-cyan-glow);
+}
+
+.bio-slide-image {
+  flex-shrink: 0;
+  align-self: center; /* center the photo vertically in the right column */
+  max-width: 540px;
+  max-height: calc(var(--vh-full) - 250px);
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 2px solid var(--terminal-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.bio-slide-image:hover {
+  transform: scale(1.02) rotate(1deg);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+}
+
+/* === TOOL TAKES GRID ===
+ * 4×2 grid of tool cards. Each card holds a silhouetted logo, a hidden
+ * name (rendered as ???), and a "take" line (opinion about the tool).
+ * Stage 0: all takes visible + first card identity revealed. Subsequent
+ * stages reveal the remaining identities one-by-one as `r` is pressed. */
+.tool-takes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: var(--space-md);
+  width: 100%;
+  height: 100%;
+}
+
+.tool-takes-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-md) var(--space-md);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--terminal-bg-secondary) 70%, transparent);
+  border: 1px solid color-mix(in srgb, var(--terminal-green) 18%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--terminal-white) 6%, transparent);
+  overflow: hidden;
+  transition:
+    border-color 0.55s ease,
+    background 0.55s ease,
+    box-shadow 0.7s ease;
+}
+
+.tool-takes-card--take-shown {
+  border-color: color-mix(in srgb, var(--terminal-green) 38%, transparent);
+  background: color-mix(in srgb, var(--terminal-bg-secondary) 85%, transparent);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 color-mix(in srgb, var(--terminal-white) 10%, transparent);
+}
+
+.tool-takes-icon {
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-md);
+  transition: filter 0.55s ease, opacity 0.55s ease, transform 0.55s ease;
+  /* Silhouette state — white tint + blur = "who's that Pokémon" effect */
+  filter: brightness(0) saturate(1) invert(1) blur(13px);
+  opacity: 0.45;
+  animation: toolTakesSilhouettePulse 3.2s ease-in-out infinite;
+}
+
+.tool-takes-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tool-takes-icon__glyph {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-h2);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--terminal-white);
+}
+
+/* Identity revealed — icon de-silhouettes, name displays */
+.tool-takes-card--identity-shown .tool-takes-icon {
+  filter: none;
+  opacity: 1;
+  animation: toolTakesIconReveal 0.7s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.tool-takes-card--identity-shown .tool-takes-icon__glyph {
+  color: var(--terminal-green);
+  text-shadow: var(--glow-text-green);
+}
+
+/* Wildcard — dashed border, no name slot, larger glyph */
+.tool-takes-card--wildcard {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--terminal-green) 28%, transparent);
+}
+
+.tool-takes-card--wildcard .tool-takes-icon {
+  width: auto;
+  height: auto;
+  margin-bottom: var(--space-md);
+}
+
+.tool-takes-card--wildcard .tool-takes-icon__glyph {
+  font-size: var(--font-size-hero);
+}
+
+.tool-takes-name {
+  font-family: var(--font-mono);
+  font-size: var(--slide-text-dense);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--terminal-white);
+  margin-bottom: var(--space-sm);
+  text-transform: uppercase;
+}
+
+.tool-takes-take {
+  font-family: var(--font-mono);
+  font-size: var(--slide-text-dense);
+  line-height: 1.25;
+  color: var(--terminal-white-dim);
+  opacity: 0;
+  transition: opacity 0.55s ease 0.15s;
+  min-height: 1em;
+}
+
+.tool-takes-card--take-shown .tool-takes-take {
+  opacity: 1;
+}
+
+@keyframes toolTakesSilhouettePulse {
+  0%, 100% {
+    opacity: 0.38;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes toolTakesIconReveal {
+  0% { transform: scale(1); }
+  45% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* === LIGHT-THEME OVERRIDES — paper/ink notebook metaphor ===
+ * Dark theme renders icons as white silhouettes against deep black; on
+ * cream paper that becomes invisible. Flip the silhouette to a dark ink
+ * blot, give the cards a tactile parchment edge, and lend the reveal a
+ * "stamped impression" feel via warmer borders and a soft inner shadow. */
+[data-theme="light"] .tool-takes-card {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--terminal-bg-input) 92%, transparent) 0%,
+    color-mix(in srgb, var(--terminal-bg-elevated) 70%, transparent) 100%
+  );
+  border-color: color-mix(in srgb, var(--terminal-orange) 22%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 1px 2px rgba(120, 70, 20, 0.08);
+}
+
+[data-theme="light"] .tool-takes-card--take-shown {
+  border-color: color-mix(in srgb, var(--terminal-orange) 38%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--terminal-bg-input) 96%, transparent) 0%,
+    color-mix(in srgb, var(--terminal-bg-elevated) 82%, transparent) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    0 12px 32px rgba(120, 70, 20, 0.14);
+}
+
+[data-theme="light"] .tool-takes-icon {
+  /* Ink-blot silhouette: keep alpha, force pixels black, then blur.
+   * Dropping invert(1) is the key — white logos become a dark smudge
+   * instead of pure white on cream. */
+  filter: brightness(0) saturate(1) blur(13px);
+  opacity: 0.4;
+}
+
+[data-theme="light"] .tool-takes-card--identity-shown .tool-takes-icon {
+  /* Reveal — stamp the logo in ink. brightness(0) flattens any colored
+   * SVG into a crisp dark glyph that reads on paper. */
+  filter: brightness(0);
+  opacity: 0.92;
+}
+
+[data-theme="light"] .tool-takes-icon__glyph {
+  /* Wildcard `?` glyph in dimmed ink while silhouetted */
+  color: color-mix(in srgb, var(--terminal-white) 35%, transparent);
+}
+
+[data-theme="light"] .tool-takes-card--identity-shown .tool-takes-icon__glyph {
+  /* Wildcard reveal — full phosphor green stamp with soft halo */
+  color: var(--terminal-green);
+  text-shadow: 0 0 12px var(--terminal-green-glow);
+}
+
+[data-theme="light"] .tool-takes-card--wildcard {
+  border-color: color-mix(in srgb, var(--terminal-green) 30%, transparent);
+}
+
+[data-theme="light"] .tool-takes-name {
+  color: var(--terminal-white);
+}
+
+[data-theme="light"] .tool-takes-take {
+  color: var(--terminal-white-dim);
+}
+
+/* Slow the silhouette pulse on light theme — on paper the wiggle reads
+ * as nervous rather than mysterious. */
+[data-theme="light"] .tool-takes-icon {
+  animation-duration: 4.2s;
+}
+
+
+/* === TITLE SLIDE ANIMATIONS === */
+/* CRT-style animations for the waiting/intro screen */
+
+.title-slide {
+  position: relative;
+  z-index: 1;
+}
+
+/* Animated scan lines that drift down (title slide only) */
+.title-slide::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.08) 2px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+  animation: scanlineDrift 8s linear infinite;
+}
+
+@keyframes scanlineDrift {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100dvh; }
+}
+
+/* Pulsing vignette overlay for CRT edge effect */
+.title-slide::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+  pointer-events: none;
+  z-index: 999;
+  animation: vignettePulse 5s ease-in-out infinite;
+}
+
+@keyframes vignettePulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.8; }
+}
+
+/* Phosphor breathing glow on hero title */
+.title-glow {
+  animation:
+    phosphorBreath 4s ease-in-out infinite,
+    subtleFlicker 6s step-end infinite;
+  will-change: text-shadow, filter, opacity;
+}
+
+@keyframes phosphorBreath {
+  0%, 100% {
+    text-shadow:
+      0 0 10px var(--terminal-orange-glow),
+      0 0 20px var(--terminal-orange-glow);
+    filter: brightness(1);
+  }
+  50% {
+    text-shadow:
+      0 0 20px var(--terminal-orange-glow),
+      0 0 40px var(--terminal-orange-glow),
+      0 0 60px var(--terminal-orange-glow);
+    filter: brightness(1.08);
+  }
+}
+
+@keyframes subtleFlicker {
+  0%, 89%, 91%, 93%, 95%, 100% { opacity: 1; }
+  90% { opacity: 0.85; }
+  92% { opacity: 0.9; }
+  94% { opacity: 0.88; }
+}
+
+/* Tagline — between title and author */
+.title-slide .title-tagline {
+  font-size: var(--font-size-h3);
+  color: var(--terminal-green);
+  text-shadow: var(--glow-text-green);
+  margin: var(--space-sm) 0 var(--space-md);
+  animation: subtitlePulse 4s ease-in-out infinite;
+  will-change: opacity, text-shadow;
+}
+
+/* Subtitle soft pulse */
+.title-subtitle {
+  animation: subtitlePulse 4s ease-in-out infinite;
+  will-change: opacity, text-shadow;
+}
+
+@keyframes subtitlePulse {
+  0%, 100% {
+    opacity: 0.7;
+    text-shadow: none;
+  }
+  50% {
+    opacity: 0.9;
+    text-shadow: 0 0 8px rgba(226, 232, 240, 0.3);
+  }
+}
+
+/* === IMAGE SLIDE === */
+/* For slides that display a single image filling available space */
+.image-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--vh-full) - 220px);
+  max-height: calc(var(--vh-full) - 220px);
+  overflow: hidden;
+  padding: 0 var(--space-lg);
+}
+
+/* Titled slides reserve a 130px title band — image must shrink to fit. */
+.slide--titled .image-slide {
+  /* Fill the slide's content-box, which already excludes the 130px
+   * title-band padding-top. Lets the image use all available height
+   * instead of double-subtracting via a vh-based calc. */
+  height: 100%;
+  max-height: 100%;
+}
+
+.image-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--terminal-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .image-slide {
+    height: calc(var(--vh-full) - 180px);
+    max-height: calc(var(--vh-full) - 180px);
+  }
+}
+
+
+/* === VS BATTLE SLIDE === */
+/* Mortal Kombat style fighting game VS screen layout */
+
+.vs-battle-slide {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-items: center;
+  width: 100%;
+  height: calc(var(--vh-full) - 220px);
+  padding: var(--space-md) var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+/* When the slide has a fixed title band, let the battle fill the remaining
+ * height instead of reserving a fixed offset against the full viewport. */
+.slide--titled .vs-battle-slide {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+
+/* Fighter containers */
+.vs-fighter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 100%;
+  max-height: calc(var(--vh-full) - 280px);
+}
+
+.vs-fighter--left {
+  justify-self: start;
+  animation: fighterEnterLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.vs-fighter--right {
+  justify-self: end;
+  animation: fighterEnterRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.15s;
+}
+
+@keyframes fighterEnterLeft {
+  0% {
+    transform: translateX(-100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fighterEnterRight {
+  0% {
+    transform: translateX(100px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Fighter images */
+.vs-fighter-image {
+  max-width: 400px;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Orange glow for Terminal fighter + mirror to face right */
+.vs-fighter--left .vs-fighter-image {
+  transform: scaleX(-1);
+  animation: terminalPulse 2.5s ease-in-out infinite;
+  border: 2px solid rgba(240, 136, 62, 0.5);
+}
+
+/* Blue glow for IDE fighter */
+.vs-fighter--right .vs-fighter-image {
+  animation: idePulse 2.5s ease-in-out infinite;
+  animation-delay: 0.3s;
+  border: 2px solid rgba(121, 192, 255, 0.5);
+}
+
+@keyframes terminalPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(240, 136, 62, 0.4))
+            drop-shadow(0 0 40px rgba(240, 136, 62, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(240, 136, 62, 0.7))
+            drop-shadow(0 0 60px rgba(240, 136, 62, 0.4))
+            drop-shadow(0 0 90px rgba(240, 136, 62, 0.2));
+  }
+}
+
+@keyframes idePulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 20px rgba(121, 192, 255, 0.4))
+            drop-shadow(0 0 40px rgba(121, 192, 255, 0.2));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(121, 192, 255, 0.7))
+            drop-shadow(0 0 60px rgba(121, 192, 255, 0.4))
+            drop-shadow(0 0 90px rgba(121, 192, 255, 0.2));
+  }
+}
+
+/* Fighter name plates */
+.vs-fighter-name {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-h3);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  background: linear-gradient(180deg, rgba(10, 14, 20, 0.9) 0%, rgba(10, 14, 20, 0.7) 100%);
+  border: 2px solid;
+  clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
+}
+
+.vs-fighter--left .vs-fighter-name {
+  color: var(--terminal-orange);
+  border-color: var(--terminal-orange);
+  text-shadow: 0 0 20px rgba(240, 136, 62, 0.8);
+}
+
+.vs-fighter--right .vs-fighter-name {
+  color: var(--terminal-blue);
+  border-color: var(--terminal-blue);
+  text-shadow: 0 0 20px rgba(121, 192, 255, 0.8);
+}
+
+/* Center content */
+.vs-center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  z-index: 3;
+  padding: 0 var(--space-md);
+  height: 100%;
+}
+
+/* VS Badge */
+.vs-badge {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-h2);
+  font-weight: 900;
+  color: var(--terminal-white);
+  text-shadow:
+    0 0 40px rgba(255, 255, 255, 0.9),
+    0 0 80px rgba(240, 136, 62, 0.6),
+    0 0 120px rgba(121, 192, 255, 0.4);
+  letter-spacing: 0.3em;
+  margin-bottom: var(--space-sm);
+  position: relative;
+  animation: vsPulse 1.5s ease-in-out infinite;
+}
+
+.vs-badge::before,
+.vs-badge::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--terminal-white), transparent);
+}
+
+.vs-badge::before {
+  right: 100%;
+  margin-right: var(--space-sm);
+}
+
+.vs-badge::after {
+  left: 100%;
+  margin-left: var(--space-sm);
+}
+
+@keyframes vsPulse {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 40px rgba(255, 255, 255, 0.9),
+      0 0 80px rgba(240, 136, 62, 0.6),
+      0 0 120px rgba(121, 192, 255, 0.4);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow:
+      0 0 60px rgba(255, 255, 255, 1),
+      0 0 100px rgba(240, 136, 62, 0.8),
+      0 0 150px rgba(121, 192, 255, 0.6);
+  }
+}
+
+/* Disclaimer content (floating, no box) */
+.vs-disclaimer-content {
+  font-size: var(--slide-text-compact);
+  max-width: 100%;
+  text-align: left;
+  padding: var(--space-sm);
+}
+
+/* === LIGHT-THEME OVERRIDES — VS battle slide ===
+ * Aesthetic: vintage 1950s boxing-fight poster on yellowed paper. The
+ * dark portraits stay but are sepia-tinted so they read as fight-card
+ * photos instead of punched-out holes. The VS badge becomes a stamped
+ * ink mark with a serif-y poster weight; the name plates drop their
+ * dark UI background entirely and become bold ink "fighter credits"
+ * underlined with the deck's amber accent. Cards tilt -1.5° / +1.5°
+ * to break the grid and add vintage-poster energy. */
+
+/* Fighter portrait — sepia/duotone tint + paper-bordered frame +
+ * slight rotation so the photo card feels glued to the page. */
+[data-theme="light"] .vs-fighter-image {
+  filter: sepia(0.32) saturate(0.85) contrast(1.05) brightness(0.95);
+  border: none;
+  padding: var(--space-sm);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--terminal-bg-input) 96%, transparent) 0%,
+    color-mix(in srgb, var(--terminal-bg-elevated) 86%, transparent) 100%
+  );
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--terminal-orange) 24%, transparent),
+    0 18px 42px rgba(120, 70, 20, 0.22),
+    0 2px 4px rgba(120, 70, 20, 0.18);
+}
+
+[data-theme="light"] .vs-fighter--left .vs-fighter-image {
+  animation: terminalPulseLight 3.4s ease-in-out infinite;
+  transform: scaleX(-1) rotate(-1.5deg);
+}
+
+[data-theme="light"] .vs-fighter--right .vs-fighter-image {
+  animation: idePulseLight 3.4s ease-in-out infinite;
+  animation-delay: 0.4s;
+  transform: rotate(1.5deg);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--terminal-blue) 28%, transparent),
+    0 18px 42px rgba(20, 50, 120, 0.18),
+    0 2px 4px rgba(20, 50, 120, 0.16);
+}
+
+/* Softer drop-shadow pulse on light theme — neon glow doesn't read on
+ * cream, so we lean into a subtle warm/cool breathing instead. */
+@keyframes terminalPulseLight {
+  0%, 100% {
+    filter: sepia(0.32) saturate(0.85) contrast(1.05) brightness(0.95)
+            drop-shadow(0 0 0 rgba(184, 85, 28, 0));
+  }
+  50% {
+    filter: sepia(0.32) saturate(0.85) contrast(1.05) brightness(0.95)
+            drop-shadow(0 0 18px rgba(184, 85, 28, 0.35));
+  }
+}
+
+@keyframes idePulseLight {
+  0%, 100% {
+    filter: sepia(0.32) saturate(0.85) contrast(1.05) brightness(0.95)
+            drop-shadow(0 0 0 rgba(30, 92, 184, 0));
+  }
+  50% {
+    filter: sepia(0.32) saturate(0.85) contrast(1.05) brightness(0.95)
+            drop-shadow(0 0 18px rgba(30, 92, 184, 0.32));
+  }
+}
+
+/* Name plates — strip the dark UI card and replace with bold stamped
+ * ink typography. The orange/blue color still cues fighter identity. */
+[data-theme="light"] .vs-fighter-name {
+  background: none;
+  border: none;
+  clip-path: none;
+  padding: var(--space-sm) 0 var(--space-xs) 0;
+  margin-top: var(--space-md);
+  font-weight: 900;
+  letter-spacing: 0.32em;
+  font-size: var(--font-size-h3);
+  position: relative;
+}
+
+[data-theme="light"] .vs-fighter-name::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+[data-theme="light"] .vs-fighter--left .vs-fighter-name {
+  color: var(--terminal-orange);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 6px rgba(184, 85, 28, 0.22);
+}
+
+[data-theme="light"] .vs-fighter--right .vs-fighter-name {
+  color: var(--terminal-blue);
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55),
+    0 2px 6px rgba(30, 92, 184, 0.22);
+}
+
+/* The VS badge — central stamped ink mark in fight-poster scale. */
+[data-theme="light"] .vs-badge {
+  color: var(--terminal-white);
+  font-size: var(--font-size-h2);
+  font-weight: 900;
+  letter-spacing: 0.42em;
+  /* Subtle warm/cool stamp glow + a 1px white relief so the ink "lifts" */
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.6),
+    0 0 22px color-mix(in srgb, var(--terminal-orange) 35%, transparent),
+    0 0 44px color-mix(in srgb, var(--terminal-blue) 22%, transparent);
+}
+
+[data-theme="light"] .vs-badge::before,
+[data-theme="light"] .vs-badge::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--terminal-white) 70%, transparent) 35%,
+    color-mix(in srgb, var(--terminal-white) 70%, transparent) 65%,
+    transparent
+  );
+  height: 2px;
+  width: 80px;
+}
+
+@keyframes vsPulseLight {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6),
+      0 0 22px color-mix(in srgb, var(--terminal-orange) 35%, transparent),
+      0 0 44px color-mix(in srgb, var(--terminal-blue) 22%, transparent);
+  }
+  50% {
+    transform: scale(1.04);
+    text-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.7),
+      0 0 30px color-mix(in srgb, var(--terminal-orange) 55%, transparent),
+      0 0 60px color-mix(in srgb, var(--terminal-blue) 38%, transparent);
+  }
+}
+
+[data-theme="light"] .vs-badge {
+  animation-name: vsPulseLight;
+}
+
+
+/* Responsive adjustments for VS battle slide */
+@media (max-width: 1200px) {
+  .vs-battle-slide {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .vs-fighter {
+    flex-direction: row;
+    gap: var(--space-md);
+    max-height: none;
+  }
+
+  .vs-fighter--left {
+    justify-self: center;
+    order: 1;
+  }
+
+  .vs-center-content {
+    order: 2;
+  }
+
+  .vs-fighter--right {
+    justify-self: center;
+    order: 3;
+  }
+
+  .vs-fighter-image {
+    max-width: 180px;
+    max-height: 220px;
+  }
+
+  .vs-fighter-name {
+    font-size: var(--font-size-small);
+  }
+
+  .vs-badge {
+    font-size: var(--font-size-h3);
+    margin-bottom: var(--space-md);
+  }
+
+  .vs-disclaimer-content {
+    font-size: var(--font-size-small);
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .vs-fighter-image {
+    max-width: 140px;
+    max-height: 170px;
+  }
+
+  .vs-badge {
+    font-size: var(--font-size-body);
+  }
+
+  .vs-disclaimer-content {
+    font-size: var(--font-size-small);
+  }
+}
+
+/* === TIMELINE SLIDE V2 - GIT LOG STYLE === */
+/* Two-column layout: time markers on left, text+image on right */
+
+.timeline-slide-v2 {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(var(--vh-full) - 220px);
+  max-height: calc(var(--vh-full) - 220px);
+  padding: 0 var(--space-lg);
+  overflow: hidden;
+}
+
+.timeline-title-v2 {
+  text-align: left;
+  margin-bottom: var(--space-lg);
+  flex-shrink: 0;
+}
+
+.timeline-layout {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-2xl);
+  flex: 1;
+  min-height: 0;
+}
+
+/* Git log column - time markers only */
+.timeline-log {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 200px;
+}
+
+.timeline-log__header {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-small);
+  margin-bottom: var(--space-md);
+  color: var(--terminal-white-muted);
+}
+
+.timeline-log__prompt {
+  color: var(--terminal-green);
+  font-weight: bold;
+  text-shadow: var(--glow-text-green);
+  margin-right: var(--space-sm);
+}
+
+.timeline-log__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.timeline-log__item {
+  padding: var(--space-sm) var(--space-md);
+  border-left: 3px solid var(--terminal-border);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0.5;
+}
+
+.timeline-log__item--past {
+  opacity: 0.35;
+}
+
+.timeline-log__item--active {
+  opacity: 1;
+  border-left-color: var(--terminal-orange);
+  background: linear-gradient(90deg, rgba(240, 136, 62, 0.12) 0%, transparent 100%);
+}
+
+.timeline-log__item--emphasis.timeline-log__item--active {
+  border-left-color: var(--terminal-green);
+  background: linear-gradient(90deg, rgba(126, 231, 135, 0.12) 0%, transparent 100%);
+}
+
+.timeline-log__time {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-body);
+  font-weight: 700;
+  color: var(--terminal-orange);
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.timeline-log__item--active .timeline-log__time {
+  text-shadow: var(--glow-text-orange);
+}
+
+.timeline-log__time--emphasis {
+  color: var(--terminal-green);
+}
+
+.timeline-log__item--active .timeline-log__time--emphasis {
+  text-shadow: var(--glow-text-green);
+}
+
+/* Hint box in left column - compact tooltip style */
+.timeline-hint-box {
+  margin-top: auto;
+  align-self: flex-start;
+  background: var(--terminal-bg-elevated);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--input-border-radius);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.timeline-hint-box__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+.timeline-hint-box__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--terminal-orange);
+  color: var(--terminal-bg);
+  font-size: var(--font-size-small);
+  font-weight: bold;
+  font-family: var(--font-mono);
+}
+
+.timeline-hint-box__title {
+  color: var(--terminal-orange);
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-shadow: var(--glow-text-orange);
+}
+
+.timeline-hint-box__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.timeline-hint-box__list li {
+  font-size: var(--font-size-small);
+  color: var(--terminal-white-dim);
+  font-family: var(--font-mono);
+  padding-left: var(--space-md);
+  position: relative;
+}
+
+.timeline-hint-box__list li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--terminal-green);
+  font-size: var(--font-size-small);
+}
+
+.timeline-hint-box__list code {
+  background: var(--terminal-bg-secondary);
+  padding: var(--space-xs) var(--space-xs);
+  border-radius: 3px;
+  color: var(--terminal-cyan);
+  font-size: 0.85em;
+  border: 1px solid var(--terminal-border);
+}
+
+/* Right panel - text + image */
+.timeline-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.timeline-panel__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  width: 100%;
+  height: 100%;
+  animation: panelContentIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes panelContentIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.timeline-panel__text {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-h3);
+  color: var(--terminal-white);
+  line-height: 1.4;
+  text-align: center;
+  max-width: 100%;
+}
+
+.timeline-panel__text--emphasis {
+  font-size: var(--font-size-h3);
+  font-weight: 600;
+  color: var(--terminal-green);
+  text-shadow: var(--glow-text-green);
+}
+
+.timeline-panel__image {
+  max-width: 80%;
+  max-height: 60%;
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 2px solid var(--terminal-border);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(240, 136, 62, 0.1);
+}
+
+.timeline-panel__image--zoom-anim {
+  transform-origin: top center;
+  animation: timeline-zoom-to-top 2s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards;
+}
+
+@keyframes timeline-zoom-to-top {
+  0%   { transform: scale(1); }
+  100% { transform: scale(3); }
+}
+
+/* Zoom into the top, then scroll down to reveal the lower part of the shot. */
+.timeline-panel__image--zoom-down-anim {
+  transform-origin: top center;
+  animation: timeline-zoom-scroll-down 3s cubic-bezier(0.4, 0, 0.2, 1) 0.6s forwards;
+}
+
+@keyframes timeline-zoom-scroll-down {
+  0%   { transform: scale(1)   translateY(0); }
+  40%  { transform: scale(2.2) translateY(0); }
+  100% { transform: scale(2.2) translateY(-28%); }
+}
+
+/* Emphasis panel state (final slide) */
+.timeline-panel__emphasis {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}
+
+.timeline-panel__emphasis-icon {
+  font-size: var(--font-size-h1);
+  color: var(--terminal-green);
+  text-shadow:
+    0 0 30px var(--terminal-green-glow),
+    0 0 60px var(--terminal-green-glow);
+  animation: emphasisPulse 2s ease-in-out infinite;
+}
+
+@keyframes emphasisPulse {
+  0%, 100% {
+    transform: scale(1);
+    text-shadow:
+      0 0 30px var(--terminal-green-glow),
+      0 0 60px var(--terminal-green-glow);
+  }
+  50% {
+    transform: scale(1.05);
+    text-shadow:
+      0 0 40px var(--terminal-green-glow),
+      0 0 80px var(--terminal-green-glow),
+      0 0 120px var(--terminal-green-glow);
+  }
+}
+
+.timeline-panel__emphasis-subtext {
+  font-family: var(--font-mono);
+  font-size: var(--slide-text-compact);
+  color: var(--terminal-green);
+  text-shadow: var(--glow-text-green);
+  opacity: 0.7;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .timeline-layout {
+    gap: var(--space-xl);
+  }
+
+  .timeline-log {
+    min-width: 180px;
+  }
+
+  .timeline-log__time {
+    font-size: var(--font-size-small);
+  }
+
+  .timeline-panel__text {
+    font-size: var(--font-size-body);
+  }
+}
+
+@media (max-width: 900px) {
+  .timeline-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: var(--space-lg);
+  }
+
+  .timeline-log {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    min-width: unset;
+  }
+
+  .timeline-log__header {
+    width: 100%;
+  }
+
+  .timeline-log__list {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+  }
+
+  .timeline-log__item {
+    padding: var(--space-xs) var(--space-sm);
+    border-left: none;
+    border-bottom: 2px solid var(--terminal-border);
+  }
+
+  .timeline-log__item--active {
+    border-bottom-color: var(--terminal-orange);
+    background: linear-gradient(180deg, transparent 0%, rgba(240, 136, 62, 0.12) 100%);
+  }
+
+  .timeline-log__time {
+    font-size: var(--font-size-small);
+  }
+
+  .timeline-hint-box {
+    display: none;
+  }
+
+  .timeline-panel__text {
+    font-size: var(--slide-text-compact);
+  }
+
+  .timeline-panel__emphasis-icon {
+    font-size: var(--font-size-h3);
+  }
+}
+
+@media (max-width: 768px) {
+  .timeline-slide-v2 {
+    height: calc(var(--vh-full) - 180px);
+    max-height: calc(var(--vh-full) - 180px);
+  }
+
+  .timeline-panel__text--emphasis {
+    font-size: var(--font-size-body);
+  }
+}
+
+
+/* === SLIDE WITH BLURRED BACKGROUND === */
+.bg-image-slide {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: var(--vh-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Center the card in the clear band between the fixed top-left title
+   * and the bottom input bar so it never collides with either. */
+  padding-top: 150px;
+  padding-bottom: var(--space-3xl);
+  box-sizing: border-box;
+  z-index: 0;
+}
+
+.bg-image-slide__background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.7;
+  z-index: 0;
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.bg-image-slide__content {
+  position: relative;
+  z-index: 1;
+  max-width: 900px;
+  max-height: calc(var(--vh-full) - 260px);
+  overflow-y: auto;
+  padding: var(--space-xl);
+  background: rgba(10, 14, 20, 0.85);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--terminal-border);
+  text-align: left;
+}
+
+/* Before the first reveal the card has no bullets — don't show an empty box. */
+.bg-image-slide__content:empty {
+  display: none;
+}
+
+/* === CONTEXT ADVICE CARD ===
+ * Floating card on top of the chalkboard background that shows ONE
+ * advice at a time. Each reveal swaps the body via React's `key` so the
+ * fade-in animation re-runs. The step counter (`[N / 6]`) anchors the
+ * audience in the sequence; the body text is large enough to be read
+ * from the back of a conference room. */
+.bg-image-slide.context-advice-slide {
+  align-items: center;
+  padding-top: var(--space-2xl); /* clear the fixed-top-left title band */
+  padding-bottom: var(--space-3xl); /* clear the bottom input bar */
+}
+
+.context-advice-slide .context-advice-card {
+  position: relative;
+  z-index: 1;
+  width: min(960px, 92%);
+  padding: var(--space-2xl) var(--space-3xl);
+  background: rgba(10, 14, 20, 0.88);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--input-border-radius);
+  border: 1px solid color-mix(in srgb, var(--terminal-orange) 32%, transparent);
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+  text-align: left;
+}
+
+.context-advice-card__body {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-h3);
+  line-height: 1.35;
+  color: var(--terminal-white);
+  animation: contextAdviceIn 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 4em;
+}
+
+@keyframes contextAdviceIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* Light theme — paper card on chalkboard photo. Keep the warm
+ * parchment edge consistent with the rest of the light deck. */
+[data-theme="light"] .context-advice-slide .context-advice-card {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--terminal-bg-input) 94%, transparent) 0%,
+    color-mix(in srgb, var(--terminal-bg-elevated) 78%, transparent) 100%
+  );
+  border-color: color-mix(in srgb, var(--terminal-orange) 36%, transparent);
+  box-shadow:
+    0 24px 64px rgba(120, 70, 20, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .context-advice-card__body {
+  color: var(--terminal-white);
+}
+
+
+/* === MOBILE: SLIDE LAYOUT REFINEMENTS === */
+@media (max-width: 480px) {
+  .slide-container {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  /* VS battle slide */
+  .vs-fighter-image {
+    max-width: 100px;
+    max-height: 130px;
+  }
+
+  .vs-badge {
+    font-size: var(--slide-text-compact);
+    margin-bottom: var(--space-sm);
+  }
+
+  .vs-fighter-name {
+    font-size: var(--font-size-small);
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .vs-disclaimer-content {
+    font-size: var(--font-size-small);
+  }
+
+  /* Timeline slide */
+  .timeline-slide-v2 {
+    padding: 0 var(--space-sm);
+  }
+
+  .timeline-log__time {
+    font-size: var(--font-size-small);
+  }
+
+  .timeline-panel__text {
+    font-size: var(--font-size-small);
+  }
+
+  .timeline-panel__text--emphasis {
+    font-size: var(--slide-text-compact);
+  }
+
+  .timeline-panel__emphasis-icon {
+    font-size: var(--font-size-h3);
+  }
+
+  /* Bio slide */
+  .bio-slide-image {
+    max-width: 200px;
+  }
+
+  /* Background image slide */
+  .bg-image-slide__content {
+    padding: var(--space-md);
+    margin: 0 var(--space-sm);
+  }
+
+  /* Code blocks */
+  .code-block pre {
+    font-size: var(--font-size-code) !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Slide items */
+  .slide-item {
+    grid-template-columns: 1rem 1fr;
+    gap: var(--space-sm);
+  }
+
+  .slide-item--compact {
+    gap: var(--space-sm);
+  }
+
+  .slide-item--dense {
+    grid-template-columns: 1rem 1fr;
+    gap: var(--space-sm);
+  }
+}
+
+
+
+/* === AI INNOVATOR CURVE — single-column framed panel for the bell curve =====
+   Ported from dou-days. Wrapper fills slide height so the framed panel
+   claims the remaining vertical space below the heading. */
+/* AIInnovatorCurveSlide styles live inline in the component since the
+ * corridor + bell-curve overlay are tightly coupled. */
+
+@keyframes skillMarketplaceMediaIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+@keyframes metaSkillsPanelIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* === INDUSTRY PATTERNS — two-column body with framed panel + status mirror ====
+   Ported from dou-days. Bullets on left, framed image / status mirror on right. */
+.industry-patterns-body {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  gap: var(--space-xl);
+  min-height: 0;
+  text-align: left;
+}
+
+.industry-patterns-bullets {
+  flex: 0 0 48%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-xs);
+  min-width: 0;
+  --slide-line-height-normal: 1.2;
+}
+
+.industry-patterns-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--terminal-bg) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  box-shadow:
+    0 18px 48px color-mix(in srgb, var(--terminal-bg) 60%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--terminal-white) 10%, transparent);
+  font-family: var(--font-mono);
+  animation: metaSkillsPanelIn 480ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.industry-patterns-panel__chrome {
+  padding: var(--space-sm) var(--space-md);
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--terminal-green) 60%, transparent);
+  flex-shrink: 0;
+}
+.industry-patterns-panel__chrome--top    { border-bottom: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent); }
+.industry-patterns-panel__chrome--bottom {
+  border-top: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent);
+  color: color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  letter-spacing: 0.12em;
+}
+
+.industry-patterns-panel__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.industry-patterns-panel__viewport--image {
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+}
+
+.industry-patterns-panel__viewport--image img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  animation: skillMarketplaceMediaIn 360ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.industry-patterns-image {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  animation: metaSkillsPanelIn 480ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.industry-patterns-image img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
+  animation: skillMarketplaceMediaIn 360ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+@keyframes industryCalendarTour {
+  0%   { transform: scale(1);   transform-origin: 50% 50%; }
+  6%   { transform: scale(2);   transform-origin: 50% 24%; }
+  20%  { transform: scale(2);   transform-origin: 50% 36%; }
+  34%  { transform: scale(2);   transform-origin: 50% 48%; }
+  48%  { transform: scale(2);   transform-origin: 50% 62%; }
+  62%  { transform: scale(2);   transform-origin: 50% 76%; }
+  76%  { transform: scale(2);   transform-origin: 50% 92%; }
+  92%  { transform: scale(1);   transform-origin: 50% 50%; }
+  100% { transform: scale(1);   transform-origin: 50% 50%; }
+}
+
+.industry-patterns-image--zoom img {
+  animation:
+    skillMarketplaceMediaIn 360ms cubic-bezier(0.19, 1, 0.22, 1) both,
+    industryCalendarTour 32s ease-in-out 0.6s infinite;
+}
+
+.industry-patterns-status {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  font-size: var(--font-size-code);
+}
+
+.industry-patterns-status__header {
+  background: color-mix(in srgb, var(--terminal-orange) 12%, transparent);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--terminal-orange);
+  font-family: var(--font-mono);
+  border-bottom: 1px solid color-mix(in srgb, var(--terminal-orange) 35%, transparent);
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.industry-patterns-status__header-meta { opacity: 0.55; }
+
+.industry-patterns-status__body {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.industry-patterns-status__loading {
+  color: var(--terminal-white);
+  opacity: 0.4;
+  font-family: var(--font-mono);
+}
+
+.industry-patterns-status__footer {
+  border-top: 1px solid color-mix(in srgb, var(--terminal-orange) 15%, transparent);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  gap: var(--space-md);
+  flex-shrink: 0;
+}
+
+.industry-patterns-status__legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--terminal-white-muted);
+  font-family: var(--font-mono);
+}
+
+.industry-patterns-status__legend-swatch {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+/* === FINAL SLIDE ===
+   Closing slide: takeaway bullets + LinkedIn QR. Ported from dou-days. */
+.slide h2.final-slide__heading {
+  color: var(--terminal-purple);
+}
+
+.final-slide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+  width: 100%;
+}
+
+.final-slide__bullets {
+  flex: 1;
+  max-width: 1000px;
+  text-align: left;
+}
+
+.final-slide__bullets .slide-item {
+  margin-bottom: var(--space-sm);
+}
+
+.final-slide__qr {
+  flex-shrink: 0;
+  max-width: 600px;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 2px solid color-mix(in srgb, var(--terminal-purple) 55%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--terminal-bg) 70%, transparent);
+  opacity: 0;
+  animation: slideItemFadeIn 0.5s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+.final-slide__contact {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-md);
+  max-width: 600px;
+}
+
+.final-slide__contact .slide-item {
+  margin-bottom: 0;
+  text-align: left;
+}
+
+.final-slide__contact .final-slide__qr {
+  max-width: 100%;
+}
+
+.final-slide__arrow {
+  color: var(--terminal-cyan);
+}
+
+
+/* === AGENT TRACES SLIDE — uploadSession code panel ===
+ * Right-side code panel that pairs with the "upload .jsonl logs to S3"
+ * bullet on stage 0. Drops away when stages 1–3 reveal the
+ * "agents review agents' sessions" follow-up bullets in a single column. */
+
+.agent-traces-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--terminal-bg) 60%, transparent);
+  border: 1px solid color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  font-family: var(--font-mono);
+  animation: panelContentIn 480ms cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.agent-traces-panel__chrome {
+  padding: 10px 18px;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--terminal-green) 60%, transparent);
+  flex-shrink: 0;
+}
+.agent-traces-panel__chrome--top    { border-bottom: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent); }
+.agent-traces-panel__chrome--bottom {
+  border-top: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent);
+  color: color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  letter-spacing: 0.12em;
+}
+
+.agent-traces-panel__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+}
+
+.agent-traces-panel__viewport .code-block {
+  flex: 1 1 auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.agent-traces-panel__viewport .code-block-header { display: none; }
+.agent-traces-panel__viewport .code-block pre {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  height: 100%;
+}
+
+/* Image variant: when the panel viewport hosts an <img> (e.g. a screenshot)
+ * instead of a code block, fill the frame and centre. */
+.agent-traces-panel__viewport--image {
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.agent-traces-panel__viewport--image img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* =============================================================================
+ * PORTED FROM PRAGMATIC-VIBE-CLAUDING-UA
+ *
+ * Slide-specific layouts for slides that don't have an ai-first counterpart.
+ * Tokens, naming, and conventions are aligned with the ai-first design-system
+ * (use --space-*, --terminal-*, --input-border-radius, --transition-normal).
+ * ============================================================================= */
+
+/* === BILLION-DOLLAR SLIDE (tweet + gif overlay) ============================ */
+.overlay-slide {
+  position: relative;
+}
+
+.overlay-gif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 95%;
+  max-height: 95%;
+  border: none !important;
+  box-shadow: none !important;
+  animation: billionDollarGifLand 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes billionDollarGifLand {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.4);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(2);
+    filter: blur(0);
+  }
+}
+
+/* === THEORY SLIDE (h2 + image container) =================================== */
+.theory-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--vh-full) - 340px);
+  max-height: calc(var(--vh-full) - 340px);
+  overflow: hidden;
+  margin-top: var(--space-lg);
+}
+
+.theory-image-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--terminal-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .theory-image-container {
+    height: calc(var(--vh-full) - 280px);
+    max-height: calc(var(--vh-full) - 280px);
+  }
+}
+
+/* === JUNIOR ENGINEER SLIDE (three-column: Slack | content | Claude Code) === */
+/* Build-up: text-only, vertically centered, bullets left-aligned. */
+.junior-engineer-text {
+  height: 100%;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  text-align: left;
+  padding-bottom: var(--space-xl);
+}
+
+/* Final reveal: punchline above the single screenshot, centered. */
+/* Final reveal: two columns — punchline on the left, screenshot on the right. */
+.junior-engineer-final {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3xl);
+  padding-bottom: var(--space-xl);
+}
+
+.junior-engineer-punchline {
+  flex: 0 1 440px;
+  text-align: left;
+  font-size: var(--font-size-h3);
+  line-height: 1.35;
+}
+
+/* Single combined screenshot (Slack + Claude Code, same request) — the hero. */
+.junior-engineer-combined {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 840px;
+  max-height: calc(var(--vh-full) - 250px);
+  object-fit: contain;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--terminal-border);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 1200px) {
+  .junior-engineer-final {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+  .junior-engineer-punchline {
+    flex: none;
+    text-align: center;
+    font-size: var(--slide-text-normal);
+  }
+  .junior-engineer-combined {
+    max-width: 100%;
+  }
+}
+
+/* === MCP SLIDE (content sandwiched between two side images) ================ */
+.mcp-slide {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-lg);
+  width: 100%;
+  padding: 0 var(--space-md);
+  height: calc(var(--vh-full) - 180px);
+}
+
+.mcp-slide-image-left,
+.mcp-slide-image-right {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+  height: calc(var(--vh-full) - 200px);
+  object-fit: cover;
+  object-position: center;
+  border-radius: var(--input-border-radius);
+  border: 1px solid var(--terminal-border);
+  opacity: 0.85;
+  transition: opacity var(--transition-normal), transform var(--transition-normal);
+}
+
+.mcp-slide-image-left:hover,
+.mcp-slide-image-right:hover {
+  opacity: 1;
+  transform: scale(1.02);
+}
+
+.mcp-slide-image-left {
+  animation: mcpSlideInFromLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.mcp-slide-image-right {
+  animation: mcpSlideInFromRight 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+@keyframes mcpSlideInFromLeft {
+  0%   { transform: translateX(-30px); opacity: 0; }
+  100% { transform: translateX(0);     opacity: 0.85; }
+}
+
+@keyframes mcpSlideInFromRight {
+  0%   { transform: translateX(30px); opacity: 0; }
+  100% { transform: translateX(0);    opacity: 0.85; }
+}
+
+.mcp-slide-content {
+  flex-shrink: 0;
+  width: 900px;
+  max-width: 900px;
+  text-align: left;
+}
+
+@media (max-width: 1400px) {
+  .mcp-slide-image-left,
+  .mcp-slide-image-right {
+    display: none;
+  }
+  .mcp-slide {
+    padding: 0;
+  }
+}
+
+/* === STAR WARS CRAWL SLIDES ===
+ * Full-bleed perspective text crawl. The .slide background prop supplies the
+ * space image; .sw-scene fills the available slide area without absolute
+ * positioning (so non-titled slides still get correct height from their
+ * natural content flow). The crawl is perspective-projected with rotateX so
+ * text recedes toward the horizon. scrollOffset (translateY) shifts how far
+ * the crawl has already scrolled — higher = text has moved further away. */
+
+.sw-scene {
+  position: relative;
+  width: 100%;
+  /* Fill slide height: full viewport minus the bottom bar and container padding */
+  height: calc(var(--vh-full) - var(--input-bar-height) - var(--space-lg) * 2);
+  overflow: hidden;
+  /* Force dark-theme yellow regardless of light/dark theme toggle —
+   * the space background is always dark so contrast rules are static. */
+  --terminal-yellow: #ffd166;
+}
+
+/* Perspective container — vanishing point near the top edge */
+.sw-crawl-wrapper {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  perspective: 520px;
+  perspective-origin: 50% 12%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+/* The tilted text strip — bottom-anchored, text recedes upward into horizon */
+.sw-crawl {
+  width: 64%;
+  text-align: justify;
+  font-family: var(--font-mono);
+  transform-origin: 50% 100%;
+  /* inline transform: rotateX(25deg) translateY(-Xpx) set per-slide */
+  padding-bottom: 6%;
+}
+
+/* Gradient fade: text appears out of nothing at the bottom */
+.sw-fade-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 22%;
+  background: linear-gradient(to top, #000008 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Gradient fade: text disappears toward the horizon at the top */
+.sw-fade-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32%;
+  background: linear-gradient(to bottom, #000008 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Episode title block — placed at the top of the crawl (furthest/smallest) */
+.sw-title-block {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.sw-episode {
+  font-size: var(--font-size-body);
+  color: var(--terminal-yellow);
+  letter-spacing: 0.35em;
+  opacity: 0.65;
+  margin-bottom: var(--space-xs);
+  font-weight: 400;
+}
+
+.sw-main-title {
+  font-size: var(--font-size-h1);
+  color: var(--terminal-yellow);
+  letter-spacing: 0.1em;
+  font-weight: 700;
+  margin: 0;
+  text-shadow:
+    0 0 40px rgba(255, 209, 102, 0.55),
+    0 0 80px rgba(255, 209, 102, 0.2);
+}
+
+/* Body paragraphs */
+.sw-para {
+  font-size: var(--font-size-body);
+  line-height: 1.8;
+  margin-bottom: 1.5em;
+  font-style: normal;
+}
+
+/* Dim paragraphs — exist in the story but are not the focal moment */
+.sw-para--dim {
+  color: var(--terminal-yellow);
+  opacity: 0.22;
+}
+
+/* THE paragraph — bright, glowing, impossible to miss */
+.sw-para--highlight {
+  color: var(--terminal-yellow);
+  opacity: 1;
+  font-weight: 700;
+  text-shadow:
+    0 0 24px rgba(255, 209, 102, 0.65),
+    0 0 48px rgba(255, 209, 102, 0.28);
+  letter-spacing: 0.01em;
+}
+
+
+/* === FRONTMATTER FIELD MAP SLIDE === */
+/* Taxonomy of SKILL.md frontmatter fields: one row per concern group —
+ * small-caps label on the left, color-coded field chips wrapping right.
+ * Groups appear per reveal stage via the shared slideItemFadeIn keyframe. */
+
+/* Two columns: left frames the concern group and teaches the focused field;
+ * right shows an imaginary skill's full frontmatter with the active line lit
+ * in the group accent (--fm-accent) and every other line dimmed. */
+.fm-split {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xl);
+  width: 100%;
+  max-width: 1560px;
+  margin: 0 auto;
+  /* Fill the space below the title band rather than the full slide height
+   * (the parent reserves 180px on top), so vertical centering stays true. */
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.fm-left {
+  flex: 0 1 42%;
+  max-width: 600px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  text-align: left;
+}
+
+/* Top — field name + one-line description */
+.fm-left__head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideItemFadeIn var(--transition-normal) var(--ease) both;
+}
+
+.fm-left__name {
+  color: var(--fm-accent);
+  font-size: clamp(1.6rem, 2.3vw, 2.3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--fm-accent) 38%, transparent);
+}
+
+.fm-left__name::before {
+  content: '▸ ';
+  color: var(--fm-accent);
+}
+
+.fm-left__hint {
+  color: var(--terminal-white);
+  font-size: clamp(1.1rem, 1.4vw, 1.4rem);
+  line-height: 1.4;
+}
+
+/* Bottom — best-practice callout: accent rail + a bulleted list of writing
+ * tips (no header). Sized generously to fill the left column. */
+.fm-left__tip {
+  list-style: none;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: var(--space-md) var(--space-lg);
+  border-left: 4px solid var(--fm-accent);
+  background: color-mix(in srgb, var(--fm-accent) 9%, transparent);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  animation: slideItemFadeIn var(--transition-normal) var(--ease) both;
+}
+
+.fm-left__tip-item {
+  position: relative;
+  padding-left: 1.4em;
+  color: var(--terminal-white);
+  font-size: clamp(1.05rem, 1.35vw, 1.35rem);
+  line-height: 1.45;
+  /* Never let a long unbreakable token (env vars, globs) spill past the box. */
+  overflow-wrap: anywhere;
+}
+
+.fm-left__tip-item::before {
+  content: '▹';
+  position: absolute;
+  left: 0;
+  color: var(--fm-accent);
+}
+
+.fm-right {
+  flex: 0 1 56%;
+  max-width: 780px;
+  min-width: 0;
+}
+
+/* Terminal-window frame, mirroring .code-block chrome. */
+.fm-spec {
+  text-align: left;
+  border-radius: var(--input-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  background: var(--terminal-bg-secondary);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  animation: slideItemFadeIn var(--transition-normal) var(--ease) both;
+}
+
+.fm-spec__head {
+  background: var(--terminal-bg-elevated);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--terminal-border);
+}
+
+.fm-spec__dots {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.fm-spec__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.fm-spec__dot--red { background: #ff5f56; }
+.fm-spec__dot--yellow { background: #ffbd2e; }
+.fm-spec__dot--green { background: #27c93f; }
+
+.fm-spec__filename {
+  flex: 1;
+  color: var(--terminal-white-muted);
+  font-size: var(--font-size-small);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.fm-spec__body {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-md) 0;
+}
+
+.fm-spec__line {
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 1.3vw, 1.35rem);
+  line-height: 1.85;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 var(--space-lg);
+  color: var(--terminal-white-muted);
+  opacity: 0.32;
+  transition: opacity var(--transition-normal) var(--ease),
+    color var(--transition-normal) var(--ease),
+    background var(--transition-normal) var(--ease);
+}
+
+/* Focused field's line: full opacity, accent-colored, glowing, with an
+ * accent rail down its left edge so the audience tracks the cursor. */
+.fm-spec__line--active {
+  opacity: 1;
+  color: var(--fm-accent);
+  background: color-mix(in srgb, var(--fm-accent) 12%, transparent);
+  box-shadow: inset 3px 0 0 var(--fm-accent);
+  text-shadow: 0 0 12px color-mix(in srgb, var(--fm-accent) 32%, transparent);
+  /* The focus line is the one to read in full — let it wrap instead of clip. */
+  white-space: pre-wrap;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+
+/* === INSTRUCTIONS VS KNOWLEDGE SLIDE === */
+/* Two columns built in sequence: the green "instructions" facts reveal one
+ * by one, then the orange "knowledge" facts. Each column carries its own
+ * accent (--ivk-accent); a verdict line spans both at the end. */
+
+.ivk-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-xl);
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.ivk-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--terminal-bg-elevated);
+  border: 1px solid color-mix(in srgb, var(--ivk-accent) 40%, transparent);
+  border-radius: var(--radius-card);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--ivk-accent) 10%, transparent);
+  text-align: left;
+}
+
+.ivk-col__head {
+  color: var(--ivk-accent);
+  font-size: clamp(1.5rem, 2.2vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--ivk-accent) 45%, transparent);
+  padding-bottom: var(--space-sm);
+  border-bottom: 1px solid color-mix(in srgb, var(--ivk-accent) 25%, transparent);
+}
+
+.ivk-item {
+  position: relative;
+  padding-left: 1.5em;
+  color: var(--terminal-white);
+  font-size: clamp(1rem, 1.3vw, 1.3rem);
+  line-height: 1.45;
+  animation: slideItemFadeIn var(--transition-normal) var(--ease) both;
+}
+
+.ivk-item::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--ivk-accent);
+  font-weight: 700;
+}
+
+
+
+/* === SIZE DISCIPLINE SLIDE === */
+
+.size-quote {
+  margin-top: var(--space-lg);
+  text-align: center;
+  color: var(--terminal-green);
+  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
+  font-weight: 700;
+  text-shadow: 0 0 22px rgba(126, 231, 135, 0.45);
+  animation: slideItemFadeIn var(--transition-slow) var(--ease) both;
+}
+
+/* === OPEN FORMAT (AGENTSKILLS.IO) SLIDE === */
+/* Left: one SKILL.md, the portable open core (bright) vs the Claude-Code-only
+ * frontmatter (dim orange). Right: rules for keeping a skill portable. */
+
+.of-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xl);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.of-left {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.of-spec {
+  border-radius: var(--input-border-radius);
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  background: var(--terminal-bg-secondary);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.of-spec__head {
+  background: var(--terminal-bg-elevated);
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--terminal-border);
+}
+
+.of-spec__dots {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.of-spec__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.of-spec__dot--red { background: #ff5f56; }
+.of-spec__dot--yellow { background: #ffbd2e; }
+.of-spec__dot--green { background: #27c93f; }
+
+.of-spec__filename {
+  flex: 1;
+  color: var(--terminal-white-muted);
+  font-size: var(--font-size-small);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.of-spec__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  padding: var(--space-md) var(--space-lg);
+}
+
+.of-line {
+  font-family: var(--font-mono);
+  font-size: clamp(0.9rem, 1.2vw, 1.2rem);
+  line-height: 1.55;
+  white-space: pre;
+}
+
+.of-line--core {
+  color: var(--terminal-white);
+}
+
+.of-line--claude {
+  color: var(--terminal-orange);
+  opacity: 0.55;
+}
+
+.of-line--note {
+  color: var(--terminal-orange);
+  opacity: 0.45;
+  font-style: italic;
+}
+
+.of-legend {
+  display: flex;
+  gap: var(--space-lg);
+  padding-left: var(--space-sm);
+  font-size: clamp(0.8rem, 1vw, 1rem);
+}
+
+.of-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  color: var(--terminal-white-dim);
+}
+
+.of-legend__item::before {
+  content: '';
+  width: 0.85em;
+  height: 0.85em;
+  border-radius: 3px;
+}
+
+.of-legend__item--core::before { background: var(--terminal-white); }
+.of-legend__item--claude::before {
+  background: color-mix(in srgb, var(--terminal-orange) 55%, transparent);
+}
+
+.of-ref {
+  padding-left: var(--space-sm);
+  color: var(--terminal-white-muted);
+  font-size: clamp(0.85rem, 1.05vw, 1.05rem);
+}
+
+.of-right {
+  flex: 1 1 46%;
+  max-width: 700px;
+  text-align: left;
+}
+
+/* === META SKILL — two-stage body ==========================================
+   Stage set 0: full-width thesis bullets, vertically centered.
+   Stage set 1: bullet column (46%) beside a scrolling SKILL.md phosphor
+   panel, mirroring the SystemPromptSlide transmission aesthetic. */
+.meta-skill-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--space-xl);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.meta-skill-bullets {
+  flex: 0 0 46%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  min-width: 0;
+  --slide-line-height-normal: 1.35;
+  overflow-wrap: anywhere; /* the best-practices URL is one long token */
+}
+
+.meta-skill-bullets--full {
+  flex: 1;
+  gap: var(--space-lg);
+}
+
+.meta-skill-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: linear-gradient(
+    180deg,
+    var(--terminal-bg) 0%,
+    var(--terminal-bg-secondary) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--terminal-bg) 50%, transparent),
+    inset 0 0 80px color-mix(in srgb, var(--terminal-bg) 30%, transparent),
+    0 0 2px var(--terminal-green-glow);
+  font-family: var(--font-mono);
+  color: var(--terminal-green);
+  text-shadow: 0 0 8px var(--terminal-green-glow);
+  animation: metaSkillPanelIn 480ms var(--ease) both;
+}
+
+.meta-skill-panel__chrome {
+  padding: 10px 18px;
+  font-size: var(--font-size-small);
+  letter-spacing: var(--letter-spacing-wide);
+  color: color-mix(in srgb, var(--terminal-green) 60%, transparent);
+  flex-shrink: 0;
+  z-index: 5;
+}
+.meta-skill-panel__chrome--top {
+  border-bottom: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent);
+}
+.meta-skill-panel__chrome--bottom {
+  border-top: 1px solid color-mix(in srgb, var(--terminal-green) 22%, transparent);
+  color: color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  letter-spacing: 0.12em;
+}
+
+.meta-skill-panel__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Top/bottom fades so the scroll emerges from and sinks into the dark */
+.meta-skill-panel__viewport::before,
+.meta-skill-panel__viewport::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 80px;
+  z-index: 4;
+  pointer-events: none;
+}
+.meta-skill-panel__viewport::before {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--terminal-bg) 90%, transparent),
+    transparent
+  );
+}
+.meta-skill-panel__viewport::after {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--terminal-bg) 90%, transparent),
+    transparent
+  );
+}
+
+.meta-skill-panel__scroll {
+  padding: 20px 24px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: var(--font-size-small);
+  line-height: 1.7;
+  animation: metaSkillScroll 120s linear infinite;
+  will-change: transform;
+}
+
+.meta-skill-panel__scroll-divider {
+  margin-top: 2em;
+  padding-top: 2em;
+  border-top: 1px solid color-mix(in srgb, var(--terminal-green) 15%, transparent);
+}
+
+@keyframes metaSkillPanelIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.99); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+/* Eases in slowly, then settles into a constant linear crawl. The content
+   is rendered twice (scroll + scroll-divider), so -100% loops seamlessly. */
+@keyframes metaSkillScroll {
+  0%    { transform: translateY(0);     animation-timing-function: linear; }
+  12.5% { transform: translateY(-1%);   animation-timing-function: linear; }
+  25%   { transform: translateY(-5%);   animation-timing-function: linear; }
+  50%   { transform: translateY(-20%);  animation-timing-function: linear; }
+  100%  { transform: translateY(-100%); }
+}
+
+/* === SKILLS ACTIVATOR — bullets beside a framed code panel ================
+   Same transmission-panel family as .meta-skill-panel: bullets accumulate
+   on the left (44%), the right panel swaps its code block per reveal stage.
+   The CodeBlock's own macOS chrome is hidden inside the panel — the
+   transmission frame provides the chrome instead. */
+.skills-activator-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: var(--space-xl);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.skills-activator-bullets {
+  flex: 0 0 44%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  min-width: 0;
+  --slide-line-height-normal: 1.35;
+}
+
+.skills-activator-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: linear-gradient(
+    180deg,
+    var(--terminal-bg) 0%,
+    var(--terminal-bg-secondary) 100%
+  );
+  border: 1px solid color-mix(in srgb, var(--terminal-green) 35%, transparent);
+  box-shadow:
+    0 0 40px color-mix(in srgb, var(--terminal-bg) 50%, transparent),
+    inset 0 0 80px color-mix(in srgb, var(--terminal-bg) 30%, transparent),
+    0 0 2px var(--terminal-green-glow);
+  font-family: var(--font-mono);
+  animation: metaSkillPanelIn 480ms var(--ease) both;
+}
+
+.skills-activator-panel__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  /* Chrome bars used to provide the inset from the rounded panel edge; with
+   * them gone, center the code so it never touches the border. */
+  align-items: center;
+  padding: var(--space-sm) 0;
+}
+
+.skills-activator-panel__viewport .code-block {
+  flex: 0 1 auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.skills-activator-panel__viewport .code-block-header { display: none; }
+.skills-activator-panel__viewport .code-block pre {
+  flex: 1 1 auto;
+  margin: 0 !important;
+  height: 100%;
+}
+
+/* The default --font-size-code is sized for hero code slides; inside the
+   panel the full snippet must stay visible, so step it down. !important
+   beats the SyntaxHighlighter theme's inline font-size. */
+.skills-activator-panel__viewport .code-block pre,
+.skills-activator-panel__viewport .code-block code {
+  font-size: clamp(0.85rem, 1.05vw, 1.2rem) !important;
+  line-height: 1.5 !important;
+}
+
+/* === SKILL MARKETPLACE — two-stage body ===================================
+   Stage set 0: full-width DIY-approach bullets, vertically centered.
+   Stage set 1: bullet column (50%) beside the framed Superhuman AI Dev
+   marketplace screenshot. */
+.skill-marketplace-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.skill-marketplace-bullets {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  --slide-line-height-normal: 1.3;
+}
+
+.skill-marketplace-bullets--full {
+  flex: 1;
+  gap: var(--space-md);
+}
+
+.skill-marketplace-shot {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-md);
+  border-radius: var(--radius-card);
+  background: var(--terminal-bg-elevated);
+  border: 1px solid var(--terminal-border-bright);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--terminal-bg) 50%, transparent);
+  overflow: hidden;
+  animation: metaSkillPanelIn 480ms var(--ease) both;
+}
+
+.skill-marketplace-shot img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* === WHAT IS AN AI-FIRST TEAM — bullets beside the evolving SDLC diagram ==
+   Left column accumulates definition bullets (40%); right side cross-fades
+   between the chaos TeamDiagram and the structured EngineerAspireDiagram. */
+.ai-first-team-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.ai-first-team-bullets {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  --slide-line-height-normal: 1.3;
+}
+
+.ai-first-team-diagram {
+  flex: 1;
+  align-self: stretch;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === SKILL FLYWHEEL — bullets beside the accelerating SDLC diagram ========
+   Same two-column idiom as .ai-first-team-body: 40% accumulating bullets,
+   60% diagram where Claude icons land per stage and arrows speed up. */
+.skill-flywheel-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.skill-flywheel-bullets {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  --slide-line-height-normal: 1.3;
+}
+
+.skill-flywheel-diagram {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === EVERY ORG RIGHT NOW — archetype text beside the adoption bell curve ==
+   Left column (50%) swaps per reveal stage to the active archetype; right
+   column holds the section-clipped bell curve SVG. */
+.every-org-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.every-org-col {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.every-org-curve {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* === SOFTWARE FACTORY — antipattern bullets beside the meme shot ========= */
+.software-factory-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xl);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.software-factory-bullets {
+  flex: 0 0 48%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.software-factory-shot {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: metaSkillPanelIn 480ms var(--ease) both;
+}
+
+.software-factory-shot img {
+  max-width: 100%;
+  max-height: calc(var(--vh-full) - 320px);
+  object-fit: contain;
+  border-radius: var(--radius-card);
+}
+
+/* === SKILLS --AGENTS — bullets beside the agents-joined flywheel ========== */
+.agents-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.agents-bullets {
+  flex: 0 0 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-width: 0;
+  --slide-line-height-normal: 1.3;
+}
+
+.agents-diagram {
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === AGENT TRACES — bullets beside a code/screenshot panel =============== */
+.agent-traces-body {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-lg);
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  min-height: 0;
+  text-align: left;
+}
+
+.agent-traces-bullets {
+  flex: 0 0 44%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  min-width: 0;
+  --slide-line-height-normal: 1.3;
+}
+
+/* The right column reuses the pre-existing .agent-traces-panel transmission
+   family defined above (chrome bars + viewport). Bound the panel to the
+   body height so the bottom chrome bar stays visible, and step the code
+   size and line-height down so the 22-line upload flow fits inside the
+   overflow-hidden viewport. !important beats the SyntaxHighlighter theme's
+   inline styles. */
+.agent-traces-body .agent-traces-panel {
+  align-self: stretch;
+}
+
+.agent-traces-panel__viewport .code-block pre,
+.agent-traces-panel__viewport .code-block code {
+  font-size: clamp(0.55rem, 0.7vw, 0.85rem) !important;
+  line-height: 1.35 !important;
+}

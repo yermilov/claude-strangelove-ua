@@ -1,0 +1,207 @@
+:root {
+  /* === DYNAMIC VIEWPORT HEIGHT === */
+  --vh-full: 100vh;
+  --vh-full: 100dvh; /* cascade override for supporting browsers */
+
+  /* === CRT TERMINAL COLOR PALETTE === */
+
+  /* Deep blacks with subtle blue undertone */
+  --terminal-bg: #0a0e14;
+  --terminal-bg-secondary: #0d1219;
+  --terminal-bg-input: #0f151c;
+  --terminal-bg-elevated: #141b24;
+
+  /* Phosphor text colors with glow potential */
+  --terminal-white: #e2e8f0;
+  --terminal-white-dim: #c8d1dc;
+  --terminal-white-muted: #8b99a8;
+
+  /* Claude Code signature orange - warm CRT amber */
+  --terminal-orange: #f0883e;
+  --terminal-orange-dim: #c96f2e;
+  --terminal-orange-glow: rgba(240, 136, 62, 0.4);
+  --terminal-orange-bright: #ffa657;
+
+  /* Terminal green - phosphor P1 inspired */
+  --terminal-green: #7ee787;
+  --terminal-green-dim: #56d364;
+  --terminal-green-glow: rgba(126, 231, 135, 0.35);
+  --terminal-green-bright: #a5f3b4;
+
+  /* Accent colors for syntax highlighting */
+  --terminal-blue: #79c0ff;
+  --terminal-blue-glow: rgba(121, 192, 255, 0.3);
+  --terminal-purple: #d2a8ff;
+  --terminal-purple-glow: rgba(210, 168, 255, 0.3);
+  --terminal-red: #ff7b72;
+  --terminal-red-glow: rgba(255, 123, 114, 0.3);
+  --terminal-cyan: #76e4f7;
+  --terminal-cyan-glow: rgba(118, 228, 247, 0.3);
+  --terminal-yellow: #ffd166;
+
+  /* Border colors */
+  --terminal-border: #1e293b;
+  --terminal-border-bright: #334155;
+  --terminal-border-focus: var(--terminal-orange);
+
+  /* === TYPOGRAPHY === */
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+
+  /* Three-tier type scale tuned for back-row readability in a conference hall.
+   * Fluid clamp(min, preferred, max) so text scales smoothly from phone
+   * (~480px) up to desktop (~1920px) without breakpoint cliffs. Maxima
+   * sized for a projector at ~3–5m viewing distance.
+   *
+   *   HERO    ~96px max — title slide only
+   *   HEADING ~80px max — h1 + h2 (same size; h1 is semantic, h2 is the
+   *                                content-slide section header)
+   *   BODY    ~40px max — paragraphs, list items, default text
+   *   CODE    ~24px max — inline code + code blocks
+   *
+   * The compact/dense body variants exist as legacy escape hatches for
+   * dense slides. The design system prefers splitting a too-dense slide
+   * over shrinking text. */
+  --font-size-hero: clamp(2.5rem, 6vw, 6rem);
+  --font-size-h1: clamp(2rem, 4vw, 5rem);
+  --font-size-h2: clamp(2rem, 4vw, 5rem);
+  --font-size-h3: clamp(1.5rem, 3vw, 3rem);
+  --font-size-body: clamp(1rem, 1.6vw, 2rem);
+  --font-size-code: clamp(0.9rem, 1.3vw, 1.5rem);
+  --font-size-input: clamp(0.95rem, 1vw, 1.25rem);
+  --font-size-small: clamp(0.8rem, 0.8vw, 1rem);
+
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.8;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;
+
+  /* Body size variants. `normal` matches the hall-readable body size.
+   * Compact / dense are escape hatches for legacy slides. */
+  --slide-text-normal: var(--font-size-body);
+  --slide-text-compact: clamp(1.05rem, 1.6vw, 2rem);
+  --slide-text-dense: clamp(0.95rem, 1.4vw, 1.65rem);
+
+  --slide-line-height-normal: 1.55;
+  --slide-line-height-compact: 1.5;
+  --slide-line-height-dense: 1.45;
+
+  /* Section headers (uppercase orange labels above body sections) */
+  --slide-section-header: clamp(1rem, 1.4vw, 1.5rem);
+  --slide-section-header-compact: clamp(0.9rem, 1.2vw, 1.25rem);
+  --slide-section-header-dense: clamp(0.8rem, 1vw, 1.1rem);
+
+  /* Inline code */
+  --slide-code-relative: 0.95em;
+
+  /* === SPACING === */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 3rem;
+  --space-2xl: 4rem;
+  --space-3xl: 6rem;
+
+  /* === RADII === */
+  /* Single unified radius for cards, inputs, tooltips, code blocks.
+   * Use 0 for raw terminal panels (no rounded chrome). */
+  --radius-card: 0.5rem;
+  --input-border-radius: var(--radius-card); /* legacy alias */
+
+  /* === INPUT STYLING === */
+  --input-height: 3.5rem;
+  --input-padding-x: 1.25rem;
+  --input-bar-height: calc(var(--input-height) + var(--space-md) * 2);
+
+  /* === EFFECTS === */
+  --transition-instant: 50ms ease;
+  --transition-fast: 150ms ease;
+  --transition-normal: 300ms ease-out;
+  --transition-slow: 500ms ease-out;
+
+  /* Single deck-wide easing. */
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+
+  /* Glow effects */
+  --glow-orange: 0 0 20px var(--terminal-orange-glow), 0 0 40px var(--terminal-orange-glow);
+  --glow-green: 0 0 20px var(--terminal-green-glow), 0 0 40px var(--terminal-green-glow);
+  --glow-text-orange: 0 0 10px var(--terminal-orange-glow);
+  --glow-text-green: 0 0 10px var(--terminal-green-glow);
+
+  /* CRT effects */
+  --scanline-opacity: 0.03;
+  --noise-opacity: 0.015;
+  --flicker-intensity: 0.005;
+}
+
+/* === LIGHT THEME — "paper terminal" ===
+ * Activate via `<html data-theme="light">` (set by Presentation.tsx
+ * in response to the `light` / `dark` terminal commands).
+ *
+ * The palette shifts to a warm cream paper background with darker,
+ * desaturated accents that read against light. Scan lines and noise
+ * overlays are disabled (light mode is a paper / notebook metaphor,
+ * not a CRT). Glow text-shadow stays at low intensity so accents
+ * still have a soft halo but don't bloom.
+ *
+ * If you add a new token to :root above, mirror it here only if the
+ * value needs to differ for light. Most things (spacing, motion,
+ * type scale, radii) are theme-agnostic. */
+[data-theme="light"] {
+  /* Cream paper backgrounds */
+  --terminal-bg: #f5efe6;
+  --terminal-bg-secondary: #ecdfc8;
+  --terminal-bg-input: #fffaf2;
+  --terminal-bg-elevated: #e5d4b3;
+
+  /* Ink text */
+  --terminal-white: #1a1a1a;
+  --terminal-white-dim: #3a3a3a;
+  --terminal-white-muted: #6a6a6a;
+
+  /* Darker amber — keeps the warm Claude-orange identity but
+   * passes contrast on cream */
+  --terminal-orange: #b8551c;
+  --terminal-orange-dim: #8c3e12;
+  --terminal-orange-glow: rgba(184, 85, 28, 0.25);
+  --terminal-orange-bright: #d96828;
+
+  /* Darker phosphor — still recognisably green, no longer neon */
+  --terminal-green: #2f7a3a;
+  --terminal-green-dim: #1f5826;
+  --terminal-green-glow: rgba(47, 122, 58, 0.2);
+  --terminal-green-bright: #3a9148;
+
+  /* Darker syntax accents */
+  --terminal-blue: #1e5cb8;
+  --terminal-blue-glow: rgba(30, 92, 184, 0.2);
+  --terminal-purple: #6b34c5;
+  --terminal-purple-glow: rgba(107, 52, 197, 0.2);
+  --terminal-red: #c43838;
+  --terminal-red-glow: rgba(196, 56, 56, 0.2);
+  --terminal-cyan: #0e7490;
+  --terminal-cyan-glow: rgba(14, 116, 144, 0.2);
+  --terminal-yellow: #b58900;
+
+  /* Borders read darker against cream */
+  --terminal-border: rgba(0, 0, 0, 0.12);
+  --terminal-border-bright: rgba(0, 0, 0, 0.24);
+
+  /* Drop the CRT atmosphere — light mode is a paper / notebook metaphor.
+   * Glow text-shadow stays (defined above via --glow-text-* which use
+   * the per-theme glow rgbas), just at lower alpha so accents have a
+   * soft halo without blooming. */
+  --scanline-opacity: 0;
+  --noise-opacity: 0;
+}
+
+/* Input control height shrinks on phones (not part of the clamp() font
+ * scale because it's a control, not a typography step). */
+@media (max-width: 480px) {
+  :root {
+    --input-height: 2.75rem;
+  }
+}

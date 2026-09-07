@@ -1,0 +1,228 @@
+/* === REUSABLE PATTERNS LAYER ===
+ * Cross-cutting design utilities used by many components and slides:
+ * color/glow text utilities, slide-item primitives, animations, CRT
+ * effects, mobile performance tweaks. */
+
+/* === CRT PRESENTATION OVERLAYS ===
+ * Scan lines + noise texture rendered as ::before / ::after on the
+ * .presentation container in base.css. The pattern definitions stay
+ * here so they're easy to tune. */
+.presentation::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 2px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 4px
+  );
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.presentation::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: var(--noise-opacity);
+  pointer-events: none;
+  z-index: 999;
+}
+
+/* === COLOR + GLOW UTILITIES === */
+.text-orange { color: var(--terminal-orange); }
+.text-green { color: var(--terminal-green); }
+.text-blue { color: var(--terminal-blue); }
+.text-purple { color: var(--terminal-purple); }
+.text-cyan { color: var(--terminal-cyan); }
+.text-dim { color: var(--terminal-white-dim); }
+.text-muted { color: var(--terminal-white-muted); }
+
+.glow-orange { text-shadow: var(--glow-text-orange); }
+.glow-green { text-shadow: var(--glow-text-green); }
+
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+/* === SECTION HEADERS (uppercase orange labels) === */
+.section-header {
+  font-size: var(--slide-section-header);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header--compact {
+  font-size: var(--slide-section-header-compact);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header--dense {
+  font-size: var(--slide-section-header-dense);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.section-header--green {
+  color: var(--terminal-green);
+  text-shadow: 0 0 10px var(--terminal-green-glow);
+}
+
+.section-header--purple {
+  color: var(--terminal-purple);
+  text-shadow: 0 0 10px var(--terminal-purple-glow);
+}
+
+.section-header--blue {
+  color: var(--terminal-blue);
+  text-shadow: 0 0 10px var(--terminal-blue-glow);
+}
+
+.section-header--orange {
+  color: var(--terminal-orange);
+  text-shadow: 0 0 10px var(--terminal-orange-glow);
+}
+
+.section-header--cyan {
+  color: var(--terminal-cyan);
+  text-shadow: 0 0 10px var(--terminal-cyan-glow);
+}
+
+/* === INLINE CODE VARIANTS (cyan default, orange, green) === */
+.code-inline {
+  background: rgba(118, 228, 247, 0.1);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 4px;
+  color: var(--terminal-cyan);
+  font-size: var(--slide-code-relative);
+  font-weight: 600;
+  border: 1px solid rgba(118, 228, 247, 0.3);
+  text-shadow: 0 0 8px var(--terminal-cyan-glow);
+}
+
+/* Element-qualified so the variants outrank `.slide code` in base.css
+ * (same specificity, later in the cascade). Without this the opt-in
+ * orange/green variants silently render as the default cyan. */
+code.code-inline--orange {
+  background: rgba(240, 136, 62, 0.1);
+  color: var(--terminal-orange);
+  border-color: rgba(240, 136, 62, 0.3);
+  text-shadow: 0 0 8px var(--terminal-orange-glow);
+}
+
+code.code-inline--green {
+  background: rgba(126, 231, 135, 0.1);
+  color: var(--terminal-green);
+  border-color: rgba(126, 231, 135, 0.3);
+  text-shadow: 0 0 8px var(--terminal-green-glow);
+}
+
+/* === SLIDE LIST ITEM PRIMITIVE ===
+ * Grid-based bullet item used by <SlideItem> React component.
+ * normal = hall-readable default. compact / dense are escape hatches. */
+.slide-item {
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  align-items: start;
+  gap: var(--space-sm);
+  font-size: var(--slide-text-normal);
+  line-height: var(--slide-line-height-normal);
+  margin-bottom: var(--space-md);
+  color: var(--terminal-white);
+}
+
+.slide-item--compact {
+  font-size: var(--slide-text-compact);
+  line-height: var(--slide-line-height-compact);
+  margin-bottom: var(--space-sm);
+  gap: var(--space-sm);
+}
+
+.slide-item--dense {
+  font-size: var(--slide-text-dense);
+  line-height: var(--slide-line-height-dense);
+  margin-bottom: var(--space-sm);
+  gap: var(--space-sm);
+  grid-template-columns: 1.2rem 1fr;
+}
+
+.slide-item__prefix {
+  color: var(--terminal-orange);
+  font-weight: bold;
+  text-shadow: 0 0 10px var(--terminal-orange-glow);
+}
+
+/* === SLIDE LINK (styled <a> for in-slide URLs) === */
+.slide-link {
+  color: var(--terminal-blue);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--terminal-blue);
+  transition: all var(--transition-fast);
+  text-shadow: 0 0 8px var(--terminal-blue-glow);
+}
+
+.slide-link:hover {
+  color: var(--terminal-cyan);
+  border-bottom-color: var(--terminal-cyan);
+  text-shadow: 0 0 12px var(--terminal-cyan-glow);
+}
+
+/* === TEXT EMPHASIS === */
+.text-emphasis {
+  font-weight: 600;
+  font-style: normal;
+}
+
+.text-emphasis--orange {
+  color: var(--terminal-orange);
+  text-shadow: 0 0 6px var(--terminal-orange-glow);
+}
+
+.text-emphasis--green {
+  color: var(--terminal-green);
+  text-shadow: 0 0 6px var(--terminal-green-glow);
+}
+
+.text-quote {
+  color: var(--terminal-orange);
+  font-style: italic;
+  text-shadow: 0 0 6px var(--terminal-orange-glow);
+}
+
+/* === REVEAL ANIMATIONS === */
+@keyframes slideItemFadeIn {
+  from { opacity: 0; transform: translateX(-12px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideItemReveal {
+  from { opacity: 0; transform: translateX(-32px); }
+  60%  { opacity: 1; transform: translateX(4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* === MOBILE: CRT PERFORMANCE ===
+ * Phones can't afford the noise + scan-line blend cost. Drop
+ * intensity to reclaim frame budget. */
+@media (max-width: 768px) and (pointer: coarse) {
+  .presentation::before { opacity: 0.3; }
+  .presentation::after  { display: none; }
+
+  .vs-fighter--left .vs-fighter-image,
+  .vs-fighter--right .vs-fighter-image {
+    animation: none;
+  }
+
+  .tool-takes-icon {
+    animation: none;
+  }
+
+  .title-slide::before { animation: none; }
+}

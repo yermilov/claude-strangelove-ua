@@ -1,0 +1,264 @@
+/* === BASE LAYER ===
+ * Foundational layout and typography for every slide: presentation
+ * container, slide chrome, headings, paragraphs, lists, links, code.
+ * Everything here applies to the whole deck via .slide. */
+
+/* Presentation Container */
+.presentation {
+  width: 100vw;
+  height: var(--vh-full);
+  background: var(--terminal-bg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Slide Container — flex parent that holds one active .slide */
+.slide-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg) var(--space-xl);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Slide — the active card */
+.slide {
+  width: 100%;
+  max-width: 1600px;
+  max-height: 100%;
+  overflow: hidden;
+  color: var(--terminal-white);
+  font-family: var(--font-mono);
+  text-align: center;
+  animation: slideIn var(--transition-normal) var(--ease);
+  position: relative;
+}
+
+/* Slides that opt in to the fixed top-left title get a reserved title
+ * band (~130px) at the top so the body content doesn't collide with it.
+ * Fill the container height so the absolute-positioned title stays
+ * anchored to the top of the viewport, not the top of the content. */
+.slide--titled {
+  padding-top: 180px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Fixed top-left title (dou-days pattern). Sits in the title band above
+ * the body. Use the `//` dim leader convention in slide definitions.
+ * Higher specificity than `.slide h2` so font-size override sticks. */
+.slide h2.slide-title {
+  position: absolute;
+  top: var(--space-lg);
+  left: 0;
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  text-align: left;
+  color: var(--terminal-green);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  text-shadow: var(--glow-text-green);
+  width: max-content;
+  max-width: 100%;
+  z-index: 3;
+}
+
+/* Frosted scrim behind the title so it stays legible over busy image
+ * backdrops. Feathered radial edges + matching dark tint make it invisible
+ * on plain #0a0e14 slides and a soft blurred panel over artwork. */
+.slide h2.slide-title::before {
+  content: '';
+  position: absolute;
+  inset: -0.3em -0.9em;
+  z-index: -1;
+  border-radius: 1em;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 14, 20, 0.82) 0%,
+    rgba(10, 14, 20, 0.55) 55%,
+    transparent 100%
+  );
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+}
+
+/* Second-line "code comment" descriptor inside a slide title.
+ * Sits underneath the main heading, smaller and dimmer, like an
+ * inline annotation. Used by section slides (engineer/team/org). */
+.slide-title-meta {
+  display: block;
+  font-size: var(--slide-text-compact);
+  font-weight: 400;
+  letter-spacing: var(--letter-spacing-normal);
+  text-shadow: none;
+  margin-top: var(--space-xs);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(20px); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* Headings — the deck uses three sizes:
+ *   h1       — content-slide section heading (orange, glowing)
+ *   h1.hero  — title slide only (extra-large)
+ *   h2       — alternate section heading (green) — equivalent size to h1
+ *   h3       — rare, reserved for sub-sections (blue) */
+.slide h1 {
+  font-size: var(--font-size-h1);
+  font-weight: 600;
+  color: var(--terminal-orange);
+  margin-bottom: var(--space-lg);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  text-shadow: var(--glow-text-orange);
+}
+
+.slide h1.hero {
+  font-size: var(--font-size-hero);
+}
+
+.slide h2 {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  color: var(--terminal-green);
+  margin-bottom: var(--space-lg);
+  letter-spacing: var(--letter-spacing-tight);
+  line-height: var(--line-height-tight);
+  text-shadow: var(--glow-text-green);
+}
+
+.slide h3 {
+  font-size: var(--font-size-h3);
+  font-weight: 500;
+  color: var(--terminal-blue);
+  margin-bottom: var(--space-md);
+  line-height: var(--line-height-tight);
+}
+
+/* Paragraphs */
+.slide p {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--space-md);
+  color: var(--terminal-white-dim);
+}
+
+.slide p strong,
+.slide p b {
+  color: var(--terminal-white);
+  font-weight: 600;
+}
+
+.slide p em {
+  color: var(--terminal-orange);
+  font-style: normal;
+}
+
+/* Lists — terminal command-line aesthetic: `>` marker for unordered,
+ * green numbered counter for ordered. Glow on the marker. */
+.slide ul,
+.slide ol {
+  list-style: none;
+  text-align: left;
+  display: inline-block;
+  margin: var(--space-lg) 0;
+}
+
+.slide li {
+  font-size: var(--font-size-body);
+  margin-bottom: var(--space-md);
+  padding-left: var(--space-xl);
+  position: relative;
+  line-height: var(--line-height-normal);
+  color: var(--terminal-white-dim);
+}
+
+.slide li::before {
+  content: '>';
+  position: absolute;
+  left: 0;
+  color: var(--terminal-orange);
+  font-weight: bold;
+  text-shadow: var(--glow-text-orange);
+}
+
+.slide ol {
+  counter-reset: slide-counter;
+}
+
+.slide ol li::before {
+  counter-increment: slide-counter;
+  content: counter(slide-counter) '.';
+  color: var(--terminal-green);
+  text-shadow: var(--glow-text-green);
+}
+
+/* Inline code */
+.slide code {
+  background: var(--terminal-bg-elevated);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: 4px;
+  color: var(--terminal-cyan);
+  font-size: 0.9em;
+  border: 1px solid var(--terminal-border);
+}
+
+/* Links — dashed underline that becomes solid + cyan on hover */
+.slide a {
+  color: var(--terminal-blue);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--terminal-blue);
+  transition: all var(--transition-fast);
+}
+
+.slide a:hover {
+  color: var(--terminal-cyan);
+  border-bottom-color: var(--terminal-cyan);
+  text-shadow: 0 0 8px var(--terminal-cyan-glow);
+}
+
+/* Blockquotes */
+.slide blockquote {
+  border-left: 3px solid var(--terminal-orange);
+  padding-left: var(--space-lg);
+  margin: var(--space-lg) 0;
+  font-style: italic;
+  color: var(--terminal-white-muted);
+}
+
+/* === RESPONSIVE LAYOUT ===
+ * Typography scaling is handled by clamp() on the font-size tokens
+ * themselves (see tokens.css). Only layout / spacing adjustments live
+ * in media queries. */
+@media (max-width: 1024px) {
+  .slide-container {
+    padding: var(--space-xl) var(--space-lg);
+  }
+}
+
+@media (max-width: 640px) {
+  .slide-container {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .input-bar {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .bio-slide {
+    flex-direction: column;
+    gap: var(--space-lg);
+  }
+
+  .bio-slide-image {
+    max-width: 280px;
+  }
+}
