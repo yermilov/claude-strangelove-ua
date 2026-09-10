@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-A custom terminal-themed presentation site built with React and TypeScript. Features a Claude Code-inspired aesthetic with command-based navigation. Hosted on GitHub Pages at https://yermilov.github.io/claude-strangelove-ua
+A custom presentation site built with React and TypeScript, with command-based navigation. Hosted on GitHub Pages at https://yermilov.github.io/claude-strangelove-ua
+
+The deck for «Клод Стрейнджлав» (Fwdays Tech Summit'26, 35-minute slot) wears a **Kubrick skin over the original terminal deck**, and the split is the point: slides are Kubrick (black, symmetrical, Jost UA in capitals, one red, no glow) while everything the machine says — code blocks, agent logs, the input bar — stays CRT terminal. Read `.claude/skills/design-system/SKILL.md` before touching any style.
 
 ## Tech Stack
 
@@ -28,7 +30,8 @@ bun run deploy   # Manual deploy to GitHub Pages
 src/
 ├── App.tsx                    # Slide array — imports and orders all slides
 ├── main.tsx                   # React entry point
-├── index.css                  # Global styles & font import
+├── index.css                  # Global styles & font faces
+├── fonts/                     # Patched Jost UA webfonts (see index.css for why)
 ├── vite-env.d.ts              # Vite type declarations
 ├── types/
 │   └── slides.ts              # TypeScript interfaces
@@ -42,6 +45,7 @@ src/
 │   ├── useSlideNavigation.ts  # Navigation state & command parsing
 │   └── useTouchNavigation.ts  # Swipe gesture support
 ├── components/
+│   ├── KubrickElements.tsx    # ActCard, LightRing, BigBoard, Machine
 │   ├── Presentation.tsx       # Main container — timer, tool activation, routing
 │   ├── Slide.tsx              # Fullscreen slide wrapper
 │   ├── TerminalInput.tsx      # Command input box

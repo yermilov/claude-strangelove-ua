@@ -32,7 +32,7 @@
   max-height: 100%;
   overflow: hidden;
   color: var(--terminal-white);
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   text-align: center;
   animation: slideIn var(--transition-normal) var(--ease);
   position: relative;
@@ -61,7 +61,8 @@
   font-weight: 600;
   text-align: left;
   color: var(--terminal-green);
-  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-heading);
   line-height: var(--line-height-tight);
   text-shadow: var(--glow-text-green);
   width: max-content;
@@ -71,7 +72,7 @@
 
 /* Frosted scrim behind the title so it stays legible over busy image
  * backdrops. Feathered radial edges + matching dark tint make it invisible
- * on plain #0a0e14 slides and a soft blurred panel over artwork. */
+ * on plain black slides and a soft blurred panel over artwork. */
 .slide h2.slide-title::before {
   content: '';
   position: absolute;
@@ -80,8 +81,8 @@
   border-radius: 1em;
   background: radial-gradient(
     ellipse at center,
-    rgba(10, 14, 20, 0.82) 0%,
-    rgba(10, 14, 20, 0.55) 55%,
+    color-mix(in srgb, var(--kubrick-black) 82%, transparent) 0%,
+    color-mix(in srgb, var(--kubrick-black) 55%, transparent) 55%,
     transparent 100%
   );
   backdrop-filter: blur(16px);
@@ -107,39 +108,47 @@
 }
 
 /* Headings — the deck uses three sizes:
- *   h1       — content-slide section heading (orange, glowing)
+ *   h1       — content-slide section heading (red)
  *   h1.hero  — title slide only (extra-large)
- *   h2       — alternate section heading (green) — equivalent size to h1
- *   h3       — rare, reserved for sub-sections (blue) */
+ *   h2       — alternate section heading (white) — equivalent size to h1
+ *   h3       — rare, reserved for sub-sections (grey)
+ *
+ * Kubrick sets titles in capitals, heavy, letter-spaced, and centred. The
+ * uppercase transform is applied here rather than typed into slide copy, so
+ * the source stays readable and searchable. */
 .slide h1 {
   font-size: var(--font-size-h1);
-  font-weight: 600;
+  font-weight: var(--font-weight-display);
   color: var(--terminal-orange);
   margin-bottom: var(--space-lg);
-  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-heading);
   line-height: var(--line-height-tight);
   text-shadow: var(--glow-text-orange);
 }
 
 .slide h1.hero {
   font-size: var(--font-size-hero);
+  letter-spacing: var(--letter-spacing-hero);
 }
 
 .slide h2 {
   font-size: var(--font-size-h2);
-  font-weight: 600;
+  font-weight: var(--font-weight-display);
   color: var(--terminal-green);
   margin-bottom: var(--space-lg);
-  letter-spacing: var(--letter-spacing-tight);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-heading);
   line-height: var(--line-height-tight);
   text-shadow: var(--glow-text-green);
 }
 
 .slide h3 {
   font-size: var(--font-size-h3);
-  font-weight: 500;
-  color: var(--terminal-blue);
+  font-weight: 600;
+  color: var(--terminal-white-dim);
   margin-bottom: var(--space-md);
+  letter-spacing: var(--letter-spacing-normal);
   line-height: var(--line-height-tight);
 }
 
@@ -160,6 +169,7 @@
 .slide p em {
   color: var(--terminal-orange);
   font-style: normal;
+  font-weight: 600;
 }
 
 /* Lists — terminal command-line aesthetic: `>` marker for unordered,
@@ -201,13 +211,16 @@
   text-shadow: var(--glow-text-green);
 }
 
-/* Inline code */
+/* Inline code — a fragment of the machine's voice inside a human sentence.
+ * The `.machine` token block (tokens.css) supplies the CRT palette and the
+ * mono family; only the chrome lives here. `0.88em` rather than `0.9em`
+ * because JetBrains Mono runs optically larger than Jost at equal size. */
 .slide code {
   background: var(--terminal-bg-elevated);
   padding: var(--space-xs) var(--space-sm);
   border-radius: 4px;
   color: var(--terminal-cyan);
-  font-size: 0.9em;
+  font-size: 0.88em;
   border: 1px solid var(--terminal-border);
 }
 
@@ -227,11 +240,11 @@
 
 /* Blockquotes */
 .slide blockquote {
-  border-left: 3px solid var(--terminal-orange);
+  border-left: 2px solid var(--kubrick-red);
   padding-left: var(--space-lg);
   margin: var(--space-lg) 0;
-  font-style: italic;
-  color: var(--terminal-white-muted);
+  font-style: normal;
+  color: var(--terminal-white-dim);
 }
 
 /* === RESPONSIVE LAYOUT ===

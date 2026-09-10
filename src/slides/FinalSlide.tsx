@@ -8,11 +8,11 @@ import linkedinQr from '/linkedin-qr.jpeg?url';
 const BULLETS: ReactNode[] = [
   <>
     лід не масштабується рев'ю — лід масштабується{' '}
-    <Emphasis color="green">процесом</Emphasis>
+    <Emphasis color="orange">процесом</Emphasis>
   </>,
   <>
     питання? питай зараз, або пиши в LinkedIn{' '}
-    <span style={{ color: 'var(--terminal-blue)' }}>→</span>
+    <span style={{ color: 'var(--kubrick-red)' }}>→</span>
   </>,
 ];
 
@@ -24,8 +24,12 @@ export const FinalSlide: SlideDefinition = {
     </>
   ),
   maxRevealStages: BULLETS.length,
+  // The closing slide is the deck's one inversion — the white room at the end
+  // of "2001". It is deliberately the only place the void turns white, so the
+  // switch itself reads as the talk ending.
   content: ({ revealStage }) => (
     <div
+      className="slide-inverse"
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -61,9 +65,7 @@ export const FinalSlide: SlideDefinition = {
             maxWidth: '600px',
             maxHeight: 'calc(100vh - 180px)',
             objectFit: 'contain',
-            borderRadius: 'var(--input-border-radius)',
-            border: '2px solid var(--terminal-border)',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+            border: '1px solid var(--kubrick-grey-3)',
             opacity: 0,
             animation: 'slideItemFadeIn 0.5s ease-out forwards',
           }}
@@ -71,5 +73,6 @@ export const FinalSlide: SlideDefinition = {
       )}
     </div>
   ),
-  notes: 'Фінальний слайд — заглушка. Висновки пишемо після того, як стане шість контролів.',
+  notes:
+    'Фінальний слайд — заглушка. Висновки пишемо після того, як стане шість контролів. Це єдиний інверсний слайд у деку.',
 };

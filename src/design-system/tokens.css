@@ -1,51 +1,159 @@
+/* === THE KUBRICK SKIN ===
+ *
+ * One rule governs this whole file: **Kubrick speaks for the human, the
+ * terminal speaks for the machine.**
+ *
+ * Slides are Kubrick — black, symmetrical, Jost set large, one red, no glow.
+ * Everywhere the machine speaks — code blocks, agent logs, the input bar,
+ * the `>` markers — the CRT terminal comes back: mono, amber, phosphor glow.
+ * The audience should see that the machine has started talking before they
+ * read a word of it. That contrast is the talk's argument, so it is
+ * load-bearing, not decoration: if you find yourself giving a slide element
+ * amber for looks, you are wrong; if you find yourself flattening a code
+ * block into greyscale, you are also wrong.
+ *
+ * Mechanically this is the DOU re-skin technique from the `deck-design-system`
+ * skill: declare the brand palette as first-class `--kubrick-*` tokens,
+ * RE-POINT the existing `--terminal-*` tokens at them, zero out the CRT — and
+ * all 3000 lines of slide-layouts.css render in the new palette for free. The
+ * machine register is then handed back by one scoped block (`.machine`), which
+ * restores the original `--terminal-*` values on its own subtree.
+ *
+ * Adding a colour? Add it as `--kubrick-*` and mirror it under
+ * `[data-theme="light"]` — the light theme here is not a fallback, it is the
+ * "2001" white void and the second half of the idea. */
+
 :root {
   /* === DYNAMIC VIEWPORT HEIGHT === */
   --vh-full: 100vh;
   --vh-full: 100dvh; /* cascade override for supporting browsers */
 
-  /* === CRT TERMINAL COLOR PALETTE === */
+  /* === THE TWO GROUNDS ===
+   * Every colour in the deck is one of these two sets: the black ROOM (the
+   * War Room, the ship at night) and the white VOID (the room at the end of
+   * "2001"). They are constants — nothing reads them directly. The theme
+   * picks one, and the inverse slide picks the other, so a hex appears
+   * exactly once no matter how many places switch between them. */
+  --room-black: #0a0a0a;
+  --room-ink: #050607;
+  --room-white: #f2f0eb;
+  --room-grey-1: #b9b7b1;
+  --room-grey-2: #6e6c67;
+  --room-grey-3: #262624;
+  --room-red: #d81f26;
+  --room-red-dim: #8f1419;
 
-  /* Deep blacks with subtle blue undertone */
-  --terminal-bg: #0a0e14;
-  --terminal-bg-secondary: #0d1219;
-  --terminal-bg-input: #0f151c;
-  --terminal-bg-elevated: #141b24;
+  --void-black: #f2f0eb;
+  --void-ink: #ffffff;           /* the one place pure white is right */
+  --void-white: #0a0a0a;
+  --void-grey-1: #45443f;
+  --void-grey-2: #78766f;
+  --void-grey-3: #d8d5cd;
+  --void-red: #c8151c;           /* a shade deeper, to hold on white */
+  --void-red-dim: #8f1419;
 
-  /* Phosphor text colors with glow potential */
-  --terminal-white: #e2e8f0;
-  --terminal-white-dim: #c8d1dc;
-  --terminal-white-muted: #8b99a8;
+  /* === KUBRICK PALETTE (first-class) ===
+   * Black, three greys, one warm white, one red. Nothing else — the
+   * constraint is the look. `--kubrick-felt` is the green baize of Ken
+   * Adam's War Room table and is allowed exactly one use per deck.
+   * This is the layer slide rules read. */
+  --kubrick-black: var(--room-black);    /* slide background */
+  --kubrick-ink: var(--room-ink);        /* deeper black — act cards */
+  --kubrick-white: var(--room-white);    /* warm film white, never #fff */
+  --kubrick-grey-1: var(--room-grey-1);  /* secondary text */
+  --kubrick-grey-2: var(--room-grey-2);  /* muted text */
+  --kubrick-grey-3: var(--room-grey-3);  /* rules, borders, panel fills */
+  --kubrick-red: var(--room-red);        /* the only accent: HAL, and danger */
+  --kubrick-red-dim: var(--room-red-dim);
+  --kubrick-felt: #14352a;               /* War Room baize — one easter egg */
 
-  /* Claude Code signature orange - warm CRT amber */
-  --terminal-orange: #f0883e;
-  --terminal-orange-dim: #c96f2e;
-  --terminal-orange-glow: rgba(240, 136, 62, 0.4);
-  --terminal-orange-bright: #ffa657;
+  /* The machine register, kept verbatim so `.machine` can hand it back.
+   * These are the deck's original CRT values; nothing else may use them. */
+  --machine-bg: #0a0e14;
+  --machine-bg-elevated: #141b24;
+  --machine-white: #e2e8f0;
+  --machine-white-dim: #c8d1dc;
+  --machine-white-muted: #8b99a8;
+  --machine-amber: #f0883e;
+  --machine-amber-dim: #c96f2e;
+  --machine-amber-bright: #ffa657;
+  --machine-green: #7ee787;
+  --machine-green-dim: #56d364;
+  --machine-green-bright: #a5f3b4;
+  --machine-cyan: #76e4f7;
+  --machine-blue: #79c0ff;
+  --machine-purple: #d2a8ff;
+  --machine-yellow: #ffd166;
+  --machine-red: #ff7b72;
+  --machine-border: #1e293b;
+  --machine-border-bright: #334155;
+  --machine-amber-glow: rgba(240, 136, 62, 0.4);
+  --machine-green-glow: rgba(126, 231, 135, 0.35);
 
-  /* Terminal green - phosphor P1 inspired */
-  --terminal-green: #7ee787;
-  --terminal-green-dim: #56d364;
-  --terminal-green-glow: rgba(126, 231, 135, 0.35);
-  --terminal-green-bright: #a5f3b4;
+  /* === CRT TERMINAL COLOR PALETTE ===
+   * Re-pointed at the Kubrick palette. Treat every `--terminal-*` name below
+   * as a legacy alias: new rules should read `--kubrick-*` directly. */
 
-  /* Accent colors for syntax highlighting */
-  --terminal-blue: #79c0ff;
-  --terminal-blue-glow: rgba(121, 192, 255, 0.3);
-  --terminal-purple: #d2a8ff;
-  --terminal-purple-glow: rgba(210, 168, 255, 0.3);
-  --terminal-red: #ff7b72;
-  --terminal-red-glow: rgba(255, 123, 114, 0.3);
-  --terminal-cyan: #76e4f7;
-  --terminal-cyan-glow: rgba(118, 228, 247, 0.3);
-  --terminal-yellow: #ffd166;
+  /* Backgrounds — flat black, no blue undertone. */
+  --terminal-bg: var(--kubrick-black);
+  --terminal-bg-secondary: var(--kubrick-ink);
+  --terminal-bg-input: var(--kubrick-ink);
+  --terminal-bg-elevated: var(--kubrick-grey-3);
+
+  /* Text */
+  --terminal-white: var(--kubrick-white);
+  --terminal-white-dim: var(--kubrick-grey-1);
+  --terminal-white-muted: var(--kubrick-grey-2);
+
+  /* The single accent. `--terminal-orange` drove h1, the `>` markers and
+   * every primary emphasis — it now drives all of them in red. */
+  --terminal-orange: var(--kubrick-red);
+  --terminal-orange-dim: var(--kubrick-red-dim);
+  --terminal-orange-glow: transparent;
+  --terminal-orange-bright: var(--kubrick-red);
+
+  /* h2 and command names were green. In a monochrome frame they become
+   * white — the hierarchy is carried by size and space, not by hue. */
+  --terminal-green: var(--kubrick-white);
+  --terminal-green-dim: var(--kubrick-grey-1);
+  --terminal-green-glow: transparent;
+  --terminal-green-bright: var(--kubrick-white);
+
+  /* Remaining accents collapse into the greys. */
+  --terminal-blue: var(--kubrick-grey-1);
+  --terminal-blue-glow: transparent;
+  --terminal-purple: var(--kubrick-grey-1);
+  --terminal-purple-glow: transparent;
+  --terminal-red: var(--kubrick-red);
+  --terminal-red-glow: transparent;
+  --terminal-cyan: var(--kubrick-grey-1);
+  --terminal-cyan-glow: transparent;
+  --terminal-yellow: var(--kubrick-grey-1);
 
   /* Border colors */
-  --terminal-border: #1e293b;
-  --terminal-border-bright: #334155;
-  --terminal-border-focus: var(--terminal-orange);
+  --terminal-border: var(--kubrick-grey-3);
+  --terminal-border-bright: var(--kubrick-grey-2);
+  --terminal-border-focus: var(--kubrick-red);
 
-  /* === TYPOGRAPHY === */
+  /* === TYPOGRAPHY ===
+   * `--font-sans` is the human voice and the deck's default; `--font-mono`
+   * stays the machine voice and is applied by the `.machine` block below,
+   * never by hand.
+   *
+   * 'Jost UA' is the patched, self-hosted build — see src/index.css for why
+   * plain Jost cannot set Ukrainian. */
+  --font-sans: 'Jost UA', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+
+  /* Kubrick sets titles in capitals with air between the letters. Headings
+   * track wide, the hero only slightly — at 96px, .08em would fall apart. */
+  --letter-spacing-hero: 0.02em;
+  --letter-spacing-heading: 0.08em;
+  --letter-spacing-label: 0.22em;
+
+  /* Weights: the geometric sans carries hierarchy by weight, not colour. */
+  --font-weight-display: 800;
+  --font-weight-body: 400;
 
   /* Three-tier type scale tuned for back-row readability in a conference hall.
    * Fluid clamp(min, preferred, max) so text scales smoothly from phone
@@ -117,85 +225,190 @@
   --input-bar-height: calc(var(--input-height) + var(--space-md) * 2);
 
   /* === EFFECTS === */
+  /* Kubrick's camera moves slowly and never cuts to hurry you. Reveals
+   * should surface, not switch on. Instant / fast stay quick because they
+   * drive controls, not content. */
   --transition-instant: 50ms ease;
   --transition-fast: 150ms ease;
-  --transition-normal: 300ms ease-out;
-  --transition-slow: 500ms ease-out;
+  --transition-normal: 600ms ease-out;
+  --transition-slow: 1100ms ease-out;
 
   /* Single deck-wide easing. */
   --ease: cubic-bezier(0.19, 1, 0.22, 1);
 
-  /* Glow effects */
-  --glow-orange: 0 0 20px var(--terminal-orange-glow), 0 0 40px var(--terminal-orange-glow);
-  --glow-green: 0 0 20px var(--terminal-green-glow), 0 0 40px var(--terminal-green-glow);
-  --glow-text-orange: 0 0 10px var(--terminal-orange-glow);
-  --glow-text-green: 0 0 10px var(--terminal-green-glow);
+  /* Glow is OFF for the human register — a Kubrick frame is clean and
+   * photographic. The `.machine` block re-arms it for the machine voice. */
+  --glow-orange: none;
+  --glow-green: none;
+  --glow-text-orange: none;
+  --glow-text-green: none;
 
-  /* CRT effects */
-  --scanline-opacity: 0.03;
-  --noise-opacity: 0.015;
-  --flicker-intensity: 0.005;
-}
-
-/* === LIGHT THEME — "paper terminal" ===
- * Activate via `<html data-theme="light">` (set by Presentation.tsx
- * in response to the `light` / `dark` terminal commands).
- *
- * The palette shifts to a warm cream paper background with darker,
- * desaturated accents that read against light. Scan lines and noise
- * overlays are disabled (light mode is a paper / notebook metaphor,
- * not a CRT). Glow text-shadow stays at low intensity so accents
- * still have a soft halo but don't bloom.
- *
- * If you add a new token to :root above, mirror it here only if the
- * value needs to differ for light. Most things (spacing, motion,
- * type scale, radii) are theme-agnostic. */
-[data-theme="light"] {
-  /* Cream paper backgrounds */
-  --terminal-bg: #f5efe6;
-  --terminal-bg-secondary: #ecdfc8;
-  --terminal-bg-input: #fffaf2;
-  --terminal-bg-elevated: #e5d4b3;
-
-  /* Ink text */
-  --terminal-white: #1a1a1a;
-  --terminal-white-dim: #3a3a3a;
-  --terminal-white-muted: #6a6a6a;
-
-  /* Darker amber — keeps the warm Claude-orange identity but
-   * passes contrast on cream */
-  --terminal-orange: #b8551c;
-  --terminal-orange-dim: #8c3e12;
-  --terminal-orange-glow: rgba(184, 85, 28, 0.25);
-  --terminal-orange-bright: #d96828;
-
-  /* Darker phosphor — still recognisably green, no longer neon */
-  --terminal-green: #2f7a3a;
-  --terminal-green-dim: #1f5826;
-  --terminal-green-glow: rgba(47, 122, 58, 0.2);
-  --terminal-green-bright: #3a9148;
-
-  /* Darker syntax accents */
-  --terminal-blue: #1e5cb8;
-  --terminal-blue-glow: rgba(30, 92, 184, 0.2);
-  --terminal-purple: #6b34c5;
-  --terminal-purple-glow: rgba(107, 52, 197, 0.2);
-  --terminal-red: #c43838;
-  --terminal-red-glow: rgba(196, 56, 56, 0.2);
-  --terminal-cyan: #0e7490;
-  --terminal-cyan-glow: rgba(14, 116, 144, 0.2);
-  --terminal-yellow: #b58900;
-
-  /* Borders read darker against cream */
-  --terminal-border: rgba(0, 0, 0, 0.12);
-  --terminal-border-bright: rgba(0, 0, 0, 0.24);
-
-  /* Drop the CRT atmosphere — light mode is a paper / notebook metaphor.
-   * Glow text-shadow stays (defined above via --glow-text-* which use
-   * the per-theme glow rgbas), just at lower alpha so accents have a
-   * soft halo without blooming. */
+  /* CRT effects — off on slides, restored inside `.machine`. */
   --scanline-opacity: 0;
   --noise-opacity: 0;
+  --flicker-intensity: 0;
+}
+
+/* === LIGHT THEME — THE WHITE VOID ===
+ * Activate via `<html data-theme="light">` (set by Presentation.tsx in
+ * response to the `light` / `dark` terminal commands).
+ *
+ * This is NOT the old cream "paper terminal", and it is not a fallback for a
+ * bright hall. It is the white room at the end of "2001": the same warm film
+ * white as the dark theme's text, the same red, inverted. Switching themes
+ * mid-talk is therefore a deliberate move — it reads as an act break, not as
+ * a brightness control.
+ *
+ * The machine register does NOT invert. A terminal is a lit screen in a dark
+ * room whichever way round the slide is, so `.machine` keeps its own black
+ * ground in both themes; see the block below. That is the point: in the white
+ * void the machine is the only dark thing on screen.
+ *
+ * Mirror every new `--kubrick-*` token here, or light mode silently inherits
+ * the dark value and the contrast breaks. */
+[data-theme="light"] {
+  --kubrick-black: var(--void-black);
+  --kubrick-ink: var(--void-ink);
+  --kubrick-white: var(--void-white);
+  --kubrick-grey-1: var(--void-grey-1);
+  --kubrick-grey-2: var(--void-grey-2);
+  --kubrick-grey-3: var(--void-grey-3);
+  --kubrick-red: var(--void-red);
+  --kubrick-red-dim: var(--void-red-dim);
+  --kubrick-felt: #1d4a3a;
+}
+
+/* === PER-SLIDE GROUNDS ===
+ * Two slide types repaint the whole frame, and both have to do it from the
+ * PRESENTATION container rather than from inside the slide: a slide cannot
+ * paint over its own ancestor's background, and — the subtler half — the
+ * `--terminal-*` aliases are substituted at the element that DECLARES them,
+ * so re-pointing `--kubrick-*` on a descendant never reaches them. Declaring
+ * both layers here, above the machine register, is what makes the whole
+ * subtree follow.
+ *
+ * `:has()` keeps the trigger in CSS: only the active slide is mounted, so the
+ * selector matches exactly when that slide type is on screen. */
+
+/* An act card sits in a deeper black than the body slides — the difference is
+ * small and it is the point: the room gets darker between acts. */
+.presentation:has(.act-card) {
+  background: var(--kubrick-ink);
+}
+
+/* The inverse slide flips to the OTHER ground, whichever the deck is on: the
+ * white void inside the black room, and the black room inside the white void.
+ * Only the `--kubrick-*` layer is chosen here; the `--terminal-*` aliases
+ * below have to be restated because they were substituted up at `:root`. */
+.presentation:has(.slide-inverse) {
+  --kubrick-black: var(--void-black);
+  --kubrick-ink: var(--void-ink);
+  --kubrick-white: var(--void-white);
+  --kubrick-grey-1: var(--void-grey-1);
+  --kubrick-grey-2: var(--void-grey-2);
+  --kubrick-grey-3: var(--void-grey-3);
+  --kubrick-red: var(--void-red);
+  --kubrick-red-dim: var(--void-red-dim);
+}
+
+[data-theme="light"] .presentation:has(.slide-inverse) {
+  --kubrick-black: var(--room-black);
+  --kubrick-ink: var(--room-ink);
+  --kubrick-white: var(--room-white);
+  --kubrick-grey-1: var(--room-grey-1);
+  --kubrick-grey-2: var(--room-grey-2);
+  --kubrick-grey-3: var(--room-grey-3);
+  --kubrick-red: var(--room-red);
+  --kubrick-red-dim: var(--room-red-dim);
+}
+
+.presentation:has(.slide-inverse) {
+  --terminal-bg: var(--kubrick-black);
+  --terminal-bg-secondary: var(--kubrick-ink);
+  --terminal-bg-elevated: var(--kubrick-grey-3);
+  --terminal-white: var(--kubrick-white);
+  --terminal-white-dim: var(--kubrick-grey-1);
+  --terminal-white-muted: var(--kubrick-grey-2);
+  --terminal-orange: var(--kubrick-red);
+  --terminal-orange-dim: var(--kubrick-red-dim);
+  --terminal-green: var(--kubrick-white);
+  --terminal-blue: var(--kubrick-grey-1);
+  --terminal-cyan: var(--kubrick-grey-1);
+  --terminal-red: var(--kubrick-red);
+  --terminal-border: var(--kubrick-grey-3);
+  --terminal-border-bright: var(--kubrick-grey-2);
+
+  background: var(--terminal-bg);
+}
+
+/* === THE MACHINE REGISTER ===
+ * Everything the machine says lives here: code blocks, the terminal input
+ * bar, agent transcripts, and any element a slide marks `.machine`.
+ *
+ * It works by re-declaring the `--terminal-*` tokens on its own subtree, so
+ * every existing rule underneath renders in CRT amber-on-near-black without
+ * being rewritten — the exact inverse of the re-pointing done in `:root`.
+ * Custom properties resolve at the point of use, which is what makes a
+ * single scoped block enough.
+ *
+ * Placed at the end of tokens.css deliberately: it is the other half of the
+ * palette decision above, and splitting the two across files is how the rule
+ * gets forgotten. */
+.machine,
+.slide pre,
+.slide code,
+.input-bar {
+  --terminal-bg: var(--machine-bg);
+  --terminal-bg-secondary: var(--machine-bg);
+  --terminal-bg-input: var(--machine-bg);
+  --terminal-bg-elevated: var(--machine-bg-elevated);
+  --terminal-white: var(--machine-white);
+  --terminal-white-dim: var(--machine-white-dim);
+  --terminal-white-muted: var(--machine-white-muted);
+  /* The FULL accent set, not just the four names a code block happens to
+   * use. Anything left out falls through to the slide palette, where it is
+   * a Kubrick colour on a CRT ground — and in the white void it lands as
+   * near-black text on the near-black bar. That is how the timer's pace
+   * colours and the progress meter went unreadable once; if you add a
+   * `--terminal-*` alias to `:root`, add it here too. */
+  --terminal-orange: var(--machine-amber);
+  --terminal-orange-dim: var(--machine-amber-dim);
+  --terminal-orange-bright: var(--machine-amber-bright);
+  --terminal-orange-glow: var(--machine-amber-glow);
+  --terminal-green: var(--machine-green);
+  --terminal-green-dim: var(--machine-green-dim);
+  --terminal-green-bright: var(--machine-green-bright);
+  --terminal-green-glow: var(--machine-green-glow);
+  --terminal-cyan: var(--machine-cyan);
+  --terminal-blue: var(--machine-blue);
+  --terminal-purple: var(--machine-purple);
+  --terminal-yellow: var(--machine-yellow);
+  --terminal-red: var(--machine-red);
+  --terminal-border: var(--machine-border);
+  --terminal-border-bright: var(--machine-border-bright);
+  --terminal-border-focus: var(--machine-amber);
+
+  /* Phosphor comes back with it — glow is what makes a screen a screen. */
+  --glow-text-orange: 0 0 10px var(--machine-amber-glow);
+  --glow-text-green: 0 0 10px var(--machine-green-glow);
+  --glow-orange: 0 0 20px var(--machine-amber-glow), 0 0 40px var(--machine-amber-glow);
+  --glow-green: 0 0 20px var(--machine-green-glow), 0 0 40px var(--machine-green-glow);
+
+  font-family: var(--font-mono);
+}
+
+/* A `.machine` panel is a screen: its own dark ground, a hairline frame, and
+ * text set at the code size rather than the body size. Code blocks and the
+ * input bar already carry their own chrome, so only the generic panel opts in. */
+.slide .machine {
+  background: var(--terminal-bg);
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-card);
+  color: var(--terminal-white);
+  font-size: var(--font-size-code);
+  line-height: var(--line-height-normal);
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
 }
 
 /* Input control height shrinks on phones (not part of the clamp() font

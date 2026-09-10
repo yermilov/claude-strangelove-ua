@@ -1,4 +1,7 @@
-const TOTAL_TIME = 60 * 60;
+/** The fwdays Tech Summit'26 slot is 35 minutes (confirmed 10.09.2026).
+ *  The pace colour below is derived from it, so this constant is the only
+ *  place a slot-length change has to land. */
+const TOTAL_TIME = 35 * 60;
 
 interface TimerProps {
   elapsedSeconds: number;

@@ -1,5 +1,43 @@
-/* === FONT IMPORTS === */
+/* === FONT IMPORTS ===
+ *
+ * Two typefaces, two registers (see design-system/tokens.css):
+ *   Jost UA  — the human voice. Slide prose, headings, act cards.
+ *   JetBrains Mono — the machine voice. Code, agent logs, the input bar.
+ *
+ * Jost is SELF-HOSTED and PATCHED, and that is not a preference. Upstream
+ * Jost — Google Fonts v20, @fontsource/jost 5.3.0 and the designer's own
+ * release alike — declares a Cyrillic `unicode-range` that includes
+ * U+0400-045F and U+0490-0491, but the font file contains no Ukrainian
+ * letters at all: І і Ї ї Є є Ґ ґ are all absent (32/32 Russian letters are
+ * present, so the gap is real, not a decoding artefact). Loaded from a CDN
+ * it would silently render most Ukrainian words in two typefaces, because
+ * і/ї/є fall back per glyph. `scripts/patch-jost-ukrainian.py` adds those
+ * eight glyphs; the built woff2 files live in `src/fonts/`. */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@font-face {
+  font-family: 'Jost UA';
+  src: url('./fonts/jost-ua-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jost UA';
+  src: url('./fonts/jost-ua-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jost UA';
+  src: url('./fonts/jost-ua-800.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* === GLOBAL RESET === */
 *,
@@ -25,11 +63,21 @@ body,
   overflow: hidden;
 }
 
+/* The ground behind `.presentation`. It is normally never seen — the
+ * presentation container fills the viewport — but it is what paints during
+ * the first frame and behind an overscroll, so it follows the theme rather
+ * than being pinned to the dark palette. Literals, not tokens: this rule has
+ * to hold before the design system's stylesheet has applied. */
 body {
-  background: #0a0e14;
-  color: #e2e8f0;
-  font-family: 'JetBrains Mono', monospace;
+  background: #0a0a0a;
+  color: #f2f0eb;
+  font-family: 'Jost UA', system-ui, sans-serif;
   line-height: 1.6;
+}
+
+html[data-theme='light'] body {
+  background: #f2f0eb;
+  color: #0a0a0a;
 }
 
 /* Smooth scrolling */
@@ -41,13 +89,13 @@ body {
 
 /* Custom selection colors */
 ::selection {
-  background: #f0883e;
-  color: #0a0e14;
+  background: #d81f26;
+  color: #f2f0eb;
 }
 
 ::-moz-selection {
-  background: #f0883e;
-  color: #0a0e14;
+  background: #d81f26;
+  color: #f2f0eb;
 }
 
 /* Custom scrollbar for webkit browsers */
@@ -57,21 +105,21 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0d1219;
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #262624;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #6e6c67;
 }
 
 /* Focus visible for accessibility */
 :focus-visible {
-  outline: 2px solid #f0883e;
+  outline: 2px solid #d81f26;
   outline-offset: 2px;
 }
 

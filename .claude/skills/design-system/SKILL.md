@@ -1,11 +1,24 @@
 ---
 name: design-system
-description: Apply the deck's terminal-CRT design system when creating or modifying slides — three-tier type scale (hero / heading / body), JetBrains Mono throughout, `>` bullet markers with phosphor glow, scan-line + noise CRT overlays, orange / green / cyan palette on deep black, bottom bar chrome wrapping Timer + Input + Progress. Tokens and reusable styles live in `src/design-system/`; per-slide layouts in `src/styles/slide-layouts.css`. TRIGGER when creating a new slide component under `src/slides/`, styling slide content, editing CSS, picking colors or fonts, adjusting spacing, modifying tokens in `src/design-system/`, when a hardcoded hex value or px font-size appears in a diff, or building UI chrome for the presentation. Also trigger when the user asks for the terminal aesthetic, says the deck doesn't feel cohesive, or asks why an accent color doesn't match the rest.
+description: Apply the deck's Kubrick design system when creating or modifying slides — two registers (Jost UA on black for the human voice, JetBrains Mono CRT amber for the machine voice), three-tier type scale (hero / heading / body), uppercase letter-spaced headings, one red accent, no glow on slides, act cards / light ring / big board layouts, bottom bar chrome wrapping Timer + Input + Progress. Tokens and reusable styles live in `src/design-system/`; per-slide layouts in `src/styles/slide-layouts.css`. TRIGGER when creating a new slide component under `src/slides/`, styling slide content, editing CSS, picking colors or fonts, adjusting spacing, modifying tokens in `src/design-system/`, when a hardcoded hex value or px font-size appears in a diff, or building UI chrome for the presentation. Also trigger when the user asks about the Kubrick look, why something is red rather than amber, whether an element should be mono, says the deck doesn't feel cohesive, or asks why an accent color doesn't match the rest.
 ---
 
 ## Scope
 
-This deck has a **terminal-CRT identity** — JetBrains Mono on deep black, warm orange / phosphor green / cyan accents, `>` markers, scan lines, subtle text-shadow glow. The aesthetic is **load-bearing**: removing the mono font, the glow, or the `>` markers breaks the look. Stay inside the system; reach for new tokens or new patterns only when nothing existing fits.
+This deck runs a **Kubrick skin over the terminal deck**, and the whole system reduces to one rule:
+
+> **Kubrick speaks for the human. The terminal speaks for the machine.**
+
+Slides are Kubrick — flat black, symmetrical, Jost UA set large in capitals, exactly one red, **no glow, no scan lines**. Everywhere the machine speaks — code blocks, agent logs, the input bar, anything marked `.machine` — the original CRT register returns: JetBrains Mono, amber and phosphor green, glow, near-black `#0a0e14`. The audience should see that the machine has started talking before they read a word of it.
+
+That contrast **is the talk's argument** ("Клод Стрейнджлав" — systems built not to fail, that fail where a human trusted the process instead of looking), so it is load-bearing, not decoration. Two ways to get it wrong, and both are common:
+
+- giving a slide element amber, glow or mono because it looks good — that dilutes the machine's voice;
+- flattening a code block or the input bar into monochrome for "consistency" — that erases it.
+
+The test for any element is a single question: **is this the machine talking?** Everything else stays Kubrick.
+
+Mechanically the skin is the DOU re-skin technique: `--kubrick-*` tokens are first-class, the old `--terminal-*` names are **aliases re-pointed at them**, and `.machine` hands the original values back on its own subtree. So all ~3000 lines of `slide-layouts.css` render in the new palette for free, and new rules should read `--kubrick-*` directly.
 
 The system is built for a **conference hall talk at 1920×1080+**: all text must be readable from the back row. Body text caps at 40px, heading at 80px. If a slide overflows, **split it** rather than shrinking text — that's the design system's first commandment.
 
@@ -19,6 +32,8 @@ The system is built for a **conference hall talk at 1920×1080+**: all text must
 | Chrome components (input bar, tooltips, code block, rotate hint) | `src/design-system/components.css` |
 | Per-slide layouts (one slide each — bio, timeline, VS battle, etc.) | `src/styles/slide-layouts.css` |
 | Slide-element React primitives (SlideItem, Emphasis, SlideLink, CodeBlock) | `src/components/SlideElements.tsx` + `src/components/CodeBlock.tsx` |
+| Kubrick primitives (ActCard, LightRing, BigBoard, Machine) | `src/components/KubrickElements.tsx` |
+| The patched Jost webfonts + the script that builds them | `src/fonts/` + `scripts/patch-jost-ukrainian.py` |
 
 Always read `tokens.css` before you write a new style — the token you need probably exists. If you're adding a new token, add it to `tokens.css` with a comment explaining when to reach for it.
 
@@ -29,7 +44,7 @@ Read `--font-size-*` in `tokens.css` for the canonical values. The deck uses **o
 | Tier | Token | Use |
 |---|---|---|
 | **Hero** | `--font-size-hero` (~96px max) | Title slide only |
-| **Heading** | `--font-size-h1` / `--font-size-h2` (~80px max) | Section heading per slide. `h1` is the default; `h2` is the same size but green |
+| **Heading** | `--font-size-h1` / `--font-size-h2` (~80px max) | Section heading per slide, uppercase and letter-spaced. `h1` is the default and is red; `h2` is the same size but white |
 | **Body** | `--font-size-body` (~40px max) | Paragraphs, list items, default text |
 | **Code** | `--font-size-code` (~24px max) | Inline code and code blocks |
 
@@ -41,33 +56,38 @@ All sizes use `clamp(min, preferred, max)` so they scale smoothly from phone to 
 
 ## Dark + light themes
 
-The deck ships **two theme variants**:
+- **Dark (default)** — the black room. `#0a0a0a` ground, warm film white `#f2f0eb` text, one red.
+- **Light** — **the white void of "2001"**, not a paper fallback: the same warm white becomes the ground, the same near-black becomes the ink, the red stays. Switching mid-talk therefore reads as an act break, not as a brightness control.
 
-- **Dark (default)** — deep black CRT terminal with full phosphor glow, scan-line + noise overlays. The original identity.
-- **Light** — "paper terminal": warm cream `#f5efe6` background, darker amber / green / blue accents, glow text-shadow at reduced alpha, **scan lines and noise dropped entirely** (light mode is a paper metaphor, not a CRT).
+The **machine register does not invert**. A terminal is a lit screen in a dark room whichever way round the slide is — so in the white void the machine is the only dark thing on screen. That is deliberate; don't "fix" it.
 
-Switch at runtime with the `light` and `dark` terminal commands. The choice persists in `localStorage` under the key `theme`. The active variant lives on the root element as `<html data-theme="light">` (dark is the absence of the attribute).
+Switch at runtime with the `light` and `dark` terminal commands. The choice persists in `localStorage` under `theme` and lands as `<html data-theme="light">` (dark is the absence of the attribute).
 
-Light-theme overrides live in `tokens.css` under the `[data-theme="light"]` selector. Only tokens that need to differ for light are overridden — spacing, motion, type scale, radii are theme-agnostic. **If you add a new accent or background token to `:root`, mirror it under `[data-theme="light"]`.** Otherwise the light theme will inherit the dark value and the contrast will break.
+Overrides live in `tokens.css` under `[data-theme="light"]`, and **only the `--kubrick-*` tokens are restated there** — the `--terminal-*` aliases follow automatically because that selector lands on the same element as `:root`. **Mirror every new `--kubrick-*` token there**, or light mode inherits the dark value and the contrast breaks.
 
-CRT effects are gated by the `--scanline-opacity` and `--noise-opacity` tokens, which are set to `0` in light theme. Don't hardcode CRT visuals — always go through these tokens so the theme switch works.
+⚠️ **The short form works only on `:root`.** A custom property is substituted at the element that DECLARES it, so `--terminal-white: var(--kubrick-white)` was already resolved up at `:root`: re-pointing `--kubrick-white` on a DESCENDANT never reaches it. Anything deeper in the tree that changes the palette — `.slide-inverse`, `.machine` — must restate the `--terminal-*` aliases by hand. That is why `.presentation:has(.slide-inverse)` in `tokens.css` looks redundant and is not.
 
-## Color palette — four accents + neutrals
+## Color palette — black, three greys, one red
 
-Read `--terminal-*` in `tokens.css`. The accent palette is small:
+Read `--kubrick-*` in `tokens.css`. The constraint is the look:
 
-| Color | Token | Use |
+| Role | Token | Hex (dark) |
 |---|---|---|
-| Orange (Claude amber) | `--terminal-orange` | h1, `>` markers, primary emphasis, input prompt, focus border |
-| Phosphor green | `--terminal-green` | h2, command names, success state, ordered-list counters |
-| Cyan | `--terminal-cyan` | Inline code, hyperlink hover, technical highlights |
-| Blue | `--terminal-blue` | h3, default link color, secondary technical accent |
+| Slide ground | `--kubrick-black` | `#0a0a0a` |
+| Deeper black — act cards, the void | `--kubrick-ink` | `#050607` |
+| Text — warm film white, never `#fff` | `--kubrick-white` | `#f2f0eb` |
+| Secondary / muted text | `--kubrick-grey-1` / `-2` | `#b9b7b1` / `#6e6c67` |
+| Rules, borders, panel fills | `--kubrick-grey-3` | `#262624` |
+| **The only accent** — HAL, and danger | `--kubrick-red` | `#d81f26` |
+| War Room baize — **one** easter-egg use in the deck | `--kubrick-felt` | `#14352a` |
 
-Plus `--terminal-purple` and `--terminal-red` exist for code-block syntax highlighting; do not use them as primary slide accents.
+There is no second accent, and adding one is the fastest way to break the look. The old `--terminal-orange` now resolves to the red and `--terminal-green` to the white; treat both names as legacy.
 
-**Backgrounds** are always `--terminal-bg` (deep black) or `--terminal-bg-elevated` (slightly lifted). No gradients, no patterns. The CRT scan-line + noise overlays in `.presentation::before` / `::after` provide all the texture.
+**Backgrounds** are flat. No gradients, no patterns, no texture — a Kubrick frame is clean and photographic.
 
-**Glow** is load-bearing. Headings, `>` markers, prompt `>`, and accent text use `text-shadow: var(--glow-text-*)`. Removing the glow makes the deck look like a generic web page. When you add new accent text, add the glow too.
+**Glow is OFF on slides** (`--glow-*: none`, `--scanline-opacity: 0`, `--noise-opacity: 0`) and **ON inside `.machine`**, which restores it. Never write a `text-shadow` literal: go through the tokens, so the register decides.
+
+**Machine values** live as `--machine-*` in `tokens.css` (`#0a0e14`, `#f0883e`, `#7ee787`, `#76e4f7`…) and are read by the `.machine` block alone. Do not reference them from a slide rule.
 
 ## Bullets and lists
 
@@ -76,9 +96,30 @@ The deck's `ul` and `ol` are styled in `base.css`:
 - `ul` → `>` marker (orange, glowing, bold)
 - `ol` → numbered counter (green, glowing)
 
-This is **command-line aesthetic**. Don't switch to `•` bullets — that breaks the identity.
+This is **command-line aesthetic** and it survives the re-skin — the `>` is a shape, not a colour, so it stays while its amber becomes red. Don't switch to `•` bullets.
+
+Note the deliberate asymmetry: bullet markers are RED (Kubrick) even though the input bar's prompt `>` is amber (machine). A bullet is you talking; the prompt is the terminal talking.
 
 For richer list items (icon prefix, inline emphasis, reveal animation), use the `<SlideItem>` React component from `src/components/SlideElements.tsx`. Its `prefix` prop accepts `>`, `>>`, `>>>`, `>>>>` for depth.
+
+## Kubrick layouts
+
+Three compositions carry the skin. They live as React components in
+`src/components/KubrickElements.tsx`, styled in `slide-layouts.css`:
+
+| Component | What it is | When |
+|---|---|---|
+| `<ActCard>` | The title-card convention of "2001": one line of type in a deeper black, held long enough to become a pause | Between acts. It is the **punctuation of a 35-minute slot** — it improves rhythm, not just looks |
+| `<LightRing>` | Ken Adam's War Room fixture: a luminous ring, dark inside, spilling into the black | Section frame — the ring holds the heading and nothing competes |
+| `<BigBoard>` | The wall of displays: a 3×2 grid where exactly one panel is lit (`activeIndex`) | The six controls. **The board never moves between slides**, so the audience keeps its bearings |
+
+Plus `<Machine>` for a panel where the machine speaks (an agent log, a tool trace) that is not a `<CodeBlock>`.
+
+`.slide-inverse` is the fourth: the white void on a single slide, without switching the deck's theme. Use it **sparingly** — its force comes from being rare; today only the final slide uses it.
+
+Two of these repaint the whole frame, and they do it from `.presentation:has(...)` in `tokens.css`, never from inside the slide. A slide cannot paint over its own ancestor's background, and a `position: fixed` pseudo-element at `z-index: -1` lands *behind* `.presentation` rather than in front of it. If you add another full-frame slide type, follow the same pattern.
+
+⚠️ **Percentage padding inside a slide-level box resolves against the SLIDE's width, not the box's.** `padding: 13%` on the 520px light ring computed to 191px a side (13% of the ~1470px slide), left an 89px content box, and pushed the label out of a circle that still looked perfectly centred. Constrain inner content with a percentage `max-width` on the child instead — a percentage *width* does resolve against the grid area.
 
 ## Code blocks
 
@@ -132,11 +173,15 @@ Read `tokens.css`. There's one scale of each:
 | Add `text-shadow: none` to a new accent heading | Glow is load-bearing for the CRT identity |
 | Put per-slide CSS in `design-system/` | DS is for cross-slide reuse; one-slide styles go in `slide-layouts.css` |
 | Float a new timer/progress/badge as `position: fixed` | Chrome lives inside `.input-bar` |
-| Introduce a serif or sans-serif body font | Mono everywhere is load-bearing |
-| Remove the scan-line / noise overlays for a "cleaner" look | They are the CRT identity |
-| Add a 5th accent colour | The palette is intentionally constrained |
-| Add a new accent token to `:root` without mirroring under `[data-theme="light"]` | Light theme will inherit the dark value and lose contrast |
-| Hardcode scan-line or noise visuals directly (instead of through `--scanline-opacity` / `--noise-opacity`) | Light theme can't disable them |
+| Set slide prose in mono | Mono is the machine's voice; using it for your own erases the distinction |
+| Give a slide element amber, glow or `--machine-*` because it looks good | Same — the machine register has to stay expensive |
+| Flatten a code block or the input bar into monochrome | The machine must stay a lit screen, in both themes |
+| Re-enable scan lines or glow on slides | A Kubrick frame is clean and photographic |
+| Add a 2nd accent colour | The palette is one red, deliberately |
+| Use `--kubrick-felt` more than once | It is an easter egg; repeated, it is just a green |
+| Add a new `--kubrick-*` token without mirroring under `[data-theme="light"]` | Light theme inherits the dark value and loses contrast |
+| Re-point `--kubrick-*` on a descendant and expect `--terminal-*` to follow | Aliases resolve where they are declared — restate them (see Dark + light themes) |
+| Type a heading in capitals in the JSX | `text-transform: uppercase` does it; keep the source readable and searchable |
 
 ## Validation
 
@@ -146,8 +191,9 @@ After any change touching `src/design-system/` or `src/slides/`:
 2. `bun run check:async-slides` — async-slide audit must pass
 3. `bun run dev` — start dev server
 4. Hard-refresh `http://localhost:5173/claude-strangelove-ua/` to clear Vite's CSS cache
-5. Eyeball at least three slides: title (hero), a content slide (heading + bullets), a code-block slide. Confirm: heading is huge and glowing, body text is back-row readable, `>` markers are orange, bottom bar is wired
-6. If touching token sizes, also resize the window to ~768px and confirm the layout still reads (no overflow, no chrome collision)
+5. Eyeball at least three slides: title (hero), a content slide (heading + bullets), a code-block slide. Confirm: **the two registers are visibly different** — slide type is Jost with no glow, the code block and input bar are mono amber-on-near-black; heading is huge, uppercase and red; body text is back-row readable; `>` markers are red; bottom bar is wired
+6. Check the light theme too (`light` command, or seed `localStorage.theme`): the ground should be the warm white void with the machine bar still dark. A Ukrainian slide must render **entirely** in Jost — if і/ї/є/ґ look like a different typeface, the patched font (`src/fonts/`) has not loaded; see `src/index.css`
+7. If touching token sizes, also resize the window to ~768px and confirm the layout still reads (no overflow, no chrome collision)
 
 ## When to evolve the system
 
