@@ -250,6 +250,16 @@
   --input-padding-x: 1.25rem;
   --input-bar-height: calc(var(--input-height) + var(--space-md) * 2);
 
+  /* === CONFERENCE MARK ===
+   * The Fwdays mark the organiser asked the deck to carry (`.fwdays-mark`).
+   * It hangs off the bottom-right of the stage, so that corner is SPOKEN FOR
+   * on every slide that shows it: a slide whose content reaches the right
+   * edge must inset itself by `--conference-mark-inset`, or the two stack.
+   * Reach for the inset whenever a layout has a full-height right column.
+   * The 1.4 is the mark's aspect — the ink box in `FwdaysLogo.tsx`, 427:305.8. */
+  --conference-mark-height: 8rem;
+  --conference-mark-inset: calc(var(--conference-mark-height) * 1.4 + var(--space-xl));
+
   /* === EFFECTS === */
   /* Kubrick's camera moves slowly and never cuts to hurry you. Reveals
    * should surface, not switch on. Instant / fast stay quick because they
@@ -438,6 +448,15 @@
   line-height: var(--line-height-normal);
   padding: var(--space-md) var(--space-lg);
   text-align: left;
+}
+
+/* The conference mark halves on a phone. Overriding the HEIGHT rather than
+ * `.fwdays-mark` keeps the inset honest — it is derived from the height, so
+ * a slide that yields the corner yields exactly as much as the mark takes. */
+@media (max-width: 900px) {
+  :root {
+    --conference-mark-height: 4rem;
+  }
 }
 
 /* Input control height shrinks on phones (not part of the clamp() font

@@ -620,25 +620,32 @@
 /* Dark ground: knock the wordmark out. */
 .fwdays-logo__word { fill: var(--kubrick-white); }
 
-/* The corner mark carried by content slides. Deliberately small and set well
- * into the corner: it is somebody else's brand inside a one-red palette, so
- * it should be present and findable rather than competing. */
+/* The corner mark carried by content slides. It sits BOTTOM-right, not
+ * top-right: the top of every slide is the title's, and a second mark up
+ * there read as a competing headline rather than as a credit. Down here it
+ * is the last thing the eye reaches, which is what a conference mark is for
+ * — and it leaves the whole top line to a long Ukrainian title. */
 .fwdays-mark {
   position: absolute;
-  top: var(--space-lg);
+  /* Equal offsets: this is now the mark's only clear space, since the
+   * viewBox no longer carries any (see FwdaysLogo.tsx). */
+  bottom: var(--space-xl);
   right: var(--space-xl);
-  /* 4.5rem is the smallest size at which the two-line wordmark is still
-   * readable on a compressed stream; below that it degrades into noise and
-   * stops functioning as a logo at all. */
-  height: 4.5rem;
+  /* Height is of the ink itself, not of a padded canvas — the token is
+   * roughly three times the artwork the old 4.5rem actually drew. That size
+   * is the point: the two-line wordmark has to survive H.264 in a browser
+   * window, and down here nothing is competing with it. */
+  height: var(--conference-mark-height);
   opacity: 0.8;
   pointer-events: none;
   z-index: 4;
 }
 
+/* The height itself halves via `--conference-mark-height` in tokens.css, so
+ * that the inset a slide reserves shrinks with it. Only the offsets are here. */
 @media (max-width: 900px) {
   .fwdays-mark {
-    height: 2.25rem;
+    bottom: var(--space-md);
     right: var(--space-md);
   }
 }

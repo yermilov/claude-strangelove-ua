@@ -14,11 +14,20 @@ import { CSSProperties } from 'react';
  * gradient id are renamed, because `st0`-`st3` and `SVGID_1_` are far too
  * generic to inline into a page. Regenerate from that file rather than
  * hand-editing the geometry here.
+ *
+ * The one thing that is NOT theirs is the viewBox. Theirs is `0 0 539.3 496.9`
+ * around ink that measures 427x305.8 at (66.6, 83.6) — i.e. 38% of the declared
+ * height is empty canvas, and unevenly so (83.6 above, 107.5 below). Because the
+ * mark is sized by CSS height, that made it draw a third smaller than asked for
+ * and float off its own bottom edge. The box below is the ink box, read off
+ * `getBBox()` in the live page: it crops empty canvas, it moves no geometry.
+ * Clear space around the mark is now the corner offset in `.fwdays-mark`,
+ * where it can be seen and tuned.
  */
 export function FwdaysLogo({ className, style }: { className?: string; style?: CSSProperties }) {
   return (
     <svg
-      viewBox="0 0 539.3 496.9"
+      viewBox="66.6 83.6 427 305.8"
       className={className ? `fwdays-logo ${className}` : 'fwdays-logo'}
       style={style}
       role="img"

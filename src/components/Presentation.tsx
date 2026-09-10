@@ -189,12 +189,14 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
     <NavigationContext.Provider value={{ goToSlideById }}>
     <div className="presentation">
       {!isExportMode && <RotateHint />}
-      {/* The conference mark the organiser asked us to carry. It lives on the
-        * presentation frame rather than inside the slide so it holds the same
-        * corner regardless of what any one slide's layout does — and it stays
-        * in export mode, because the PDF is what actually gets sent to them. */}
-      {!activeSlide.hideConferenceMark && <FwdaysLogo className="fwdays-mark" />}
       <div className="slide-container" ref={containerRef} key={activeSlide.id}>
+        {/* The conference mark the organiser asked us to carry. It hangs off
+          * the stage rather than inside the slide, so it holds the same corner
+          * regardless of what any one slide's layout does — and it stays in
+          * export mode, because the PDF is what actually gets sent to them.
+          * The stage, not the frame: the mark is bottom-anchored, and the
+          * frame's bottom edge is the input bar, which the PDF does not have. */}
+        {!activeSlide.hideConferenceMark && <FwdaysLogo className="fwdays-mark" />}
         <Slide
           isActive
           notes={activeSlide.notes}

@@ -37,6 +37,9 @@ export const FinalSlide: SlideDefinition = {
         gap: 'var(--space-3xl)',
         width: '100%',
         paddingBottom: 'var(--space-xl)',
+        // The QR card is a full-height right column, so it would otherwise
+        // run straight into the Fwdays mark in the corner. See the token.
+        paddingRight: 'var(--conference-mark-inset)',
       }}
     >
       {/* Left column - bullets */}

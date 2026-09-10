@@ -73,9 +73,9 @@
   line-height: var(--line-height-tight);
   text-shadow: var(--glow-text-green);
   width: max-content;
-  /* Leave the top-right corner free: the Fwdays mark lives there, and a long
-   * title would otherwise run underneath it. */
-  max-width: calc(100% - 7rem);
+  /* The full top line is the title's — the Fwdays mark moved to the bottom
+   * corner, so nothing up here needs reserving any more. */
+  max-width: 100%;
   z-index: 3;
 }
 
