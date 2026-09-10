@@ -20,7 +20,27 @@ The test for any element is a single question: **is this the machine talking?** 
 
 Mechanically the skin is the DOU re-skin technique: `--kubrick-*` tokens are first-class, the old `--terminal-*` names are **aliases re-pointed at them**, and `.machine` hands the original values back on its own subtree. So all ~3000 lines of `slide-layouts.css` render in the new palette for free, and new rules should read `--kubrick-*` directly.
 
-The system is built for a **conference hall talk at 1920×1080+**: all text must be readable from the back row. Body text caps at 40px, heading at 80px. If a slide overflows, **split it** rather than shrinking text — that's the design system's first commandment.
+⚠️ **The talk is ONLINE.** Fwdays Tech Summit'26 went fully online (organiser, 10.09.2026), and that
+changes what "legible" means. The old premise — a projector in a hall, read from the back row — is
+gone. The audience watches a **re-encoded video stream in a window**, so the enemy is H.264, not
+throw distance: it halves chroma resolution, smears saturated red on black, and eats thin
+low-contrast lines outright.
+
+Practical consequences, and they are the reason several values look "too light" next to a normal
+dark theme:
+
+- **Every text colour clears WCAG AA (4.5:1) at BODY size**, not merely at display size — the red and
+  the muted grey are used for small letter-spaced labels, which is what a stream destroys first.
+- **A border is a line, not a fill.** `--kubrick-rule` exists for borders that carry structure;
+  `--kubrick-grey-3` is for fills only. A 1px hairline at 1.3:1 is simply not there after re-encoding.
+- **Code sets at the same maximum as body text** (~32px), on the organiser's explicit request.
+- Avoid faint large-area gradients and sub-10% tints — they band.
+
+Body text caps at 32px, heading at 80px. If a slide overflows, **split it** rather than shrinking
+text — that's still the design system's first commandment.
+
+**The slot is 35 minutes: 25–30 of talk plus 5–10 of Q&A.** `Timer.tsx` counts down the **30**, which
+is the number to rehearse against.
 
 ## Where things live
 
@@ -46,7 +66,7 @@ Read `--font-size-*` in `tokens.css` for the canonical values. The deck uses **o
 | **Hero** | `--font-size-hero` (~96px max) | Title slide only |
 | **Heading** | `--font-size-h1` / `--font-size-h2` (~80px max) | Section heading per slide, uppercase and letter-spaced. `h1` is the default and is red; `h2` is the same size but white |
 | **Body** | `--font-size-body` (~40px max) | Paragraphs, list items, default text |
-| **Code** | `--font-size-code` (~24px max) | Inline code and code blocks |
+| **Code** | `--font-size-code` (~32px max) | Inline code and code blocks. Raised from 24px for the online format — write code samples SHORT enough to fit rather than winding this back |
 
 `--font-size-h3` exists but is rarely used and not part of the canonical scale. If you want to write h3, ask whether you actually need a third heading tier — usually you can structure it as body with a `.section-header` label above.
 
@@ -71,15 +91,17 @@ Overrides live in `tokens.css` under `[data-theme="light"]`, and **only the `--k
 
 Read `--kubrick-*` in `tokens.css`. The constraint is the look:
 
-| Role | Token | Hex (dark) |
-|---|---|---|
-| Slide ground | `--kubrick-black` | `#0a0a0a` |
-| Deeper black — act cards, the void | `--kubrick-ink` | `#050607` |
-| Text — warm film white, never `#fff` | `--kubrick-white` | `#f2f0eb` |
-| Secondary / muted text | `--kubrick-grey-1` / `-2` | `#b9b7b1` / `#6e6c67` |
-| Rules, borders, panel fills | `--kubrick-grey-3` | `#262624` |
-| **The only accent** — HAL, and danger | `--kubrick-red` | `#d81f26` |
-| War Room baize — **one** easter-egg use in the deck | `--kubrick-felt` | `#14352a` |
+| Role | Token | Hex (dark) | On `#0a0a0a` |
+|---|---|---|---|
+| Slide ground | `--kubrick-black` | `#0a0a0a` | — |
+| Deeper black — act cards, the void | `--kubrick-ink` | `#050607` | — |
+| Text — warm film white, never `#fff` | `--kubrick-white` | `#f2f0eb` | 17.4:1 |
+| Body text | `--kubrick-grey-1` | `#b9b7b1` | 9.9:1 |
+| Muted text | `--kubrick-grey-2` | `#87857f` | 5.4:1 |
+| Panel **fills** | `--kubrick-grey-3` | `#262624` | fill only |
+| **Lines** that carry structure | `--kubrick-rule` | `#565550` | 2.7:1 |
+| **The only accent** — HAL, and danger | `--kubrick-red` | `#e63946` | 4.8:1 |
+| War Room baize — **one** easter-egg use in the deck | `--kubrick-felt` | `#14352a` | — |
 
 There is no second accent, and adding one is the fastest way to break the look. The old `--terminal-orange` now resolves to the red and `--terminal-green` to the white; treat both names as legacy.
 
@@ -178,6 +200,8 @@ Read `tokens.css`. There's one scale of each:
 | Flatten a code block or the input bar into monochrome | The machine must stay a lit screen, in both themes |
 | Re-enable scan lines or glow on slides | A Kubrick frame is clean and photographic |
 | Add a 2nd accent colour | The palette is one red, deliberately |
+| Darken a text colour below 4.5:1 because it "looks better" | You are optimising for your monitor and against a compressed stream |
+| Use `--kubrick-grey-3` for a border | It is a fill; a line needs `--kubrick-rule` or it vanishes on video |
 | Use `--kubrick-felt` more than once | It is an easter egg; repeated, it is just a green |
 | Add a new `--kubrick-*` token without mirroring under `[data-theme="light"]` | Light theme inherits the dark value and loses contrast |
 | Re-point `--kubrick-*` on a descendant and expect `--terminal-*` to follow | Aliases resolve where they are declared — restate them (see Dark + light themes) |
@@ -194,6 +218,9 @@ After any change touching `src/design-system/` or `src/slides/`:
 5. Eyeball at least three slides: title (hero), a content slide (heading + bullets), a code-block slide. Confirm: **the two registers are visibly different** — slide type is Jost with no glow, the code block and input bar are mono amber-on-near-black; heading is huge, uppercase and red; body text is back-row readable; `>` markers are red; bottom bar is wired
 6. Check the light theme too (`light` command, or seed `localStorage.theme`): the ground should be the warm white void with the machine bar still dark. A Ukrainian slide must render **entirely** in Jost — if і/ї/є/ґ look like a different typeface, the patched font (`src/fonts/`) has not loaded; see `src/index.css`
 7. If touching token sizes, also resize the window to ~768px and confirm the layout still reads (no overflow, no chrome collision)
+8. **`bun run pdf`** — the organiser needs the deck as a FILE (deadline: Friday 2 October). It writes
+   `dist/claude-strangelove-ua.pdf` at 1920×1080. Run it after any structural change; it is also the
+   only end-to-end test of the export-mode settle handshake
 
 ## When to evolve the system
 

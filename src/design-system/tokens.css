@@ -33,24 +33,42 @@
    * War Room, the ship at night) and the white VOID (the room at the end of
    * "2001"). They are constants — nothing reads them directly. The theme
    * picks one, and the inverse slide picks the other, so a hex appears
-   * exactly once no matter how many places switch between them. */
+   * exactly once no matter how many places switch between them.
+   *
+   * ⚠️ THESE VALUES ARE TUNED FOR A COMPRESSED VIDEO STREAM, NOT A PROJECTOR.
+   * Fwdays Tech Summit'26 went fully ONLINE (organiser, 10.09.2026), which
+   * changes what "legible" means: the audience watches a re-encoded stream in
+   * a window, so the enemy is no longer throw distance but H.264 — which
+   * halves chroma resolution, smears saturated red on black, and eats thin
+   * low-contrast lines outright. Measured contrast on `--room-black`, and the
+   * comment on each line is why it is not darker:
+   *
+   *   white   17.4:1   grey-1  9.9:1   grey-2  5.4:1   red  4.8:1   rule 2.7:1
+   *
+   * Every text colour clears WCAG AA (4.5:1) at BODY size, not merely at
+   * display size — because the red and the muted grey are used for small
+   * letter-spaced labels, which is exactly what a stream destroys first.
+   * If you darken any of these for looks, you are optimising for your
+   * monitor and against the actual audience. */
   --room-black: #0a0a0a;
   --room-ink: #050607;
   --room-white: #f2f0eb;
-  --room-grey-1: #b9b7b1;
-  --room-grey-2: #6e6c67;
-  --room-grey-3: #262624;
-  --room-red: #d81f26;
-  --room-red-dim: #8f1419;
+  --room-grey-1: #b9b7b1;        /* 9.9:1  — body text */
+  --room-grey-2: #87857f;        /* 5.4:1  — muted; was #6e6c67 at 3.8:1 */
+  --room-grey-3: #262624;        /* FILL only — contrast irrelevant */
+  --room-rule: #565550;          /* 2.7:1  — lines that carry structure */
+  --room-red: #e63946;           /* 4.8:1  — was #d81f26 at 3.9:1 */
+  --room-red-dim: #a3202a;
 
   --void-black: #f2f0eb;
   --void-ink: #ffffff;           /* the one place pure white is right */
   --void-white: #0a0a0a;
-  --void-grey-1: #45443f;
-  --void-grey-2: #78766f;
-  --void-grey-3: #d8d5cd;
-  --void-red: #c8151c;           /* a shade deeper, to hold on white */
-  --void-red-dim: #8f1419;
+  --void-grey-1: #45443f;        /* 8.6:1 */
+  --void-grey-2: #6b6961;        /* 4.8:1  — was #78766f at 4.0:1 */
+  --void-grey-3: #d8d5cd;        /* FILL only */
+  --void-rule: #98958d;          /* 2.6:1 */
+  --void-red: #b3121a;           /* 6.1:1  — deeper, to hold on white */
+  --void-red-dim: #7a0f16;
 
   /* === KUBRICK PALETTE (first-class) ===
    * Black, three greys, one warm white, one red. Nothing else — the
@@ -62,7 +80,8 @@
   --kubrick-white: var(--room-white);    /* warm film white, never #fff */
   --kubrick-grey-1: var(--room-grey-1);  /* secondary text */
   --kubrick-grey-2: var(--room-grey-2);  /* muted text */
-  --kubrick-grey-3: var(--room-grey-3);  /* rules, borders, panel fills */
+  --kubrick-grey-3: var(--room-grey-3);  /* panel FILLS */
+  --kubrick-rule: var(--room-rule);      /* borders and lines that must READ */
   --kubrick-red: var(--room-red);        /* the only accent: HAL, and danger */
   --kubrick-red-dim: var(--room-red-dim);
   --kubrick-felt: #14352a;               /* War Room baize — one easter egg */
@@ -130,8 +149,9 @@
   --terminal-cyan-glow: transparent;
   --terminal-yellow: var(--kubrick-grey-1);
 
-  /* Border colors */
-  --terminal-border: var(--kubrick-grey-3);
+  /* Border colors. A border is a LINE, so it reads the rule token, not the
+   * fill — a 1px hairline at 1.3:1 simply is not there after re-encoding. */
+  --terminal-border: var(--kubrick-rule);
   --terminal-border-bright: var(--kubrick-grey-2);
   --terminal-border-focus: var(--kubrick-red);
 
@@ -164,7 +184,7 @@
    *   HEADING ~80px max — h1 + h2 (same size; h1 is semantic, h2 is the
    *                                content-slide section header)
    *   BODY    ~40px max — paragraphs, list items, default text
-   *   CODE    ~24px max — inline code + code blocks
+   *   CODE    ~32px max — inline code + code blocks
    *
    * The compact/dense body variants exist as legacy escape hatches for
    * dense slides. The design system prefers splitting a too-dense slide
@@ -174,7 +194,13 @@
   --font-size-h2: clamp(2rem, 4vw, 5rem);
   --font-size-h3: clamp(1.5rem, 3vw, 3rem);
   --font-size-body: clamp(1rem, 1.6vw, 2rem);
-  --font-size-code: clamp(0.9rem, 1.3vw, 1.5rem);
+  /* Bumped from a 24px maximum on the organiser's explicit request
+   * (10.09.2026): "якщо у вас в презентації є код — просимо зробити літери
+   * більшими, щоб він був читабельним". 24px survives a hall projector and
+   * does not survive a re-encoded stream watched in a window. Code now sets
+   * at the same maximum as body text; write code samples SHORT enough to fit
+   * rather than winding this back. */
+  --font-size-code: clamp(1.05rem, 1.7vw, 2rem);
   --font-size-input: clamp(0.95rem, 1vw, 1.25rem);
   --font-size-small: clamp(0.8rem, 0.8vw, 1rem);
 
@@ -273,6 +299,7 @@
   --kubrick-grey-1: var(--void-grey-1);
   --kubrick-grey-2: var(--void-grey-2);
   --kubrick-grey-3: var(--void-grey-3);
+  --kubrick-rule: var(--void-rule);
   --kubrick-red: var(--void-red);
   --kubrick-red-dim: var(--void-red-dim);
   --kubrick-felt: #1d4a3a;
@@ -307,6 +334,7 @@
   --kubrick-grey-1: var(--void-grey-1);
   --kubrick-grey-2: var(--void-grey-2);
   --kubrick-grey-3: var(--void-grey-3);
+  --kubrick-rule: var(--void-rule);
   --kubrick-red: var(--void-red);
   --kubrick-red-dim: var(--void-red-dim);
 }
@@ -318,6 +346,7 @@
   --kubrick-grey-1: var(--room-grey-1);
   --kubrick-grey-2: var(--room-grey-2);
   --kubrick-grey-3: var(--room-grey-3);
+  --kubrick-rule: var(--room-rule);
   --kubrick-red: var(--room-red);
   --kubrick-red-dim: var(--room-red-dim);
 }
@@ -335,7 +364,7 @@
   --terminal-blue: var(--kubrick-grey-1);
   --terminal-cyan: var(--kubrick-grey-1);
   --terminal-red: var(--kubrick-red);
-  --terminal-border: var(--kubrick-grey-3);
+  --terminal-border: var(--kubrick-rule);
   --terminal-border-bright: var(--kubrick-grey-2);
 
   background: var(--terminal-bg);

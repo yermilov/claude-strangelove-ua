@@ -4,7 +4,7 @@
 
 A custom presentation site built with React and TypeScript, with command-based navigation. Hosted on GitHub Pages at https://yermilov.github.io/claude-strangelove-ua
 
-The deck for «Клод Стрейнджлав» (Fwdays Tech Summit'26, 35-minute slot) wears a **Kubrick skin over the original terminal deck**, and the split is the point: slides are Kubrick (black, symmetrical, Jost UA in capitals, one red, no glow) while everything the machine says — code blocks, agent logs, the input bar — stays CRT terminal. Read `.claude/skills/design-system/SKILL.md` before touching any style.
+The deck for «Клод Стрейнджлав» (Fwdays Tech Summit'26 — **online**, Saturday 3 October, Track B, 14:00; 35-minute slot = 25–30 min talk + 5–10 min Q&A) wears a **Kubrick skin over the original terminal deck**, and the split is the point: slides are Kubrick (black, symmetrical, Jost UA in capitals, one red, no glow) while everything the machine says — code blocks, agent logs, the input bar — stays CRT terminal. Read `.claude/skills/design-system/SKILL.md` before touching any style.
 
 ## Tech Stack
 

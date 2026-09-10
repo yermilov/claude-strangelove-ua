@@ -1,7 +1,10 @@
-/** The fwdays Tech Summit'26 slot is 35 minutes (confirmed 10.09.2026).
+/** The fwdays slot is 35 minutes, but the TALK is not: the organiser's
+ *  breakdown (10.09.2026) is "25-30 хв на доповідь + 5-10 хв на Q&A". This
+ *  timer paces the talk, so it counts down the 30 — running it to 35 would
+ *  have him finishing exactly when the Q&A should already be under way.
  *  The pace colour below is derived from it, so this constant is the only
  *  place a slot-length change has to land. */
-const TOTAL_TIME = 35 * 60;
+const TOTAL_TIME = 30 * 60;
 
 interface TimerProps {
   elapsedSeconds: number;
