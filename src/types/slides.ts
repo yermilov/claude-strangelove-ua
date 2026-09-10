@@ -28,6 +28,19 @@ export interface SlideDefinition {
    */
   detours?: { atStage: number; toId: string; returnStage: number }[];
   /**
+   * Hide the small Fwdays mark in the corner for this slide. Set on slides
+   * that already carry the conference branding (their own title slide) or
+   * where the frame must stay empty (the deck's title).
+   */
+  hideConferenceMark?: boolean;
+  /**
+   * Give the slide the full height of the stage. Needed by slides whose
+   * content sizes itself against the parent (a contained full-bleed image):
+   * without it `.slide` is auto-height, so a child's `height: 100%` and
+   * `max-height: 100%` resolve against nothing and the content overflows.
+   */
+  fullBleed?: boolean;
+  /**
    * Opt out of the export-mode auto-settle in Slide.tsx. Set true on slides
    * that do their own async work (fetches, etc.) and call
    * `exportRegistry.markSlideSettled(id)` from the async path themselves.

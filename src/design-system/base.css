@@ -49,6 +49,13 @@
   flex-direction: column;
 }
 
+/* Full-bleed slides (a contained image filling the stage) need a definite
+ * height for their content to size against — see `fullBleed` in
+ * types/slides.ts. */
+.slide--fill {
+  height: 100%;
+}
+
 /* Fixed top-left title (dou-days pattern). Sits in the title band above
  * the body. Use the `//` dim leader convention in slide definitions.
  * Higher specificity than `.slide h2` so font-size override sticks. */
@@ -66,7 +73,9 @@
   line-height: var(--line-height-tight);
   text-shadow: var(--glow-text-green);
   width: max-content;
-  max-width: 100%;
+  /* Leave the top-right corner free: the Fwdays mark lives there, and a long
+   * title would otherwise run underneath it. */
+  max-width: calc(100% - 7rem);
   z-index: 3;
 }
 

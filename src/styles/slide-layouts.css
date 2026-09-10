@@ -595,3 +595,79 @@
 .slide-inverse {
   position: relative;
 }
+
+/* === FWDAYS CONFERENCE BRANDING ===
+ * The organiser asked for their logo in the deck and supplied a title slide
+ * (10.09.2026). Both are THEIR assets and are used as given — the only
+ * change is the wordmark knockout below, and that is a legibility fix, not a
+ * restyle.
+ *
+ * Their wordmark ships as #1D1E1C, which is within a couple of percent of
+ * this deck's own background: on a black slide the words "Fwdays Tech Summit"
+ * simply are not there. So the dark theme paints the WORDMARK in the deck's
+ * warm white and leaves the CHEVRON in the brand's own green, orange and
+ * gradient. The white void needs no such fix and gets the original ink. */
+.fwdays-logo {
+  width: auto;
+  height: 100%;
+  display: block;
+}
+
+.fwdays-logo__mark--st0 { fill: url(#fwdaysLogoGradient); }
+.fwdays-logo__mark--st1 { fill: #f39519; }
+.fwdays-logo__mark--st2 { fill: #4f845f; }
+
+/* Dark ground: knock the wordmark out. */
+.fwdays-logo__word { fill: var(--kubrick-white); }
+
+/* The corner mark carried by content slides. Deliberately small and set well
+ * into the corner: it is somebody else's brand inside a one-red palette, so
+ * it should be present and findable rather than competing. */
+.fwdays-mark {
+  position: absolute;
+  top: var(--space-lg);
+  right: var(--space-xl);
+  /* 4.5rem is the smallest size at which the two-line wordmark is still
+   * readable on a compressed stream; below that it degrades into noise and
+   * stops functioning as a logo at all. */
+  height: 4.5rem;
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@media (max-width: 900px) {
+  .fwdays-mark {
+    height: 2.25rem;
+    right: var(--space-md);
+  }
+}
+
+/* === FWDAYS TITLE SLIDE ===
+ * The organiser's own branded opener, rendered verbatim at 16:9. It is their
+ * artwork, so it is never recoloured, cropped or overlaid — `contain` keeps
+ * it whole whatever the window does. */
+.fwdays-title-slide {
+  display: grid;
+  /* `minmax(0, 1fr)`, not the implicit `auto` row: an auto row is sized by its
+   * content, so the image's `max-height: 100%` would resolve against the
+   * already-overflowing 846px row instead of the 745px stage and clamp
+   * nothing. Measured — that is exactly what happened. */
+  grid-template-rows: minmax(0, 1fr);
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* `.slide` is auto-height by default, so the `height: 100%` above and the
+ * image's `max-height: 100%` would resolve against nothing and the artwork
+ * would overflow the stage. `slide--fill` (set by `fullBleed` on the slide
+ * definition) gives the chain a definite height to measure against. */
+
+.fwdays-title-slide img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}

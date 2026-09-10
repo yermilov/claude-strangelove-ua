@@ -11,6 +11,8 @@ interface SlideProps {
   asyncSettle?: boolean;
   /** Optional title rendered as a fixed top-left band above the slide body. */
   title?: ReactNode;
+  /** Stretch the slide to the full stage height (see SlideDefinition). */
+  fullBleed?: boolean;
 }
 
 export function Slide({
@@ -20,6 +22,7 @@ export function Slide({
   slideId,
   asyncSettle,
   title,
+  fullBleed,
 }: SlideProps) {
   // Auto-settle on mount for slides that don't do their own async work.
   // Slides with `asyncSettle: true` opt out and call markSlideSettled themselves.
@@ -38,7 +41,11 @@ export function Slide({
 
   return (
     <div
-      className={title ? 'slide slide--titled' : 'slide'}
+      className={
+        [ 'slide', title && 'slide--titled', fullBleed && 'slide--fill' ]
+          .filter(Boolean)
+          .join(' ')
+      }
       style={background ? { background } : undefined}
     >
       {title && <h2 className="slide-title">{title}</h2>}

@@ -2,6 +2,7 @@ import { SlideDefinition } from '../types/slides';
 
 export const TitleSlide: SlideDefinition = {
   id: 'title',
+  hideConferenceMark: true,
   content: (
     <div className="title-slide">
       <h1 className="hero">Клод Стрейнджлав</h1>

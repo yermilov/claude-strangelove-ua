@@ -8,6 +8,7 @@ import { TerminalInput } from './TerminalInput';
 import { SlideProgress } from './SlideProgress';
 import { Timer } from './Timer';
 import { RotateHint } from './RotateHint';
+import { FwdaysLogo } from './FwdaysLogo';
 import { preloadSlideAssets } from '../utils/preloadAssets';
 import { exportRegistry } from './exportRegistry';
 
@@ -188,6 +189,11 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
     <NavigationContext.Provider value={{ goToSlideById }}>
     <div className="presentation">
       {!isExportMode && <RotateHint />}
+      {/* The conference mark the organiser asked us to carry. It lives on the
+        * presentation frame rather than inside the slide so it holds the same
+        * corner regardless of what any one slide's layout does — and it stays
+        * in export mode, because the PDF is what actually gets sent to them. */}
+      {!activeSlide.hideConferenceMark && <FwdaysLogo className="fwdays-mark" />}
       <div className="slide-container" ref={containerRef} key={activeSlide.id}>
         <Slide
           isActive
@@ -196,6 +202,7 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
           slideId={activeSlide.id}
           asyncSettle={activeSlide.asyncSettle}
           title={slideTitle}
+          fullBleed={activeSlide.fullBleed}
         >
           {slideContent}
         </Slide>
