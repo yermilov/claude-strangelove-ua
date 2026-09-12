@@ -238,6 +238,10 @@ export const MySlide: SlideDefinition = {
 
 ## Navigation Commands
 
+**The input box is hidden.** Press **Esc** to bring the terminal up over the slide; Esc again, or
+running a command, dismisses it. On a touch device the clock in the bottom-right is the tap target.
+Slide navigation does NOT need it — the keys below work with the terminal closed.
+
 Type in the input box:
 - `next` or `n` → Next slide
 - `prev`, `back`, `p`, `b` → Previous slide

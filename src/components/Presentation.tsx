@@ -5,8 +5,7 @@ import { NavigationContext } from '../context/NavigationContext';
 import { useTouchNavigation } from '../hooks/useTouchNavigation';
 import { Slide } from './Slide';
 import { TerminalInput } from './TerminalInput';
-import { SlideProgress } from './SlideProgress';
-import { Timer } from './Timer';
+import { FlightTrack } from './FlightTrack';
 import { RotateHint } from './RotateHint';
 import { FwdaysLogo } from './FwdaysLogo';
 import { preloadSlideAssets } from '../utils/preloadAssets';
@@ -97,6 +96,32 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
   // Track current input text for interactive slides
   const [inputText, setInputText] = useState('');
 
+  // The terminal is no longer parked in the frame: Esc calls it up over the
+  // slide and Esc (or running a command) dismisses it. Everything the talk
+  // actually needs mid-flight — arrows, space, PageUp/PageDown from the
+  // clicker — is on the window handler in useSlideNavigation, which is
+  // exactly why the input can be absent without costing any navigation.
+  const [commandOpen, setCommandOpen] = useState(false);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      e.preventDefault();
+      // Escape typed INSIDE the field bubbles up to here too, so one key
+      // both opens and closes it.
+      setCommandOpen((open) => !open);
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
+
+  // Leaving a slide drops any half-typed command with the overlay, so an
+  // interactive slide never inherits the previous one's text.
+  useEffect(() => {
+    setCommandOpen(false);
+    setInputText('');
+  }, [currentSlide]);
+
   // Warm the HTTP cache for every downstream slide asset while the title
   // slide is on screen. Deferred to idle so the first paint is unblocked.
   useEffect(() => {
@@ -149,6 +174,10 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
 
   const handleCommand = useCallback((command: string) => {
     const trimmed = command.trim().toLowerCase();
+
+    // A command is a one-shot: the overlay closes behind it, so the slide is
+    // never left with a terminal sitting on top of it.
+    setCommandOpen(false);
 
     if (trimmed === 'dark' || trimmed === 'light') {
       setTheme(trimmed);
@@ -209,24 +238,23 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
           {slideContent}
         </Slide>
       </div>
-      {!isExportMode && (
-        <div className="input-bar">
-          <Timer
-            elapsedSeconds={timerSeconds}
-            progress={totalUnits > 0 ? consumedUnits / totalUnits : 0}
-          />
+      {!isExportMode && commandOpen && (
+        <div className="command-overlay">
           <TerminalInput
             onCommand={handleCommand}
             onInputChange={setInputText}
             onArrowLeft={revealPrev}
             onArrowRight={revealNext}
-            placeholder="type anything to continue, 'prev' to go back, or slide number..."
+            placeholder="команда, номер слайда, 'prev' — або esc, щоб сховати"
           />
-          <SlideProgress
-            current={consumedUnits}
-            total={totalUnits}
-            isFirst={currentSlide === Math.floor(slides.length / 2)}
-            hidden={(currentSlide + 1) / slides.length <= 0.5}
+        </div>
+      )}
+      {!isExportMode && (
+        <div className="deck-chrome">
+          <FlightTrack
+            elapsedSeconds={timerSeconds}
+            progress={totalUnits > 0 ? consumedUnits / totalUnits : 0}
+            onOpenCommand={() => setCommandOpen((open) => !open)}
           />
         </div>
       )}

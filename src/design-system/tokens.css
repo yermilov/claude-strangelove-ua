@@ -248,7 +248,10 @@
   /* === INPUT STYLING === */
   --input-height: 3.5rem;
   --input-padding-x: 1.25rem;
-  --input-bar-height: calc(var(--input-height) + var(--space-md) * 2);
+  /* The Esc terminal is an overlay now, so it no longer sets the height of
+   * the bottom strip — the flight track does. Kept because slides that need
+   * to clear the chrome should measure against the strip, not the input. */
+  --deck-chrome-height: calc(2.5rem + var(--space-sm) + var(--space-xs) + var(--font-size-small));
 
   /* === CONFERENCE MARK ===
    * The Fwdays mark the organiser asked the deck to carry (`.fwdays-mark`).
@@ -393,10 +396,17 @@
  * Placed at the end of tokens.css deliberately: it is the other half of the
  * palette decision above, and splitting the two across files is how the rule
  * gets forgotten. */
+/* ⚠️ The bottom strip is NOT on this list any more, and that is deliberate.
+ * It used to be, because it WAS the terminal — the input lived in it. Now
+ * the terminal only appears over the slide on Esc, and what stays at the
+ * bottom is the flight track, which is the speaker's own instrument. So the
+ * overlay inherits the CRT voice and `.deck-chrome` inherits Kubrick. If you
+ * ever park something machine-ish back in the strip, mark THAT element
+ * `.machine` rather than re-adding the strip here. */
 .machine,
 .slide pre,
 .slide code,
-.input-bar {
+.command-overlay {
   --terminal-bg: var(--machine-bg);
   --terminal-bg-secondary: var(--machine-bg);
   --terminal-bg-input: var(--machine-bg);

@@ -1,25 +1,195 @@
 /* === COMPONENTS LAYER ===
- * Chrome and reusable UI components: bottom bar (Timer + Input +
- * Progress), code blocks,
+ * Chrome and reusable UI components: the bottom chrome (the flight track),
+ * the Esc command overlay, code blocks,
  * rotate hint, mobile responsive tweaks for these elements. */
 
-/* === BOTTOM BAR === */
-/* Strip at the bottom that wraps Timer + TerminalInput + SlideProgress.
- * Replaces three separately-positioned fixed elements with one
- * horizontally-laid-out chrome bar. */
-.input-bar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  padding: var(--space-md) var(--space-xl);
-  background: linear-gradient(
-    180deg,
-    var(--terminal-bg-secondary) 0%,
-    var(--terminal-bg) 100%
-  );
-  border-top: 1px solid var(--terminal-border);
+/* === BOTTOM CHROME === */
+/* The strip at the bottom of the frame. It holds the flight track and
+ * nothing else — the terminal is no longer parked here; it comes in over
+ * the slide on Esc (`.command-overlay`).
+ *
+ * Note what this strip is NOT: it is not in the machine block in
+ * tokens.css. The track is the speaker's instrument, so it is Kubrick —
+ * flat black, warm white, one red. Putting it back on the CRT palette
+ * would make the deck's own chrome shout in the machine's voice. */
+.deck-chrome {
+  padding: var(--space-sm) 0;
+  background: var(--kubrick-black);
+  border-top: 1px solid var(--kubrick-rule);
   position: relative;
   z-index: 1001;
+}
+
+/* === FLIGHT TRACK === */
+/* The corridor shot: the ship is the clock, the monolith is the material,
+ * and the gap between them is the pace. See FlightTrack.tsx for the why. */
+.flight-track {
+  --flight-ship-width: 7rem;
+  --flight-monolith-width: 0.375rem;
+  --flight-monolith-height: 1.5rem;
+  display: block;
+}
+
+/* The corridor spans the FULL width of the frame, edge to edge — the ship
+ * flying across the whole screen is the brief, so this box takes no side
+ * padding. The labels below it do. */
+.flight-track__space {
+  position: relative;
+  height: 2.5rem;
+}
+
+.flight-track__corridor,
+.flight-track__wake {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.flight-track__corridor {
+  right: 0;
+  background: var(--kubrick-grey-3);
+}
+
+/* The distance already flown. A shade brighter than the corridor ahead, so
+ * the split reads even when the ship is small on a compressed stream. */
+.flight-track__wake {
+  background: var(--kubrick-rule);
+  transition: width var(--transition-normal);
+}
+
+/* The material marker: the monolith, 1:4, standing on the corridor. Filled
+ * with the deeper black and outlined, so it reads as an object rather than
+ * as a tick mark on a ruler. */
+.flight-track__monolith {
+  position: absolute;
+  top: 50%;
+  width: var(--flight-monolith-width);
+  height: var(--flight-monolith-height);
+  transform: translateY(-50%);
+  background: var(--kubrick-ink);
+  border: 1px solid var(--kubrick-white);
+  transition: left var(--transition-normal);
+}
+
+.flight-track__ship {
+  position: absolute;
+  top: 50%;
+  width: var(--flight-ship-width);
+  transform: translateY(-50%);
+  /* The hull occludes the corridor instead of being skewered by it: the
+   * ship's own black box masks the hairline running underneath. Without
+   * this the line draws straight through the command sphere. */
+  background: var(--kubrick-black);
+  /* The hull is always the warm white; `color` is inherited by the exhaust
+   * alone, which is the single element allowed to turn red. */
+  color: var(--kubrick-grey-2);
+  transition: left var(--transition-normal), color var(--transition-normal);
+}
+
+.flight-track__ship-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: var(--kubrick-white);
+}
+
+.flight-track__exhaust {
+  fill: currentColor;
+}
+
+/* Behind schedule: the one red on the whole strip.
+ * Three elements carry it, and that is on purpose rather than for emphasis —
+ * the exhaust is a 12px sliver and the clock is small letterforms, which is
+ * precisely what a re-encoded stream destroys first (see the online-format
+ * note in the design-system skill). The WAKE is the stream-proof one: a
+ * full-width line nothing can smear away. It takes the dim red so it reads
+ * as structure that has changed colour, not as an alarm. */
+.flight-track--late .flight-track__ship {
+  color: var(--kubrick-red);
+}
+
+.flight-track--late .flight-track__wake {
+  background: var(--kubrick-red-dim);
+}
+
+/* The two captions under the corridor. These take the side padding the
+ * corridor refuses, so the ship still crosses the full screen. */
+.flight-track__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: 0 var(--space-lg);
+}
+
+.flight-track__label,
+.flight-track__clock {
+  font-family: var(--font-sans);
+  font-size: var(--font-size-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--kubrick-grey-2);
+  white-space: nowrap;
+}
+
+.flight-track__clock {
+  font-variant-numeric: tabular-nums;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  /* Holds the right edge once the caption beside it is hidden — with
+   * `space-between` and a single child, the clock would slide to the left. */
+  margin-left: auto;
+}
+
+.flight-track__clock:hover,
+.flight-track__clock:focus-visible {
+  color: var(--kubrick-white);
+}
+
+.flight-track--late .flight-track__clock {
+  color: var(--kubrick-red);
+}
+
+/* === COMMAND OVERLAY === */
+/* The terminal is gone from the frame until Esc calls it up, and then it
+ * arrives OVER the slide rather than pushing it. It keeps the machine
+ * register (tokens.css) because it is the one thing here that is the
+ * machine talking. */
+.command-overlay {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-3xl);
+  width: min(900px, 90vw);
+  transform: translateX(-50%);
+  z-index: 1200;
+  animation: commandOverlayIn var(--transition-fast) ease-out;
+}
+
+@keyframes commandOverlayIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(var(--space-sm));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command-overlay {
+    animation: none;
+  }
+
+  .flight-track__ship,
+  .flight-track__monolith,
+  .flight-track__wake {
+    transition: none;
+  }
 }
 
 /* === TERMINAL INPUT === */
@@ -89,68 +259,9 @@
   flex-shrink: 0;
 }
 
-/* === SLIDE PROGRESS === */
-.slide-progress {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex-shrink: 0;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.progress-bar {
-  width: 120px;
-  height: 4px;
-  background: var(--terminal-border);
-  border-radius: 2px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--terminal-orange);
-  transition: width var(--transition-normal);
-}
-
-.progress-text {
-  color: var(--terminal-white-muted);
-  font-size: var(--font-size-small);
-  font-family: var(--font-mono);
-}
-
-.progress-text--glow {
-  color: var(--terminal-green-bright);
-  font-weight: 600;
-  animation: progressGlow 1.5s ease-in-out infinite;
-}
-
-@keyframes progressGlow {
-  0%, 100% {
-    text-shadow:
-      0 0 5px var(--terminal-green),
-      0 0 15px var(--terminal-green-glow),
-      0 0 30px var(--terminal-green-glow),
-      0 0 45px var(--terminal-green-glow);
-  }
-  50% {
-    text-shadow:
-      0 0 10px var(--terminal-green),
-      0 0 25px var(--terminal-green-glow),
-      0 0 50px var(--terminal-green-glow),
-      0 0 75px var(--terminal-green-glow),
-      0 0 100px var(--terminal-green-glow);
-  }
-}
-
-/* === TIMER === */
-.timer-countdown {
-  font-family: var(--font-mono);
-  font-size: var(--font-size-small);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
+/* The separate progress bar and the mono countdown that used to sit in this
+ * strip are gone: the flight track above carries both axes on one line, and
+ * a second meter beside it was the same information twice. */
 
 /* === CODE BLOCK === */
 .code-block {
@@ -245,26 +356,50 @@
 
 
 
-/* === MOBILE: BOTTOM BAR ELEMENT SIZING === */
-@media (max-width: 768px) and (pointer: coarse) {
-  .input-bar {
-    padding: var(--space-sm) var(--space-md);
-    gap: var(--space-sm);
-  }
-
-  .progress-bar {
-    width: 60px;
-  }
-
-  /* Hide progress text on narrow screens; the bar alone communicates progress */
-  .progress-text,
-  .progress-text--glow {
+/* The auto-compact caption goes on WIDTH ALONE, before the coarse-pointer
+ * rules below get a say. A narrow desktop window is `pointer: fine`, so it
+ * would otherwise keep a 300px caption on a 390px strip and collide with the
+ * clock. The corridor already carries what the caption restates, so dropping
+ * it early costs nothing. (Measured at the narrowest viewport Chrome would
+ * actually give on this machine — 500px, not 390: `resize_window` reports
+ * success and leaves `innerWidth` untouched, and devtools' own resize floors
+ * at 500. So this rule is here by construction, not because 390 was seen.) */
+@media (max-width: 640px) {
+  .flight-track__label {
     display: none;
   }
 }
 
+/* === MOBILE: BOTTOM CHROME SIZING === */
+@media (max-width: 768px) and (pointer: coarse) {
+  .flight-track {
+    --flight-ship-width: 4.5rem;
+    --flight-monolith-height: 1rem;
+  }
 
-/* === END MOBILE BOTTOM BAR — ROTATE HINT BELOW === */
+  .flight-track__space {
+    height: 1.75rem;
+  }
+
+  .flight-track__meta {
+    padding: 0 var(--space-md);
+  }
+
+  /* The auto-compact caption is the first thing to go when the strip gets
+   * narrow — the clock has to stay, and the corridor already carries the
+   * progress the caption was restating. */
+  .flight-track__label {
+    display: none;
+  }
+
+  .command-overlay {
+    bottom: var(--space-xl);
+    width: 94vw;
+  }
+}
+
+
+/* === END MOBILE BOTTOM CHROME — ROTATE HINT BELOW === */
 
 /* === ROTATE HINT (portrait phones only) === */
 .rotate-hint {

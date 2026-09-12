@@ -80,11 +80,6 @@ export interface SlideProps {
   asyncSettle?: boolean;
 }
 
-export interface SlideProgressProps {
-  current: number;
-  total: number;
-}
-
 export type NavigationCommand =
   | { type: 'next' }
   | { type: 'prev' }

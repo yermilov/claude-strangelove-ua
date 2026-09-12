@@ -271,8 +271,8 @@
     padding: var(--space-lg) var(--space-md);
   }
 
-  .input-bar {
-    padding: var(--space-sm) var(--space-md);
+  .deck-chrome {
+    padding: var(--space-xs) 0;
   }
 
   .bio-slide {

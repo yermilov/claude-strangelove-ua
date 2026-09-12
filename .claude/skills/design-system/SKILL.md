@@ -1,6 +1,6 @@
 ---
 name: design-system
-description: Apply the deck's Kubrick design system when creating or modifying slides — two registers (Jost UA on black for the human voice, JetBrains Mono CRT amber for the machine voice), three-tier type scale (hero / heading / body), uppercase letter-spaced headings, one red accent, no glow on slides, act cards / light ring / big board layouts, bottom bar chrome wrapping Timer + Input + Progress. Tokens and reusable styles live in `src/design-system/`; per-slide layouts in `src/styles/slide-layouts.css`. TRIGGER when creating a new slide component under `src/slides/`, styling slide content, editing CSS, picking colors or fonts, adjusting spacing, modifying tokens in `src/design-system/`, when a hardcoded hex value or px font-size appears in a diff, or building UI chrome for the presentation. Also trigger when the user asks about the Kubrick look, why something is red rather than amber, whether an element should be mono, says the deck doesn't feel cohesive, or asks why an accent color doesn't match the rest.
+description: Apply the deck's Kubrick design system when creating or modifying slides — two registers (Jost UA on black for the human voice, JetBrains Mono CRT amber for the machine voice), three-tier type scale (hero / heading / body), uppercase letter-spaced headings, one red accent, no glow on slides, act cards / light ring / big board layouts, and the bottom chrome (the flight track — ship = clock, monolith = material — with the terminal hidden until Esc). Tokens and reusable styles live in `src/design-system/`; per-slide layouts in `src/styles/slide-layouts.css`. TRIGGER when creating a new slide component under `src/slides/`, styling slide content, editing CSS, picking colors or fonts, adjusting spacing, modifying tokens in `src/design-system/`, when a hardcoded hex value or px font-size appears in a diff, or building UI chrome for the presentation. Also trigger when the user asks about the Kubrick look, why something is red rather than amber, whether an element should be mono, says the deck doesn't feel cohesive, or asks why an accent color doesn't match the rest.
 ---
 
 ## Scope
@@ -39,8 +39,8 @@ dark theme:
 Body text caps at 32px, heading at 80px. If a slide overflows, **split it** rather than shrinking
 text — that's still the design system's first commandment.
 
-**The slot is 35 minutes: 25–30 of talk plus 5–10 of Q&A.** `Timer.tsx` counts down the **30**, which
-is the number to rehearse against.
+**The slot is 35 minutes: 25–30 of talk plus 5–10 of Q&A.** `FlightTrack.tsx` spans the **30**, which
+is the number to rehearse against — `TOTAL_TIME` there is the only place a slot change has to land.
 
 ## Where things live
 
@@ -52,6 +52,7 @@ is the number to rehearse against.
 | Chrome components (input bar, tooltips, code block, rotate hint) | `src/design-system/components.css` |
 | Per-slide layouts (one slide each — bio, timeline, VS battle, etc.) | `src/styles/slide-layouts.css` |
 | Slide-element React primitives (SlideItem, Emphasis, SlideLink, CodeBlock) | `src/components/SlideElements.tsx` + `src/components/CodeBlock.tsx` |
+| Bottom chrome — the flight track and the Esc terminal overlay | `src/components/FlightTrack.tsx` + `.deck-chrome` / `.command-overlay` in `components.css` |
 | Kubrick primitives (ActCard, LightRing, BigBoard, Machine) | `src/components/KubrickElements.tsx` |
 | The patched Jost webfonts + the script that builds them | `src/fonts/` + `scripts/patch-jost-ukrainian.py` |
 
@@ -151,9 +152,19 @@ For variants (orange / green inline code), use the `.code-inline--orange` / `.co
 
 ## Bottom bar
 
-Timer, terminal input, and slide progress live in a single `.input-bar` strip pinned to the bottom of `.presentation` (see `components.css`). They are **inline flex children**, not absolutely-positioned floating elements. If you add a new piece of chrome that should live next to the input, put it inside `.input-bar`; don't add another fixed-position element.
+The strip at the bottom is `.deck-chrome`, and it holds **one** thing: the flight track (`FlightTrack.tsx`). The separate countdown and progress bar are gone — the track carries both axes on a single line.
 
-The slide progress bar appears only after the deck is past 50% (`(currentSlide + 1) / slides.length > 0.5` in `Presentation.tsx`) — early slides don't show progress so the audience focuses on opening framing.
+**The track is the corridor shot from "2001".** The screen is the whole journey: left edge is 00:00 and slide one, right edge is the end of the talk and the last reveal.
+
+- the **ship** (Discovery One, nose right) sits at `elapsed / 30 min` — it is the CLOCK;
+- the **monolith** sits at reveal-weighted deck progress — it is the MATERIAL;
+- the gap between them is the pace, with no arithmetic. Ship behind the monolith = ahead of schedule; ship past it = late, and the exhaust, the clock and the **wake** turn red. The wake is the stream-proof one — a 12px exhaust sliver does not survive H.264.
+
+⚠️ **The track is KUBRICK, not machine** — it is the speaker's instrument, so `.deck-chrome` is deliberately absent from the machine block in `tokens.css`. The strip used to be on that list because it WAS the terminal. If you park something machine-ish back in it, mark that element `.machine` rather than re-adding the strip.
+
+⚠️ **The corridor takes no side padding** — the ship crossing the full screen is the brief. The two captions underneath take the gutter instead; the ship's own black background masks the hairline so the corridor is occluded by the hull rather than drawn through it.
+
+**The terminal is not in the frame.** Esc calls it up as `.command-overlay` over the slide, Esc or running a command dismisses it, and it keeps the CRT register because it is the one thing down there that is the machine talking. Everything the talk needs mid-flight — arrows, space, PageUp/PageDown from the clicker — is on the window handler in `useSlideNavigation`, which is what makes the input safe to hide. The clock doubles as the tap target so a phone, which has no Esc key, can still reach it.
 
 ## CRT effects
 
@@ -194,7 +205,8 @@ Read `tokens.css`. There's one scale of each:
 | Switch `>` to `•` for bullets | Breaks the command-line aesthetic |
 | Add `text-shadow: none` to a new accent heading | Glow is load-bearing for the CRT identity |
 | Put per-slide CSS in `design-system/` | DS is for cross-slide reuse; one-slide styles go in `slide-layouts.css` |
-| Float a new timer/progress/badge as `position: fixed` | Chrome lives inside `.input-bar` |
+| Float a new timer/progress/badge as `position: fixed` | Chrome lives inside `.deck-chrome` |
+| Put the flight track on the machine palette, or park the terminal back in the strip | The track is the speaker's voice; only `.command-overlay` is the machine's |
 | Set slide prose in mono | Mono is the machine's voice; using it for your own erases the distinction |
 | Give a slide element amber, glow or `--machine-*` because it looks good | Same — the machine register has to stay expensive |
 | Flatten a code block or the input bar into monochrome | The machine must stay a lit screen, in both themes |
