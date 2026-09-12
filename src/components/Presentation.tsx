@@ -46,13 +46,34 @@ function getInitialTheme(): Theme {
   return localStorage.getItem(THEME_KEY) === 'light' ? 'light' : 'dark';
 }
 
+/** A timer left running in localStorage is only ever meant to survive a
+ *  reload mid-talk. Past this, it is last week's rehearsal: the deck was
+ *  opened, the tab was closed, and the clock kept accruing wall time.
+ *
+ *  Measured on the live site 12.09.2026: `timerStartedAt` was still holding
+ *  a value from 10.09, so the deck opened 42 HOURS into a 30-minute slot.
+ *  That was always the behaviour, but it used to surface as a countdown
+ *  reading 00:00 in the corner; with the flight track it parks the ship at
+ *  the far right and turns the strip red the moment the page loads, which
+ *  is a bad thing to discover in front of an audience. Four hours is far
+ *  longer than any slot and far shorter than "a different day". */
+const STALE_TIMER_MS = 4 * 60 * 60 * 1000;
+
 function getInitialTimerState(): { seconds: number; running: boolean } {
   const startedAt = localStorage.getItem(TIMER_STARTED_AT_KEY);
   const accumulated = parseInt(localStorage.getItem(TIMER_ACCUMULATED_KEY) || '0', 10);
 
   if (startedAt) {
-    const elapsed = Math.floor((Date.now() - parseInt(startedAt, 10)) / 1000);
-    return { seconds: accumulated + elapsed, running: true };
+    const startedMs = parseInt(startedAt, 10);
+    const sinceStart = Date.now() - startedMs;
+
+    if (!Number.isFinite(startedMs) || sinceStart > STALE_TIMER_MS || sinceStart < 0) {
+      localStorage.removeItem(TIMER_STARTED_AT_KEY);
+      localStorage.removeItem(TIMER_ACCUMULATED_KEY);
+      return { seconds: 0, running: false };
+    }
+
+    return { seconds: accumulated + Math.floor(sinceStart / 1000), running: true };
   }
   return { seconds: accumulated, running: false };
 }
