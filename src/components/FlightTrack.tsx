@@ -9,13 +9,16 @@
  *    - the MONOLITH is the material — it sits where the deck has got to.
  *
  *  Ship behind the monolith → running ahead of schedule. Ship past it →
- *  running late, and the exhaust turns red. No arithmetic, one glance.
+ *  running late, and the wake plus clock turn red. No arithmetic, one glance.
  *
  *  Register: this is the SPEAKER's instrument, not the machine's, so it is
  *  Kubrick — flat black, warm white, one red, no glow. Only the command
  *  overlay (`.command-overlay`) keeps the CRT voice. See the design-system
  *  skill: `.deck-chrome` is deliberately NOT in the machine block.
  */
+
+import discoveryOne from '/discovery-one.png?url';
+import monolith from '/monolith.png?url';
 
 /** The fwdays slot is 35 minutes, but the TALK is not: the organiser's
  *  breakdown (10.09.2026) is "25-30 хв на доповідь + 5-10 хв на Q&A". The
@@ -39,38 +42,6 @@ interface FlightTrackProps {
   onOpenCommand: () => void;
 }
 
-/** Discovery One in profile, nose to the right. The shape only reads at this
- *  size if the three masses stay very unequal — a big command sphere, a
- *  HAIRLINE spine, a bulky engine cluster at the tail. Even them out and it
- *  turns into a barbell, which is what the first pass drew.
- *
- *  Drawn at 160×28 and scaled by CSS width, so the ship's size is a token
- *  rather than a magic number in here. `currentColor` is the exhaust alone —
- *  the hull never changes colour. */
-function Discovery() {
-  return (
-    <svg
-      className="flight-track__ship-art"
-      viewBox="0 0 160 28"
-      role="presentation"
-      focusable="false"
-    >
-      {/* exhaust — the one element that carries the pace colour */}
-      <polygon className="flight-track__exhaust" points="0,10 12,12.5 12,15.5 0,18" />
-      {/* engine cluster: the heavy tail */}
-      <rect x="12" y="4" width="30" height="20" />
-      <rect x="42" y="8" width="8" height="12" />
-      {/* the spine, with its module boxes */}
-      <rect x="50" y="12.5" width="86" height="3" />
-      <rect x="62" y="9.5" width="6" height="9" />
-      <rect x="82" y="9.5" width="6" height="9" />
-      <rect x="102" y="9.5" width="6" height="9" />
-      {/* command sphere */}
-      <circle cx="146" cy="14" r="12" />
-    </svg>
-  );
-}
-
 function formatClock(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
@@ -81,6 +52,7 @@ export function FlightTrack({ elapsedSeconds, progress, onOpenCommand }: FlightT
   const flown = Math.min(1, elapsedSeconds / TOTAL_TIME);
   const covered = Math.min(1, Math.max(0, progress));
   const remaining = Math.max(0, TOTAL_TIME - elapsedSeconds);
+  const contextPercent = Math.round((1 - covered) * 100);
 
   // Positive = the clock is ahead of the deck, i.e. the talk is running slow.
   const behind = flown - covered;
@@ -103,16 +75,25 @@ export function FlightTrack({ elapsedSeconds, progress, onOpenCommand }: FlightT
           className="flight-track__monolith"
           style={{ left: monolithLeft }}
           title="матеріал"
-        />
+        >
+          <img src={monolith} alt="" aria-hidden="true" />
+        </div>
         <div className="flight-track__ship" style={{ left: shipLeft }}>
-          <Discovery />
+          <img
+            className="flight-track__ship-art"
+            src={discoveryOne}
+            alt=""
+            aria-hidden="true"
+          />
         </div>
       </div>
 
       <div className="flight-track__meta">
-        <span className="flight-track__label">
-          context left until auto-compact {Math.round((1 - covered) * 100)}%
-        </span>
+        {contextPercent < 33 && (
+          <span className="flight-track__label">
+            context left until auto-compact {contextPercent}%
+          </span>
+        )}
         <button
           type="button"
           className="flight-track__clock"

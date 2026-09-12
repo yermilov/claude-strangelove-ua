@@ -24,9 +24,9 @@
 /* The corridor shot: the ship is the clock, the monolith is the material,
  * and the gap between them is the pace. See FlightTrack.tsx for the why. */
 .flight-track {
-  --flight-ship-width: 7rem;
-  --flight-monolith-width: 0.375rem;
-  --flight-monolith-height: 1.5rem;
+  --flight-ship-width: 8.5rem;
+  --flight-monolith-width: 1rem;
+  --flight-monolith-height: 2.25rem;
   display: block;
 }
 
@@ -59,18 +59,22 @@
   transition: width var(--transition-normal);
 }
 
-/* The material marker: the monolith, 1:4, standing on the corridor. Filled
- * with the deeper black and outlined, so it reads as an object rather than
- * as a tick mark on a ruler. */
+/* The material marker: a generated miniature with grazing rim light, so the
+ * black slab still reads as a solid object against the black corridor. */
 .flight-track__monolith {
   position: absolute;
   top: 50%;
   width: var(--flight-monolith-width);
   height: var(--flight-monolith-height);
   transform: translateY(-50%);
-  background: var(--kubrick-ink);
-  border: 1px solid var(--kubrick-white);
   transition: left var(--transition-normal);
+}
+
+.flight-track__monolith img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .flight-track__ship {
@@ -82,34 +86,19 @@
    * ship's own black box masks the hairline running underneath. Without
    * this the line draws straight through the command sphere. */
   background: var(--kubrick-black);
-  /* The hull is always the warm white; `color` is inherited by the exhaust
-   * alone, which is the single element allowed to turn red. */
-  color: var(--kubrick-grey-2);
-  transition: left var(--transition-normal), color var(--transition-normal);
+  transition: left var(--transition-normal);
 }
 
 .flight-track__ship-art {
   display: block;
   width: 100%;
-  height: auto;
-  fill: var(--kubrick-white);
+  height: 2.5rem;
+  object-fit: contain;
 }
 
-.flight-track__exhaust {
-  fill: currentColor;
-}
-
-/* Behind schedule: the one red on the whole strip.
- * Three elements carry it, and that is on purpose rather than for emphasis —
- * the exhaust is a 12px sliver and the clock is small letterforms, which is
- * precisely what a re-encoded stream destroys first (see the online-format
- * note in the design-system skill). The WAKE is the stream-proof one: a
- * full-width line nothing can smear away. It takes the dim red so it reads
- * as structure that has changed colour, not as an alarm. */
-.flight-track--late .flight-track__ship {
-  color: var(--kubrick-red);
-}
-
+/* Behind schedule: the one red on the whole strip. The generated miniature
+ * stays photographic; the wake and clock carry the warning. The wake is the
+ * stream-proof signal — a full-width line H.264 cannot smear away. */
 .flight-track--late .flight-track__wake {
   background: var(--kubrick-red-dim);
 }
@@ -119,7 +108,7 @@
 .flight-track__meta {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--space-md);
   padding: 0 var(--space-lg);
 }
@@ -140,9 +129,6 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  /* Holds the right edge once the caption beside it is hidden — with
-   * `space-between` and a single child, the clock would slide to the left. */
-  margin-left: auto;
 }
 
 .flight-track__clock:hover,
@@ -377,8 +363,9 @@
 /* === MOBILE: BOTTOM CHROME SIZING === */
 @media (max-width: 768px) and (pointer: coarse) {
   .flight-track {
-    --flight-ship-width: 4.5rem;
-    --flight-monolith-height: 1rem;
+    --flight-ship-width: 5.5rem;
+    --flight-monolith-width: 0.75rem;
+    --flight-monolith-height: 1.5rem;
   }
 
   .flight-track__space {
