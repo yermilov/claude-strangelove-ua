@@ -360,10 +360,14 @@
  * rules below get a say. A narrow desktop window is `pointer: fine`, so it
  * would otherwise keep a 300px caption on a 390px strip and collide with the
  * clock. The corridor already carries what the caption restates, so dropping
- * it early costs nothing. (Measured at the narrowest viewport Chrome would
- * actually give on this machine — 500px, not 390: `resize_window` reports
- * success and leaves `innerWidth` untouched, and devtools' own resize floors
- * at 500. So this rule is here by construction, not because 390 was seen.) */
+ * it early costs nothing.
+ *
+ * ⚠️ To check any of this at phone width, use CDP device emulation — window
+ * resizing lies here. `resize_window` returns success and leaves
+ * `innerWidth` at 1728; devtools' `resize_page` does move it but floors at
+ * 500. `emulate({viewport: '390x844x3,mobile,touch'})` gives a true 390 with
+ * `pointer: coarse`, which is the only way the rules below are reachable at
+ * all. Verified there: no overflow, caption hidden, clock on a 16px gutter. */
 @media (max-width: 640px) {
   .flight-track__label {
     display: none;
