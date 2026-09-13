@@ -8,108 +8,120 @@
  * single slide. If you find yourself reusing one across slides,
  * promote it to design-system/components.css. */
 
-/* === BIO SLIDE LAYOUT === */
+/* === BIO SLIDE LAYOUT ===
+ * Kubrick register: Jost, no glow, no hover tricks. The career path climbs
+ * in value — muted grey (past), film white (then), the one red (now) — so
+ * the red lands on the line the talk grows out of. */
 .bio-slide {
   display: flex;
-  align-items: flex-start; /* text stays top-aligned under the title */
+  align-items: center;
   justify-content: center;
-  gap: var(--space-3xl);
+  gap: var(--space-2xl);
   text-align: left;
   width: 100%;
   flex: 1; /* fill the content area so the photo can center vertically */
   min-height: 0;
-  padding-bottom: var(--space-xl); /* Clear timer/progress bar */
+  padding-bottom: var(--space-xl);
+  /* the photo is a full-height right column; keep it off the Fwdays mark */
+  padding-right: var(--conference-mark-inset);
 }
 
 .bio-slide-content {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.bio-slide-content h1 {
-  text-align: left;
-  margin-bottom: var(--space-xl);
-}
-
-.bio-slide-content h3 {
-  text-align: left;
-  color: var(--terminal-white-dim);
-  font-weight: 400;
-  margin-bottom: var(--space-lg);
+.bio-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
 }
 
 .bio-item {
   font-size: var(--font-size-body);
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 2ch 1fr;
   align-items: baseline;
   gap: var(--space-md);
+  color: var(--kubrick-white);
+  animation: slideItemFadeIn 600ms var(--ease) both;
 }
 
 .bio-item__prefix {
   font-weight: 700;
-  letter-spacing: -0.02em;
   white-space: nowrap;
+  color: var(--kubrick-red);
 }
 
+.bio-item--past { color: var(--kubrick-grey-2); }
+.bio-item--past .bio-item__prefix { color: var(--kubrick-grey-2); }
+.bio-item--now { color: var(--kubrick-red); font-weight: 600; }
+
 .bio-sub-items {
-  padding-left: 3rem;
-  margin-top: var(--space-xs);
+  padding-left: calc(2ch + var(--space-md));
+  margin-top: var(--space-sm);
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
+  animation: slideItemFadeIn 600ms var(--ease) both;
 }
 
 .bio-sub-item {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: var(--space-md);
-  font-size: var(--slide-text-dense);
-  opacity: 0.72;
+  font-size: var(--font-size-code);
+  color: var(--kubrick-grey-1);
   line-height: 1.4;
 }
 
 .bio-sub-item__prefix {
-  color: var(--terminal-white-dim);
-  font-weight: 700;
+  color: var(--kubrick-grey-2);
   white-space: nowrap;
 }
 
-.bio-subtitle {
-  color: var(--terminal-orange);
-  font-weight: 700;
+.slide .bio-subtitle {
+  color: var(--kubrick-grey-1);
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  text-shadow: 0 0 16px rgba(240, 136, 62, 0.35);
-}
-
-.bio-slide-content a {
-  color: var(--terminal-blue);
-  text-decoration: none;
-  border-bottom: 1px dashed var(--terminal-blue);
-  transition: all var(--transition-fast);
-}
-
-.bio-slide-content a:hover {
-  color: var(--terminal-cyan);
-  border-color: var(--terminal-cyan);
-  text-shadow: 0 0 8px var(--terminal-cyan-glow);
+  letter-spacing: 0.12em;
+  /* a label, not a paragraph: three quarters of body keeps it on one line */
+  font-size: calc(var(--font-size-body) * 0.75);
+  line-height: 1.3;
+  margin-bottom: var(--space-xl);
 }
 
 .bio-slide-image {
   flex-shrink: 0;
-  align-self: center; /* center the photo vertically in the right column */
-  max-width: 540px;
+  align-self: center;
+  max-width: min(26vw, 460px);
   max-height: calc(var(--vh-full) - 250px);
   object-fit: contain;
-  border-radius: var(--input-border-radius);
-  border: 2px solid var(--terminal-border);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+  border: 1px solid var(--kubrick-rule);
 }
 
-.bio-slide-image:hover {
-  transform: scale(1.02) rotate(1deg);
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.5);
+@media (max-width: 768px) {
+  .bio-slide {
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding-right: 0;
+  }
+  .bio-slide-image {
+    max-width: 60vw;
+    max-height: 30vh;
+  }
+}
+
+/* A phone on its side has ~220px of slide: the whole path plus the details
+ * cannot fit. Once the details are up, the earlier steps have been said, so
+ * keep only the "now" line they hang from (same idea as a sliding window). */
+@media (max-height: 500px) {
+  .bio-slide-image { display: none; }
+  .bio-items:has(.bio-sub-items) .bio-item:not(.bio-item--now),
+  .bio-slide-content:has(.bio-sub-items) .bio-subtitle { display: none; }
+  .bio-slide { padding-bottom: 0; }
+  .bio-sub-items { margin-top: 0; gap: 0; }
+  .bio-sub-item { line-height: 1.25; }
 }
 
 /* === TOOL TAKES GRID ===
