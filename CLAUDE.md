@@ -194,7 +194,7 @@ The `.slide` container has `max-height: 100%; overflow: hidden` as a hard CSS gu
   ```
 - For image/media containers, use `calc(var(--vh-full) - 220px)` (or similar offset) so they leave room for the timer and input bar.
 - The standard image-slide pattern already handles this via `.image-slide` height constraint.
-- Last-resort font tightening: `1.3–1.5rem` body text in genuinely dense reference slides where every bullet must stay visible at once.
+- **No font tightening.** The deck has exactly three font sizes (title 96 / heading 64 / text 40 — see the design-system skill); a slide that does not fit gets split, not a smaller size.
 
 Example fix pattern for overflow:
 ```css

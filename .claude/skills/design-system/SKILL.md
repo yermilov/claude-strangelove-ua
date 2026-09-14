@@ -33,10 +33,10 @@ dark theme:
   the muted grey are used for small letter-spaced labels, which is what a stream destroys first.
 - **A border is a line, not a fill.** `--kubrick-rule` exists for borders that carry structure;
   `--kubrick-grey-3` is for fills only. A 1px hairline at 1.3:1 is simply not there after re-encoding.
-- **Code sets at the same maximum as body text** (~32px), on the organiser's explicit request.
+- **Code sets at the same size as body text** (40px), on the organiser's explicit request.
 - Avoid faint large-area gradients and sub-10% tints — they band.
 
-Body text caps at 32px, heading at 80px. If a slide overflows, **split it** rather than shrinking
+Text caps at 40px, headings at 64px, the title-slide title at 96px. If a slide overflows, **split it** rather than shrinking
 text — that's still the design system's first commandment.
 
 **The slot is 35 minutes: 25–30 of talk plus 5–10 of Q&A.** `FlightTrack.tsx` spans the **30**, which
@@ -58,22 +58,31 @@ is the number to rehearse against — `TOTAL_TIME` there is the only place a slo
 
 Always read `tokens.css` before you write a new style — the token you need probably exists. If you're adding a new token, add it to `tokens.css` with a comment explaining when to reach for it.
 
-## Type scale — three tiers + hero exception
+## Type scale — exactly three sizes
 
-Read `--font-size-*` in `tokens.css` for the canonical values. The deck uses **only four sizes**:
+Yarik's rule (14.09.2026): **a slide has three font sizes, no more.** They are `--font-size-title`,
+`--font-size-heading` and `--font-size-text` in `tokens.css`; every other size token is an alias onto
+one of them, so a rule written against an old name still lands on a tier.
 
-| Tier | Token | Use |
-|---|---|---|
-| **Hero** | `--font-size-hero` (~96px max) | Title slide only |
-| **Heading** | `--font-size-h1` / `--font-size-h2` (~80px max) | Section heading per slide, uppercase and letter-spaced. `h1` is the default and is red; `h2` is the same size but white |
-| **Body** | `--font-size-body` (~40px max) | Paragraphs, list items, default text |
-| **Code** | `--font-size-code` (~32px max) | Inline code and code blocks. Raised from 24px for the online format — write code samples SHORT enough to fit rather than winding this back |
+| Tier | Token | Max | Use |
+|---|---|---|---|
+| **1 · Title** | `--font-size-title` | 96px | The title of the title slide — nothing else |
+| **2 · Heading** | `--font-size-heading` | 64px | The title slide's tagline, and the title of every other slide (h1/h2/h3, `.slide-title`, act-card and light-ring titles) |
+| **3 · Text** | `--font-size-text` | 40px | Everything else on a slide: paragraphs, bullets, labels, the speaker credit on the title slide, and code (mono sets at the same size — the organiser asked for big code) |
 
-`--font-size-h3` exists but is rarely used and not part of the canonical scale. If you want to write h3, ask whether you actually need a third heading tier — usually you can structure it as body with a `.section-header` label above.
+Aliases: `hero` → title; `h1`/`h2`/`h3` → heading; `body`, `code`, `--slide-text-*`,
+`--slide-section-header-*` → text. The `compact`/`dense` variants **no longer shrink anything** — if
+a slide does not fit at 40px, split it or narrow the image beside it (that is what the bio slide did),
+never add a fourth size. Hierarchy inside a tier comes from weight, colour and capitals, not size.
 
-**Body variants** — `--slide-text-compact` and `--slide-text-dense` are escape hatches for legacy slides with too much content. **Do not reach for them.** If a slide needs them, split the slide instead. The hall-readable default is `--slide-text-normal` which equals `--font-size-body`.
+The one deliberate exception is inline `<code>` inside prose at `0.88em`: JetBrains Mono runs
+optically larger than Jost, so that factor makes it read as the SAME size, not a smaller one.
 
-All sizes use `clamp(min, preferred, max)` so they scale smoothly from phone to 1920px without breakpoint cliffs.
+**Chrome is not slide type.** The Esc terminal, the captions under the flight track and the tooltips
+keep `--font-size-input` / `--font-size-small`.
+
+Verify with computed sizes, not by eye: on each slide every text node should report 96, 64 or 40px at
+1920×1080.
 
 ## Dark + light themes
 
@@ -201,7 +210,7 @@ Read `tokens.css`. There's one scale of each:
 |---|---|
 | Hardcode hex colours (`color: #f0883e`) | Use tokens; the palette is centrally tunable |
 | Hardcode px font sizes | Use `clamp()` tokens; they handle hall + phone |
-| Reach for `slide-text-compact` / `dense` to fit content | Split the slide instead — back-row readability matters |
+| Reach for `slide-text-compact` / `dense`, or a `calc()` of a size token, to fit content | They are aliases of TEXT now; a fourth size breaks the three-size rule — split the slide |
 | Switch `>` to `•` for bullets | Breaks the command-line aesthetic |
 | Add `text-shadow: none` to a new accent heading | Glow is load-bearing for the CRT identity |
 | Put per-slide CSS in `design-system/` | DS is for cross-slide reuse; one-slide styles go in `slide-layouts.css` |

@@ -43,7 +43,7 @@ export const FinalSlide: SlideDefinition = {
       }}
     >
       {/* Left column - bullets */}
-      <div style={{ flex: 1, maxWidth: '650px', textAlign: 'left' }}>
+      <div style={{ flex: 1, maxWidth: '900px', textAlign: 'left' }}>
         {(() => {
           // rolling window: overflow slide
           const WINDOW = 3;

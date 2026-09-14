@@ -175,32 +175,34 @@
   --font-weight-display: 800;
   --font-weight-body: 400;
 
-  /* Three-tier type scale tuned for back-row readability in a conference hall.
-   * Fluid clamp(min, preferred, max) so text scales smoothly from phone
-   * (~480px) up to desktop (~1920px) without breakpoint cliffs. Maxima
-   * sized for a projector at ~3–5m viewing distance.
+  /* THREE font sizes on slides — no more (Yarik, 14.09.2026). Every slide
+   * size token below resolves to one of these, so a new rule cannot invent a
+   * fourth by accident:
    *
-   *   HERO    ~96px max — title slide only
-   *   HEADING ~80px max — h1 + h2 (same size; h1 is semantic, h2 is the
-   *                                content-slide section header)
-   *   BODY    ~40px max — paragraphs, list items, default text
-   *   CODE    ~32px max — inline code + code blocks
+   *   TITLE    ~96px max — the title of the title slide, and nothing else
+   *   HEADING  ~64px max — the title slide's tagline AND every other slide's
+   *                        title (h1/h2/h3, act-card and light-ring titles)
+   *   TEXT     ~40px max — everything else on a slide: paragraphs, bullets,
+   *                        labels, the speaker credit, and code (mono sets at
+   *                        the same size — the organiser asked for big code)
    *
-   * The compact/dense body variants exist as legacy escape hatches for
-   * dense slides. The design system prefers splitting a too-dense slide
-   * over shrinking text. */
-  --font-size-hero: clamp(2.5rem, 6vw, 6rem);
-  --font-size-h1: clamp(2rem, 4vw, 5rem);
-  --font-size-h2: clamp(2rem, 4vw, 5rem);
-  --font-size-h3: clamp(1.5rem, 3vw, 3rem);
-  --font-size-body: clamp(1rem, 1.6vw, 2rem);
-  /* Bumped from a 24px maximum on the organiser's explicit request
-   * (10.09.2026): "якщо у вас в презентації є код — просимо зробити літери
-   * більшими, щоб він був читабельним". 24px survives a hall projector and
-   * does not survive a re-encoded stream watched in a window. Code now sets
-   * at the same maximum as body text; write code samples SHORT enough to fit
-   * rather than winding this back. */
-  --font-size-code: clamp(1.05rem, 1.7vw, 2rem);
+   * TEXT is deliberately large. If a slide does not fit, split it; the
+   * compact/dense names survive only as aliases and no longer shrink anything.
+   * Fluid clamp(min, preferred, max) scales from phone to 1920px.
+   *
+   * Chrome (the Esc terminal, captions under the flight track, tooltips) is
+   * UI, not slide type — it keeps its own `--font-size-input`/`-small`. */
+  --font-size-title: clamp(2.5rem, 6vw, 6rem);
+  --font-size-heading: clamp(1.75rem, 3.4vw, 4rem);
+  --font-size-text: clamp(1.1rem, 2.1vw, 2.5rem);
+
+  /* Legacy names — aliases onto the three tiers. */
+  --font-size-hero: var(--font-size-title);
+  --font-size-h1: var(--font-size-heading);
+  --font-size-h2: var(--font-size-heading);
+  --font-size-h3: var(--font-size-heading);
+  --font-size-body: var(--font-size-text);
+  --font-size-code: var(--font-size-text);
   --font-size-input: clamp(0.95rem, 1vw, 1.25rem);
   --font-size-small: clamp(0.8rem, 0.8vw, 1rem);
 
@@ -215,20 +217,20 @@
   /* Body size variants. `normal` matches the hall-readable body size.
    * Compact / dense are escape hatches for legacy slides. */
   --slide-text-normal: var(--font-size-body);
-  --slide-text-compact: clamp(1.05rem, 1.6vw, 2rem);
-  --slide-text-dense: clamp(0.95rem, 1.4vw, 1.65rem);
+  --slide-text-compact: var(--font-size-text);
+  --slide-text-dense: var(--font-size-text);
 
   --slide-line-height-normal: 1.55;
   --slide-line-height-compact: 1.5;
   --slide-line-height-dense: 1.45;
 
   /* Section headers (uppercase orange labels above body sections) */
-  --slide-section-header: clamp(1rem, 1.4vw, 1.5rem);
-  --slide-section-header-compact: clamp(0.9rem, 1.2vw, 1.25rem);
-  --slide-section-header-dense: clamp(0.8rem, 1vw, 1.1rem);
+  --slide-section-header: var(--font-size-text);
+  --slide-section-header-compact: var(--font-size-text);
+  --slide-section-header-dense: var(--font-size-text);
 
   /* Inline code */
-  --slide-code-relative: 0.95em;
+  --slide-code-relative: 1em;
 
   /* === SPACING === */
   --space-xs: 0.25rem;
