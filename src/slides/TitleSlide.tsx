@@ -10,8 +10,11 @@ export const TitleSlide: SlideDefinition = {
         або як я перестав хвилюватися і читати код, згенерований AI
       </p>
       <p className="title-subtitle">
-        Ярослав Єрмілов · Principal Software Engineer @ Superhuman (formerly
-        Grammarly)
+        <span className="credit-part">Ярослав Єрмілов</span>
+        <span className="credit-sep"> · </span>
+        <span className="credit-part">
+          Principal Software Engineer, <span className="nowrap">ex-Grammarly</span>
+        </span>
       </p>
     </div>
   ),

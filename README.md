@@ -9,7 +9,7 @@
 > Сьогодні кожен із нас став тімлідом команди АІ агентів і ми задаємо собі і один одному
 > аналогічне питання: як називати людину що не читає код, який генерують його агенти?
 
-Ярослав Єрмілов, Principal Software Engineer @ Superhuman (formerly Grammarly).
+Ярослав Єрмілов, Principal Software Engineer, ex-Grammarly.
 
 Скопійовано з [`revenge-of-the-skill-en`](https://github.com/yermilov/revenge-of-the-skill-en) —
 референсної реалізації дека. Метод описано в плагіні `presentation-dev`.
