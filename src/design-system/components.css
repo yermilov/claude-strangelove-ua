@@ -70,11 +70,20 @@
   transition: left var(--transition-normal);
 }
 
+/* The rim light in the art is a sub-pixel line at this size, so on the black
+ * room the slab vanished outright. A hard 1px edge traced around its alpha
+ * (zero-blur drop-shadows — an outline, not a glow) gives it a silhouette.
+ * grey-2, not the rule: a stream eats 2.7:1 hairlines first. */
 .flight-track__monolith img {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
+  filter:
+    drop-shadow(1px 0 0 var(--kubrick-grey-2))
+    drop-shadow(-1px 0 0 var(--kubrick-grey-2))
+    drop-shadow(0 1px 0 var(--kubrick-grey-2))
+    drop-shadow(0 -1px 0 var(--kubrick-grey-2));
 }
 
 .flight-track__ship {

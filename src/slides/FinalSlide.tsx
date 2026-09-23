@@ -36,6 +36,9 @@ export const FinalSlide: SlideDefinition = {
         justifyContent: 'center',
         gap: 'var(--space-3xl)',
         width: '100%',
+        // Fill the stage under the title band so the QR can size against it.
+        flex: 1,
+        minHeight: 0,
         paddingBottom: 'var(--space-xl)',
         // The QR card is a full-height right column, so it would otherwise
         // run straight into the Fwdays mark in the corner. See the token.
@@ -63,10 +66,13 @@ export const FinalSlide: SlideDefinition = {
         <img
           src={linkedinQr}
           alt="LinkedIn QR code - Yarik Yermilov"
+          className="final-qr"
           style={{
             flexShrink: 0,
             maxWidth: '600px',
-            maxHeight: 'calc(100vh - 180px)',
+            // The row's height, not `100vh - 180px`: at 720p that ran the
+            // QR ~190px under the flight track.
+            maxHeight: '100%',
             objectFit: 'contain',
             border: '1px solid var(--kubrick-grey-3)',
             opacity: 0,

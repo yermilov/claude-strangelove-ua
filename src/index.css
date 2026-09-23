@@ -39,6 +39,24 @@
   font-display: swap;
 }
 
+/* True italics for <em> — without these the browser slants the upright
+ * glyphs itself. Same Ukrainian patch, re-sheared for the 10° slant. */
+@font-face {
+  font-family: 'Jost UA';
+  src: url('./fonts/jost-ua-400-italic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jost UA';
+  src: url('./fonts/jost-ua-600-italic.woff2') format('woff2');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* === GLOBAL RESET === */
 *,
 *::before,

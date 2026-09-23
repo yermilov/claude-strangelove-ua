@@ -156,6 +156,9 @@ import myVideo from '/my-video.mp4?url';
 
 GIF vs MP4: `petermobile.gif` was 5 MB → `petermobile.mp4` is 306 KB.
 
+**No personal photos in this deck** (Yarik, 23.09.2026 — family, concert, badge shots were removed
+from the bio slide). The bio is text-only until a new layout is agreed; do not re-add them.
+
 ### Full-Screen Image Slides
 
 For slides that display a single image filling the available space:
