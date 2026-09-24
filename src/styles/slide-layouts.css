@@ -11,10 +11,10 @@
 /* === BIO SLIDE LAYOUT ===
  * Kubrick register: Jost, no glow, no hover tricks. Text only — two columns
  * either side of one vertical rule, the symmetry of the War Room board:
- * tenure on the left (HEADING figures over TEXT labels), the career path on
+ * tenure on the left (bold white figures over grey labels), the career path on
  * the right. The path climbs in value — muted grey (past), film white
  * (then), the one red (now) — so the red lands on the line the talk grows
- * out of. Three sizes only: the figures are heading, everything else text. */
+ * out of. Three sizes only: everything under the title is text size. */
 .bio-slide {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
@@ -43,8 +43,11 @@
 }
 
 .slide .bio-tenure__figure {
-  font-size: var(--font-size-heading);
-  font-weight: var(--font-weight-display);
+  /* TEXT size, not heading: at heading size and display weight the figures
+   * out-shouted the slide title. Weight and white keep them above the grey
+   * company line. */
+  font-size: var(--font-size-text);
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-heading);
   line-height: var(--line-height-tight);

@@ -10,10 +10,15 @@ import { SlideDefinition } from '../types/slides';
 
 type Level = 'past' | 'then' | 'now';
 
+// `stage` is the reveal on which the row appears: Preply (now) first, then
+// Grammarly (the nine years behind it), then the Grammarly path on the right.
 const TENURE = [
-  { figure: '9 років', company: 'Grammarly' },
-  { figure: '9 днів', company: 'Preply' },
+  { figure: '9 років', company: 'Grammarly', stage: 1 },
+  { figure: '9 днів', company: 'Preply', stage: 0 },
 ];
+
+// The first path step lands on the reveal after the last tenure row.
+const PATH_START = Math.max(...TENURE.map((t) => t.stage)) + 1;
 
 const BIO_ITEMS: { level: Level; content: ReactNode }[] = [
   { level: 'past', content: <>починав як Java backend-інженер</> },
@@ -26,15 +31,21 @@ const BIO_ITEMS: { level: Level; content: ReactNode }[] = [
 export const BioSlide: SlideDefinition = {
   id: 'bio',
   title: <>хто я</>,
-  // One stage per career step; stage 0 already shows the first one.
-  maxRevealStages: BIO_ITEMS.length - 1,
+  // Stage 0 is Preply alone, stage 1 adds Grammarly, then one stage per step.
+  maxRevealStages: PATH_START + BIO_ITEMS.length - 1,
   content: ({ revealStage }) => (
     <div className="bio-slide">
       {/* Left: the two numbers the bio hangs on, set as a board — the same
        * "9" twice, and the unit is the joke. */}
       <dl className="bio-tenure">
         {TENURE.map((t) => (
-          <div key={t.company} className="bio-tenure__row">
+          // An unrevealed row keeps its place (hidden, not unmounted), so
+          // Preply does not jump down when Grammarly arrives above it.
+          <div
+            key={t.company}
+            className="bio-tenure__row"
+            style={revealStage >= t.stage ? undefined : { visibility: 'hidden' }}
+          >
             <dt className="bio-tenure__figure">{t.figure}</dt>
             <dd className="bio-tenure__company">{t.company}</dd>
           </div>
@@ -44,7 +55,7 @@ export const BioSlide: SlideDefinition = {
       {/* Right: the path, one step per reveal, on a single hairline. */}
       <ol className="bio-path">
         {BIO_ITEMS.map((item, i) =>
-          revealStage >= i ? (
+          revealStage >= PATH_START + i ? (
             <li key={i} className={`bio-item bio-item--${item.level}`}>
               {item.content}
             </li>

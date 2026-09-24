@@ -75,6 +75,11 @@ Aliases: `hero` → title; `h1`/`h2`/`h3` → heading; `body`, `code`, `--slide-
 a slide does not fit at 40px, split it or narrow the image beside it (that is what the bio slide did),
 never add a fourth size. Hierarchy inside a tier comes from weight, colour and capitals, not size.
 
+**Nothing under a slide title may share its tier at a heavier weight.** At the same 64px, a heavier
+weight reads as BIGGER — the bio board's «9 РОКІВ / 9 ДНІВ» at 64px/800 out-shouted the 64px/600
+«ХТО Я» and Yarik called it hierarchically wrong (24.09.2026). Content under a title sits at the text
+tier; set it apart with weight and colour there (the bio figures are now 40px/600 white over grey).
+
 The one deliberate exception is inline `<code>` inside prose at `0.88em`: JetBrains Mono runs
 optically larger than Jost, so that factor makes it read as the SAME size, not a smaller one.
 
