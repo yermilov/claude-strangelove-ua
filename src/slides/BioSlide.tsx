@@ -13,8 +13,8 @@ type Level = 'past' | 'then' | 'now';
 // `stage` is the reveal on which the row appears: Preply (now) first, then
 // Grammarly (the nine years behind it), then the Grammarly path on the right.
 const TENURE = [
-  { figure: '9 років', company: 'Grammarly', stage: 1 },
-  { figure: '9 днів', company: 'Preply', stage: 0 },
+  { figure: '9 років', company: 'у Grammarly', stage: 1 },
+  { figure: '9 днів', company: 'у Preply', stage: 0 },
 ];
 
 // The first path step lands on the reveal after the last tenure row.
