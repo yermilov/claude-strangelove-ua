@@ -18,6 +18,28 @@ That contrast **is the talk's argument** ("Клод Стрейнджлав" — 
 
 The test for any element is a single question: **is this the machine talking?** Everything else stays Kubrick.
 
+⚠️ **Readability outranks the aesthetic — always.** Yarik's order (26.09.2026): «моя перша ціль
+завжди — читабельність для презентації, а друга вже — слідування естетиці». When the look and the
+legibility disagree, the look loses. Concretely, from the slide that taught it («мій перший день»):
+no grey-on-grey — diagram labels are `--kubrick-white`, structural lines `--kubrick-grey-1`, never
+`--kubrick-rule`-on-black for anything the audience must read; **screenshots and illustrations keep
+their own colours** — desaturating them "to fit the one-red palette" made them unreadable and was
+reverted. The one-red rule governs what the DECK draws, not what a picture it shows already contains.
+
+⚠️ **A reveal never moves what is already on screen.** Yarik (26.09.2026, «Хто я»): «щоб текст не
+зміщувався а кожен булет поінт зявлявся на тому місці де він і буде до кінця». Lay every revealed
+element out from the first stage and hide the not-yet-revealed ones with `visibility: hidden` (not
+unmounted), so each lands where it stays — the bio path, the tenure board, the IntelliJ asks and the
+Gmail/DevTools pair all do this. Two traps: drop the element's `animation` while hidden, or its
+fade-in plays once at mount and never on reveal; and an animation whose keyframes set `transform`
+(`slideItemFadeIn`) overrides a centring `transform` on the same element — centre with the
+independent `translate` property instead.
+
+**Stepping out of a slide and back** is `SlideDefinition.detours` (see `types/slides.ts`): «Хто я»
+jumps to «мій перший день» and «команда з трьох» mid-reveal and returns one stage later. A detour
+target is ONE slide, so a multi-scene excursion is one slide with a scene per reveal; list targets
+right after their origin in `slides/index.ts`.
+
 Mechanically the skin is the DOU re-skin technique: `--kubrick-*` tokens are first-class, the old `--terminal-*` names are **aliases re-pointed at them**, and `.machine` hands the original values back on its own subtree. So all ~3000 lines of `slide-layouts.css` render in the new palette for free, and new rules should read `--kubrick-*` directly.
 
 ⚠️ **The talk is ONLINE.** Fwdays Tech Summit'26 went fully online (organiser, 10.09.2026), and that

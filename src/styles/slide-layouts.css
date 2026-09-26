@@ -65,9 +65,10 @@
   color: var(--kubrick-grey-2);
 }
 
-/* The path: one hairline down the left, a square station per step. Each
- * step draws the segment down to the next one, and unrevealed steps are not
- * rendered, so the line is exactly as long as the steps revealed so far. */
+/* The path: one hairline down the left, a square station per step. A step
+ * draws the segment down to the next one only when both are revealed
+ * (`--linked`), so the rule joins exactly the steps shown so far. Unrevealed
+ * steps are laid out but hidden, so nothing shifts. */
 .slide .bio-path {
   display: flex;
   flex-direction: column;
@@ -102,8 +103,15 @@
   text-shadow: none;
 }
 
+/* not yet revealed: holds its place; dropping `animation` here is what lets
+ * the fade-in play when the step is revealed, not once at mount */
+.slide .bio-item--hidden {
+  visibility: hidden;
+  animation: none;
+}
+
 /* the rule joining this station to the next one */
-.slide .bio-item:not(:last-child)::after {
+.slide .bio-item--linked::after {
   content: '';
   position: absolute;
   left: calc(0.225em - 0.5px);
@@ -112,6 +120,9 @@
   width: 1px;
   background: var(--kubrick-rule);
 }
+
+/* keep a compound like "backend-інженер" from breaking at its hyphen */
+.slide .bio-item .nowrap { white-space: nowrap; }
 
 .slide .bio-item--past { color: var(--kubrick-grey-2); }
 .slide .bio-item--now { color: var(--kubrick-red); font-weight: 600; }
@@ -146,7 +157,227 @@
   .bio-tenure__row { flex-direction: row; align-items: baseline; gap: var(--space-md); }
   .slide .bio-path { margin-left: var(--space-md); }
   .slide .bio-item { padding-left: var(--space-lg); }
-  .slide .bio-item:not(:last-child) { display: none; }
+  .slide .bio-item:not(.bio-item--newest) { display: none; }
+  /* one step on screen: nothing for the rule to join */
+  .slide .bio-item::after { display: none; }
+}
+
+/* === DETOUR STAGE ===
+ * The stage of a detour out of «Хто я» («мій перший день», «команда з
+ * трьох»): one box that swaps scenes per reveal. */
+.first-day {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: var(--space-lg);
+  padding-right: var(--conference-mark-inset);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+
+/* === ARCHITECTURE DIAGRAM ===
+ * <ArchitectureDiagram> (components/ArchitectureDiagram.tsx), shared by «мій
+ * перший день» and «команда з трьох». */
+.arch__diagram {
+  width: 100%;
+  height: 100%;
+  font-family: var(--font-sans);
+  overflow: visible;
+}
+
+.arch__box rect {
+  fill: none;
+  stroke: var(--kubrick-grey-1);
+  stroke-width: 2;
+}
+.arch__box text {
+  fill: var(--kubrick-white);
+  font-size: 30px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+/* the column the story is about */
+.arch__box--strong rect { stroke: var(--kubrick-white); stroke-width: 4; }
+.arch__box--strong text { fill: var(--kubrick-white); font-weight: 600; }
+
+.arch__arrow line { stroke: var(--kubrick-grey-1); stroke-width: 3; }
+.arch__arrow path { fill: var(--kubrick-grey-1); }
+
+.arch__zone line {
+  stroke: var(--kubrick-grey-2);
+  stroke-width: 2;
+  stroke-dasharray: 6 10;
+}
+.arch__zone text {
+  fill: var(--kubrick-grey-1);
+  font-size: 22px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.arch__devices rect,
+.arch__devices path {
+  fill: none;
+  stroke: var(--kubrick-white);
+  stroke-width: 3;
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+
+.arch__wss text {
+  fill: var(--terminal-orange);
+  font-family: var(--font-mono);
+  font-size: 22px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* HAL: a metal rim, a black bezel, the red lens */
+.arch__hal { animation: slideItemFadeIn 600ms var(--ease) both; }
+.arch__hal-rim { fill: var(--kubrick-grey-3); stroke: var(--kubrick-grey-1); stroke-width: 2; }
+.arch__hal-bezel { fill: var(--kubrick-ink); }
+
+.arch__character { animation: slideItemFadeIn 600ms var(--ease) both; }
+
+/* === SLIDE SCREENSHOT ===
+ * <SlideScreenshot> (components/SlideScreenshot.tsx).
+ * A screenshot sizes itself to the room it is given: the figure is a size
+ * container, and the frame takes the largest box of the image's own ratio
+ * that fits — so the frame hugs the image and the marks, placed in
+ * fractions of the frame, land on the pixels they point at. */
+.shot {
+  margin: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shot--hidden { visibility: hidden; }
+.shot:not(.shot--hidden) {
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.shot__frame {
+  position: relative;
+  aspect-ratio: var(--ratio);
+  width: min(100cqw, 100cqh * var(--ratio));
+}
+.shot__frame > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--kubrick-rule);
+  border-radius: var(--radius-card);
+}
+
+/* two screenshots side by side */
+.shot-pair {
+  display: flex;
+  gap: var(--space-xl);
+  width: 100%;
+  height: 100%;
+}
+
+/* the Grammarly button: a red ring round it, the G spinning inside */
+.shot__spinner {
+  position: absolute;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  padding: 6px;
+  border: 4px solid transparent;
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+.shot__spinner--marked {
+  border-color: var(--kubrick-red);
+  animation: shot-ring-in 600ms var(--ease) both;
+}
+@keyframes shot-ring-in {
+  from { border-color: transparent; }
+}
+.shot__spinner img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 50%;
+  animation: shot-spin 2.4s linear infinite;
+}
+@keyframes shot-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shot__spinner img { animation: none; }
+}
+
+.shot__mark {
+  position: absolute;
+  border: 4px solid var(--kubrick-red);
+  border-radius: var(--radius-card);
+  pointer-events: none;
+}
+
+/* === TEAM OF THREE ===
+ * The second detour out of «Хто я». Scenes live on the `.first-day` stage. */
+.team__tabs {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+}
+.team__tabs .shot { flex: 1 1 0; min-height: 0; width: 100%; }
+.team__tabs figcaption {
+  font-size: var(--font-size-text);
+  color: var(--kubrick-grey-1);
+}
+
+/* IntelliJ on top, the asks under it; the rows are reserved from the start */
+.team__intellij {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.team__intellij .shot { flex: 1 1 0; min-height: 0; }
+.slide .team__asks {
+  display: block;
+  margin: 0 auto;
+  padding: 0;
+}
+.slide .team__asks li {
+  color: var(--kubrick-white);
+  margin-bottom: var(--space-xs);
+  line-height: var(--line-height-tight);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .team__asks li.team__ask--hidden {
+  visibility: hidden;
+  animation: none;
+}
+
+/* TL;DR: the points made so far — the one just made in white, the earlier
+ * ones stepped back to body grey (still well above AA). */
+.slide .team__tldr {
+  display: block;
+  margin: 0;
+  padding: 0;
+  align-self: center;
+}
+.slide .team__tldr li {
+  color: var(--kubrick-white);
+  font-weight: 600;
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .team__tldr li.team__tldr--said {
+  color: var(--kubrick-grey-1);
+  font-weight: 400;
+  animation: none;
 }
 
 /* === TOOL TAKES GRID ===

@@ -124,6 +124,12 @@ For interactive slides (reveal stages, live input, tool activation), pass a rend
 
 ### Using Images
 
+**Put slide images in `src/assets/` and import them relatively** (`import img from
+'../assets/my-image.png'`). `utils/preloadAssets.ts` globs `src/assets/` and warms every image while
+the deck is idle, so a scene never pops in on a live connection; nothing under `public/` is
+preloaded (a review caught exactly that on 26.09.2026). `public/` is for files that need a stable
+un-hashed URL.
+
 Images in `public/` must be imported with `?url` suffix for GitHub Pages compatibility:
 
 ```tsx

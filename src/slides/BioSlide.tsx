@@ -20,19 +20,31 @@ const TENURE = [
 // The first path step lands on the reveal after the last tenure row.
 const PATH_START = Math.max(...TENURE.map((t) => t.stage)) + 1;
 
-const BIO_ITEMS: { level: Level; content: ReactNode }[] = [
-  { level: 'past', content: <>починав як Java backend-інженер</> },
-  { level: 'then', content: <>потім техлідив продуктові фічі</> },
-  { level: 'then', content: <>потім <em>техлідив продуктові фреймворки</em></> },
-  { level: 'then', content: <>потім техлід платформної організації</> },
-  { level: 'now', content: <>зараз <em>AI-first розробка</em></> },
+// Listed top to bottom; `order` is the reveal order within the path — "now"
+// first (it stays at the bottom), then the path from the start.
+const BIO_ITEMS: { level: Level; order: number; content: ReactNode }[] = [
+  { level: 'past', order: 1, content: <>а починав в 2017 як Java <span className="nowrap">backend-інженер</span></> },
+  { level: 'then', order: 2, content: <>потім техлідив продуктові фічі</> },
+  { level: 'then', order: 3, content: <>потім <em>техлідив продуктові фреймворки</em></> },
+  { level: 'then', order: 4, content: <>потім техлід платформної організації</> },
+  { level: 'now', order: 0, content: <>з травня 2025 року пушив Superhuman/Grammarly у напрямку <em>агентної розробки</em></> },
 ];
 
 export const BioSlide: SlideDefinition = {
   id: 'bio',
   title: <>хто я</>,
-  // Stage 0 is Preply alone, stage 1 adds Grammarly, then one stage per step.
+  // Stage 0 is Preply alone, stage 1 adds Grammarly, then one stage per step
+  // in `order`.
   maxRevealStages: PATH_START + BIO_ITEMS.length - 1,
+  // Once the two ends of the path are up (the start in 2017 and "now"), the
+  // talk steps out to the first day and comes back to fill in the middle,
+  // landing with its first step already shown. Once «…фреймворки» is up it
+  // steps out again, to the team of three, and lands on «…платформної
+  // організації».
+  detours: [
+    { atStage: PATH_START + 1, toId: 'first-day', returnStage: PATH_START + 2 },
+    { atStage: PATH_START + 3, toId: 'team-of-three', returnStage: PATH_START + 4 },
+  ],
   content: ({ revealStage }) => (
     <div className="bio-slide">
       {/* Left: the two numbers the bio hangs on, set as a board — the same
@@ -52,15 +64,28 @@ export const BioSlide: SlideDefinition = {
         ))}
       </dl>
 
-      {/* Right: the path, one step per reveal, on a single hairline. */}
+      {/* Right: the path, one step per reveal, on a single hairline. Like the
+       * tenure rows, unrevealed steps keep their place (hidden, not
+       * unmounted), so each step lands where it will stay. A step draws the
+       * rule down to the next one only once that one is revealed too, so the
+       * line grows from the top until it reaches "now". */}
       <ol className="bio-path">
-        {BIO_ITEMS.map((item, i) =>
-          revealStage >= PATH_START + i ? (
-            <li key={i} className={`bio-item bio-item--${item.level}`}>
+        {BIO_ITEMS.map((item, i) => {
+          const isRevealed = (it: { order: number }) => revealStage >= PATH_START + it.order;
+          const next = BIO_ITEMS[i + 1];
+          const classes = [
+            'bio-item',
+            `bio-item--${item.level}`,
+            !isRevealed(item) && 'bio-item--hidden',
+            isRevealed(item) && next && isRevealed(next) && 'bio-item--linked',
+            revealStage === PATH_START + item.order && 'bio-item--newest',
+          ];
+          return (
+            <li key={i} className={classes.filter(Boolean).join(' ')}>
               {item.content}
             </li>
-          ) : null,
-        )}
+          );
+        })}
       </ol>
     </div>
   ),

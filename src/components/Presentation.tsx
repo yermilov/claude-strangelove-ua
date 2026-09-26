@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { PresentationProps } from '../types/slides';
 import { useSlideNavigation } from '../hooks/useSlideNavigation';
 import { NavigationContext } from '../context/NavigationContext';
@@ -9,6 +9,7 @@ import { FlightTrack } from './FlightTrack';
 import { RotateHint } from './RotateHint';
 import { FwdaysLogo } from './FwdaysLogo';
 import { preloadSlideAssets } from '../utils/preloadAssets';
+import { traversalOrder } from '../utils/traversal';
 import { exportRegistry } from './exportRegistry';
 
 declare global {
@@ -208,6 +209,8 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
     handleNavCommand(command);
   }, [handleNavCommand]);
 
+  // Computed before the early return below: hooks must run on every render.
+  const traversal = useMemo(() => traversalOrder(slides), [slides]);
   const activeSlide = slides[currentSlide];
 
   if (!activeSlide) {
@@ -224,16 +227,13 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
       ? activeSlide.title({ revealStage, inputText })
       : activeSlide.title;
 
-  // Progress bar weights every reveal across the deck equally: each slide
-  // contributes (maxRevealStages + 1) units, so a slide with eight reveals
-  // fills more of the bar than a single-shot slide. Consumed = all prior
-  // slides in full + the current reveal stage within this slide.
-  const revealUnits = slides.map((s) => (s.maxRevealStages ?? 0) + 1);
-  const totalUnits = revealUnits.reduce((sum, u) => sum + u, 0);
+  // Progress weights every reveal across the deck equally, in the order the
+  // talk actually visits them — a detour's reveals count where the detour is
+  // taken, not where its slide sits in the array, so the flight track never
+  // rewinds when a detour returns (see utils/traversal.ts).
+  const totalUnits = traversal.total;
   const consumedUnits =
-    revealUnits.slice(0, currentSlide).reduce((sum, u) => sum + u, 0) +
-    Math.min(revealStage, activeSlide.maxRevealStages ?? 0) +
-    1;
+    (traversal.position.get(`${currentSlide}:${Math.min(revealStage, activeSlide.maxRevealStages ?? 0)}`) ?? 0) + 1;
 
   return (
     <NavigationContext.Provider value={{ goToSlideById }}>
