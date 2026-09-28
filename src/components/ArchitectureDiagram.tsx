@@ -104,11 +104,35 @@ const CHARACTER_SPOTS: Record<'code' | 'me' | 'mateLeft' | 'mateBelow', Spot> = 
 
 export type Wolf = Exclude<keyof typeof CHARACTER_SPOTS, 'code'>;
 
-function Character({ spot }: { spot: keyof typeof CHARACTER_SPOTS }) {
-  const s = CHARACTER_SPOTS[spot];
+// The rest of the 50 contributors, all over the diagram as in the original
+// «500 MR from 50 contributors» slide — on every box, not only beside the
+// code. Kept inside the viewBox; about half face the other way.
+const CROWD_W = 175;
+const CROWD: Spot[] = (
+  [
+    [1000, 80],
+    [560, 175, true],
+    [870, 190],
+    [1360, 70, true],
+    [1640, 60],
+    [1150, 170],
+    [430, 330, true],
+    [780, 310, true],
+    [1300, 280],
+    [600, 470],
+    [930, 440],
+    [1190, 520, true],
+    [1450, 500],
+    [380, 560, true],
+  ] as [number, number, boolean?][]
+).map(([x, y, flip]) => ({ x, y, flip, w: CROWD_W, src: wolfImg, alt: 'Вовк — контриб’ютор' }));
+
+function Character({ spot, delayMs }: { spot: Spot; delayMs?: number }) {
+  const s = spot;
   const image = (
     <image
       className="arch__character"
+      style={delayMs ? { animationDelay: `${delayMs}ms` } : undefined}
       href={s.src}
       x={s.x - s.w / 2}
       y={s.y - s.w / 2}
@@ -131,12 +155,14 @@ export interface ArchitectureDiagramProps {
   code?: boolean;
   /** which wolves stand beside the code */
   wolves?: Wolf[];
+  /** the whole crowd of contributors over the diagram, arriving one by one */
+  crowd?: boolean;
 }
 
 /** The 2017 Grammarly architecture from the Berlin 2023 talk, redrawn as one
  * scaling SVG — its labels scale with it, like the text in an image. Layers
  * are switched on by props so a slide can build it up reveal by reveal. */
-export function ArchitectureDiagram({ clients, code, wolves = [] }: ArchitectureDiagramProps) {
+export function ArchitectureDiagram({ clients, code, wolves = [], crowd }: ArchitectureDiagramProps) {
   const p = COL.processing;
   return (
     <svg className="arch__diagram" viewBox={`0 0 ${W + 330} ${H}`} role="img" aria-label="Архітектура Grammarly, 2017">
@@ -172,10 +198,11 @@ export function ArchitectureDiagram({ clients, code, wolves = [] }: Architecture
           </text>
         </g>
       )}
+      {crowd && CROWD.map((s, i) => <Character key={i} spot={s} delayMs={300 + i * 120} />)}
       {wolves.map((w) => (
-        <Character key={w} spot={w} />
+        <Character key={w} spot={CHARACTER_SPOTS[w]} />
       ))}
-      {code && <Character spot="code" />}
+      {code && <Character spot={CHARACTER_SPOTS.code} />}
     </svg>
   );
 }

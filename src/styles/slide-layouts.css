@@ -457,6 +457,56 @@
   animation: none;
 }
 
+/* === CONCLUSIONS (the second «проміжні висновки») ===
+ * The TL;DR list top-left, with the picture beside it on the right. */
+.conclusions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--space-2xl);
+}
+.slide .conclusions .team__tldr li { margin-bottom: var(--space-md); }
+.conclusions__picture {
+  max-height: calc(var(--vh-full) * 0.5);
+  max-width: 32vw;
+  border-radius: var(--radius-card);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.conclusions__picture--hidden {
+  visibility: hidden;
+  animation: none;
+}
+/* until the photo lands: a frame of the same size, so the layout is final */
+.conclusions__placeholder {
+  width: min(32vw, calc(var(--vh-full) * 0.5 * 0.8));
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--kubrick-rule);
+  color: var(--kubrick-grey-2);
+  font-size: var(--font-size-text);
+}
+
+/* === PROBLEMS ===
+ * «які можуть бути проблеми?»: one point per reveal, top-left under the
+ * title; unrevealed points keep their place. */
+.slide .problems {
+  margin: 0;
+  padding: 0;
+}
+.slide .problems li {
+  color: var(--kubrick-white);
+  margin-bottom: var(--space-md);
+  line-height: var(--line-height-tight);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .problems li.problems__item--hidden {
+  visibility: hidden;
+  animation: none;
+}
+
 /* === TOOL TAKES GRID ===
  * 4×2 grid of tool cards. Each card holds a silhouetted logo, a hidden
  * name (rendered as ???), and a "take" line (opinion about the tool).

@@ -83,7 +83,8 @@ const ASKS: ReactNode[] = [
   <>Документація? Домовленість?</>,
 ];
 
-const TLDR: ReactNode[] = [<>Вибір — контрпродуктивний</>, <>Не покладайся на дії інженера</>];
+// also recapped on «проміжні висновки» after «які можуть бути проблеми?»
+export const TLDR: ReactNode[] = [<>Вибір — контрпродуктивний</>, <>Не покладайся на дії інженера</>];
 
 const TITLES: Record<Scene, ReactNode> = {
   team: <>команда з трьох</>,
