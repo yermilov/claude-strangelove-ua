@@ -18,13 +18,14 @@ export interface SlideDefinition {
   /** Optional contextual tooltip shown next to the slide (ported from pragmatic-vibe-clauding-ua). */
   tooltip?: ReactNode;
   maxRevealStages?: number;
-  initialRevealStage?: number;
   /**
    * Optional non-linear detours. When the presenter advances past `atStage`
-   * on this slide, navigation jumps to the slide with id `toId` (at reveal 0);
-   * once that slide is fully revealed, it returns here at `returnStage`. Detour
-   * targets are skipped on the subsequent linear pass. Multiple detours from
-   * one slide should list their target slides consecutively right after it.
+   * on this slide, navigation plays the slide with id `toId` in full, then
+   * returns here at `returnStage`. Detour targets are skipped on the linear
+   * pass. The whole talk is flattened into one line of steps by
+   * `utils/traversal.ts` — that line is what navigation and `#slide-N` walk.
+   * Multiple detours from one slide should list their target slides
+   * consecutively right after it.
    */
   detours?: { atStage: number; toId: string; returnStage: number }[];
   /**

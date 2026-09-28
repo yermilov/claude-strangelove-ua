@@ -1,24 +1,31 @@
 import { SlideDefinition } from '../types/slides';
 
+export interface Step {
+  /** index into the slides array */
+  index: number;
+  revealStage: number;
+}
+
 /**
- * The order in which forward navigation actually visits every (slide, reveal)
- * pair, detours included — so progress can follow the talk rather than the
- * slide array. A detour target sits after its origin in the array but is
- * shown in the MIDDLE of the origin's reveals; measuring progress by array
- * index would rewind the flight track every time a detour returns.
+ * The talk as one line: every (slide, reveal) pair in the order the talk
+ * visits it, detours inlined. A detour target sits after its origin in the
+ * array but is shown in the MIDDLE of the origin's reveals: at `atStage` the
+ * target plays in full, then the origin resumes at `returnStage`; the target
+ * is not visited again on the linear pass.
  *
- * Mirrors `revealNext` in useSlideNavigation: at `atStage` the detour target
- * plays in full, then the origin resumes at `returnStage`; detour targets are
- * skipped on the linear pass. Returns a map from `${slideIndex}:${stage}` to
- * its position, and the total step count.
+ * Navigation is a position on this line — forward is +1, back is −1, and the
+ * URL's `#slide-N` is position N — so ids rise monotonically through detours
+ * and back always retraces forward.
  */
-export function traversalOrder(slides: SlideDefinition[]): { position: Map<string, number>; total: number } {
+export function deckPath(slides: SlideDefinition[]): Step[] {
   const detourTargets = new Set(slides.flatMap((s) => (s.detours ?? []).map((d) => d.toId)));
-  const position = new Map<string, number>();
-  let step = 0;
-  const visit = (index: number, stage: number) => {
-    const key = `${index}:${stage}`;
-    if (!position.has(key)) position.set(key, step++);
+  const steps: Step[] = [];
+  const seen = new Set<string>();
+  const visit = (index: number, revealStage: number) => {
+    const key = `${index}:${revealStage}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    steps.push({ index, revealStage });
   };
 
   slides.forEach((slide, index) => {
@@ -35,5 +42,5 @@ export function traversalOrder(slides: SlideDefinition[]): { position: Map<strin
     }
   });
 
-  return { position, total: step };
+  return steps;
 }

@@ -251,10 +251,16 @@ export const MySlide: SlideDefinition = {
 running a command, dismisses it. On a touch device the clock in the bottom-right is the tap target.
 Slide navigation does NOT need it — the keys below work with the terminal closed.
 
+**Every reveal is a step with its own id.** `utils/traversal.ts` flattens the talk into one line —
+every (slide, reveal) pair in the order it is shown, detours inlined — and navigation is a position
+on that line: forward is +1, back is −1, and `#slide-N` in the URL is step N. Ids rise monotonically
+through detours, so a detour's reveals are numbered where the detour happens, not where its slide
+sits in `slides/index.ts`.
+
 Type in the input box:
-- `next` or `n` → Next slide
-- `prev`, `back`, `p`, `b` → Previous slide
-- Number (e.g., `3`) → Go to slide 3
+- `next` or `n` → Next slide (skips the current slide's remaining reveals)
+- `prev`, `back`, `p`, `b` → Start of the previous slide
+- Number (e.g., `14`) → Go to step 14, the same id as `#slide-14`
 - `first`, `home` → First slide (`start` activates the timer, not navigation)
 - `last`, `end` → Last slide
 - `reveal` or `r` → Reveal next content stage

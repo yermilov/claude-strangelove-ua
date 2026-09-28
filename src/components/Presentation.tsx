@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { PresentationProps } from '../types/slides';
 import { useSlideNavigation } from '../hooks/useSlideNavigation';
 import { NavigationContext } from '../context/NavigationContext';
@@ -9,7 +9,6 @@ import { FlightTrack } from './FlightTrack';
 import { RotateHint } from './RotateHint';
 import { FwdaysLogo } from './FwdaysLogo';
 import { preloadSlideAssets } from '../utils/preloadAssets';
-import { traversalOrder } from '../utils/traversal';
 import { exportRegistry } from './exportRegistry';
 
 declare global {
@@ -80,7 +79,7 @@ function getInitialTimerState(): { seconds: number; running: boolean } {
 }
 
 export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
-  const { currentSlide, goToSlide, goToSlideWithReveal, handleCommand: handleNavCommand, revealStage, revealNext, revealPrev } = useSlideNavigation(
+  const { currentSlide, step, totalSteps, goToSlide, goToSlideWithReveal, handleCommand: handleNavCommand, revealStage, revealNext, revealPrev } = useSlideNavigation(
     slides,
     initialSlide
   );
@@ -209,8 +208,6 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
     handleNavCommand(command);
   }, [handleNavCommand]);
 
-  // Computed before the early return below: hooks must run on every render.
-  const traversal = useMemo(() => traversalOrder(slides), [slides]);
   const activeSlide = slides[currentSlide];
 
   if (!activeSlide) {
@@ -227,13 +224,10 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
       ? activeSlide.title({ revealStage, inputText })
       : activeSlide.title;
 
-  // Progress weights every reveal across the deck equally, in the order the
-  // talk actually visits them — a detour's reveals count where the detour is
-  // taken, not where its slide sits in the array, so the flight track never
-  // rewinds when a detour returns (see utils/traversal.ts).
-  const totalUnits = traversal.total;
-  const consumedUnits =
-    (traversal.position.get(`${currentSlide}:${Math.min(revealStage, activeSlide.maxRevealStages ?? 0)}`) ?? 0) + 1;
+  // Progress is the position on the talk's line (see utils/traversal.ts):
+  // every reveal weighs the same, and a detour's reveals count where the
+  // detour is taken, so the flight track never rewinds when one returns.
+  const progress = totalSteps > 0 ? (step + 1) / totalSteps : 0;
 
   return (
     <NavigationContext.Provider value={{ goToSlideById }}>
@@ -274,7 +268,7 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
         <div className="deck-chrome">
           <FlightTrack
             elapsedSeconds={timerSeconds}
-            progress={totalUnits > 0 ? consumedUnits / totalUnits : 0}
+            progress={progress}
             onOpenCommand={() => setCommandOpen((open) => !open)}
           />
         </div>
