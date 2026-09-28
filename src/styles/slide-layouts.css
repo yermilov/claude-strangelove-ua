@@ -263,13 +263,29 @@
   position: relative;
   aspect-ratio: var(--ratio);
   width: min(100cqw, 100cqh * var(--ratio));
+  overflow: hidden;
+  border: 1px solid var(--kubrick-rule);
+  border-radius: var(--radius-card);
 }
-.shot__frame > img {
+/* image + its mark, as one unit so a zoom scales them together; the frame
+ * above is the clip window and never moves. The push-in itself is a
+ * `transition` on `transform` driven by an inline style (see
+ * SlideScreenshot.tsx), not a `@keyframes` class — a transition re-fires on
+ * every genuine value change, so it replays correctly no matter how many
+ * times a reveal is stepped back and forward. */
+.shot__zoom {
+  position: absolute;
+  inset: 0;
+  transition-property: transform;
+  transition-timing-function: var(--ease);
+}
+.shot__zoom > img {
   display: block;
   width: 100%;
   height: 100%;
-  border: 1px solid var(--kubrick-rule);
-  border-radius: var(--radius-card);
+}
+@media (prefers-reduced-motion: reduce) {
+  .shot__zoom { transition: none !important; }
 }
 
 /* two screenshots side by side */

@@ -66,7 +66,9 @@ export const FirstDaySlide: SlideDefinition = {
               alt="DevTools: wss://capi.grammarly.com/freews"
               ratio={1544 / 1402}
               mark={{ x: 0.32, y: 0.09, w: 0.4, h: 0.04 }}
+              marked={revealStage >= DEVTOOLS_AT}
               hidden={revealStage < DEVTOOLS_AT}
+              zoom
             />
           </div>
         )}
