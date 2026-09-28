@@ -13,7 +13,7 @@ export const TitleSlide: SlideDefinition = {
         <span className="credit-part">Ярослав Єрмілов</span>
         <span className="credit-sep"> · </span>
         <span className="credit-part">
-          Principal Software Engineer, <span className="nowrap">ex-Grammarly</span>
+          Principal Engineer, <span className="nowrap">ex-Grammarly</span>
         </span>
       </p>
     </div>
