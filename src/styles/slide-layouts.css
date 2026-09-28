@@ -128,6 +128,22 @@
 .slide .bio-item--now { color: var(--kubrick-red); font-weight: 600; }
 .slide .bio-item--now::before { background: var(--kubrick-red); }
 
+/* focus: one step bold, the rest stepped back to muted grey (5.4:1, still
+ * clears AA on the stream) — "now" too, so its red does not compete */
+.slide .bio-item--focus { font-weight: 600; }
+.slide .bio-item--dim {
+  color: var(--kubrick-grey-2);
+  font-weight: 400;
+  transition: color var(--transition-normal) var(--ease);
+}
+.slide .bio-item--dim::before { background: transparent; }
+/* the Preply figure steps back a notch with them; its company line is
+ * already at muted grey, the floor for text on the stream */
+.slide .bio-tenure__row--dim .bio-tenure__figure {
+  color: var(--kubrick-grey-1);
+  transition: color var(--transition-normal) var(--ease);
+}
+
 /* Narrow portrait: stack — tenure above, rule becomes horizontal. Portrait
  * only: a small phone on its side is narrow too, and has no height to stack. */
 @media (max-width: 768px) and (orientation: portrait) {
@@ -232,11 +248,6 @@
   dominant-baseline: central;
 }
 
-/* HAL: a metal rim, a black bezel, the red lens */
-.arch__hal { animation: slideItemFadeIn 600ms var(--ease) both; }
-.arch__hal-rim { fill: var(--kubrick-grey-3); stroke: var(--kubrick-grey-1); stroke-width: 2; }
-.arch__hal-bezel { fill: var(--kubrick-ink); }
-
 .arch__character { animation: slideItemFadeIn 600ms var(--ease) both; }
 
 /* === SLIDE SCREENSHOT ===
@@ -335,40 +346,82 @@
   pointer-events: none;
 }
 
-/* === TEAM OF THREE ===
- * The second detour out of «Хто я». Scenes live on the `.first-day` stage. */
-.team__tabs {
-  margin: 0;
+/* === TERMINAL DIFF ===
+ * <TerminalDiff> (components/TerminalDiff.tsx): a `git show` as one scaling
+ * SVG. The machine talking, so it reads the `--terminal-*` aliases that the
+ * `.machine` group hands back. Sizes are SVG user units, not slide type — the
+ * whole window scales as a picture. Bands are 18% tints: fainter ones band on
+ * the stream. */
+.diff-term {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-md);
 }
-.team__tabs .shot { flex: 1 1 0; min-height: 0; width: 100%; }
-.team__tabs figcaption {
-  font-size: var(--font-size-text);
-  color: var(--kubrick-grey-1);
+.diff-term__window { fill: var(--terminal-bg); stroke: var(--terminal-border-bright); stroke-width: 2; }
+.diff-term__bar { fill: var(--terminal-bg-elevated); }
+.diff-term__rule { stroke: var(--terminal-border-bright); stroke-width: 2; }
+/* the same traffic lights as <CodeBlock> (components.css) */
+.diff-term__dot--red { fill: #ff5f56; }
+.diff-term__dot--yellow { fill: #ffbd2e; }
+.diff-term__dot--green { fill: #27c93f; }
+.diff-term text {
+  font-family: var(--font-mono);
+  white-space: pre;
+}
+.diff-term .diff-term__title,
+.diff-term .diff-term__stat {
+  font-size: 22px;
+  dominant-baseline: central;
+}
+.diff-term__title { fill: var(--terminal-white-muted); text-anchor: middle; }
+.diff-term__stat { text-anchor: end; font-weight: 600; }
+.diff-term__line { font-size: 32px; fill: var(--terminal-white); }
+.diff-term__prompt { fill: var(--terminal-orange); font-weight: 700; }
+.diff-term__hunk { fill: var(--terminal-cyan); }
+.diff-term .diff-term__ctx { fill: var(--terminal-white-dim); }
+.diff-term .diff-term__add { fill: var(--terminal-green); }
+.diff-term .diff-term__del { fill: var(--terminal-red); }
+.diff-term__band--add { fill: var(--terminal-green); fill-opacity: 0.18; }
+.diff-term__band--del { fill: var(--terminal-red); fill-opacity: 0.18; }
+.diff-term__cursor {
+  fill: var(--terminal-orange);
+  animation: diff-term-blink 1.1s steps(1) infinite;
+}
+@keyframes diff-term-blink {
+  50% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .diff-term__cursor { animation: none; }
 }
 
-/* IntelliJ on top, the asks under it; the rows are reserved from the start */
+/* === TEAM OF THREE ===
+ * The second detour out of «Хто я». Scenes live on the `.first-day` stage. */
+
+/* «як пофіксимо?»: the asks down the left, spread over the full height of
+ * the stage, IntelliJ on the right; the rows are reserved from the start */
 .team__intellij {
   height: 100%;
   width: 100%;
+  display: grid;
+  /* the asks take exactly their longest line — none wraps — and the
+   * screenshot gets everything else */
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-xl);
+}
+/* The screenshot sits mid-height, clear of the conference mark in the
+ * bottom corner, so this scene takes back the gutter kept for it. */
+.first-day:has(.team__intellij) { padding-right: 0; }
+.team__intellij .shot { height: 100%; min-height: 0; }
+.slide .team__asks {
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
-}
-.team__intellij .shot { flex: 1 1 0; min-height: 0; }
-.slide .team__asks {
-  display: block;
-  margin: 0 auto;
+  justify-content: space-evenly;
+  height: 100%;
+  margin: 0;
   padding: 0;
 }
 .slide .team__asks li {
   color: var(--kubrick-white);
-  margin-bottom: var(--space-xs);
+  margin: 0;
   line-height: var(--line-height-tight);
   animation: slideItemFadeIn 600ms var(--ease) both;
 }
@@ -383,7 +436,11 @@
   display: block;
   margin: 0;
   padding: 0;
-  align-self: center;
+}
+/* the conclusions read from the top-left, under the title, not mid-stage */
+.first-day:has(.team__tldr) {
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 .slide .team__tldr li {
   color: var(--kubrick-white);
@@ -393,6 +450,10 @@
 .slide .team__tldr li.team__tldr--said {
   color: var(--kubrick-grey-1);
   font-weight: 400;
+  animation: none;
+}
+.slide .team__tldr li.team__tldr--hidden {
+  visibility: hidden;
   animation: none;
 }
 

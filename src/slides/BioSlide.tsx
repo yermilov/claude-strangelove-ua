@@ -12,9 +12,10 @@ type Level = 'past' | 'then' | 'now';
 
 // `stage` is the reveal on which the row appears: Preply (now) first, then
 // Grammarly (the nine years behind it), then the Grammarly path on the right.
+// `dimOnFocus`: steps back with the path once the focused step is up.
 const TENURE = [
   { figure: '9 років', company: 'у Grammarly', stage: 1 },
-  { figure: '9 днів', company: 'у Preply', stage: 0 },
+  { figure: '9 днів', company: 'у Preply', stage: 0, dimOnFocus: true },
 ];
 
 // The first path step lands on the reveal after the last tenure row.
@@ -22,11 +23,13 @@ const PATH_START = Math.max(...TENURE.map((t) => t.stage)) + 1;
 
 // Listed top to bottom; `order` is the reveal order within the path — "now"
 // first (it stays at the bottom), then the path from the start.
-const BIO_ITEMS: { level: Level; order: number; content: ReactNode }[] = [
+// `focus`: once this step is up, it is set bold and every other step steps
+// back to muted grey, so the eye lands on it.
+const BIO_ITEMS: { level: Level; order: number; content: ReactNode; focus?: boolean }[] = [
   { level: 'past', order: 1, content: <>а починав в 2017 як Java <span className="nowrap">backend-інженер</span></> },
   { level: 'then', order: 2, content: <>потім техлідив продуктові фічі</> },
   { level: 'then', order: 3, content: <>потім <em>техлідив продуктові фреймворки</em></> },
-  { level: 'then', order: 4, content: <>потім техлід платформної організації</> },
+  { level: 'then', order: 4, content: <>потім техлід платформної організації</>, focus: true },
   { level: 'now', order: 0, content: <>з травня 2025 року пушив Superhuman/Grammarly у напрямку <em>агентної розробки</em></> },
 ];
 
@@ -45,7 +48,10 @@ export const BioSlide: SlideDefinition = {
     { atStage: PATH_START + 1, toId: 'first-day', returnStage: PATH_START + 2 },
     { atStage: PATH_START + 3, toId: 'team-of-three', returnStage: PATH_START + 4 },
   ],
-  content: ({ revealStage }) => (
+  content: ({ revealStage }) => {
+    const isRevealed = (it: { order: number }) => revealStage >= PATH_START + it.order;
+    const focusUp = BIO_ITEMS.some((it) => it.focus && isRevealed(it));
+    return (
     <div className="bio-slide">
       {/* Left: the two numbers the bio hangs on, set as a board — the same
        * "9" twice, and the unit is the joke. */}
@@ -55,7 +61,7 @@ export const BioSlide: SlideDefinition = {
           // Preply does not jump down when Grammarly arrives above it.
           <div
             key={t.company}
-            className="bio-tenure__row"
+            className={`bio-tenure__row${focusUp && t.dimOnFocus ? ' bio-tenure__row--dim' : ''}`}
             style={revealStage >= t.stage ? undefined : { visibility: 'hidden' }}
           >
             <dt className="bio-tenure__figure">{t.figure}</dt>
@@ -71,7 +77,6 @@ export const BioSlide: SlideDefinition = {
        * line grows from the top until it reaches "now". */}
       <ol className="bio-path">
         {BIO_ITEMS.map((item, i) => {
-          const isRevealed = (it: { order: number }) => revealStage >= PATH_START + it.order;
           const next = BIO_ITEMS[i + 1];
           const classes = [
             'bio-item',
@@ -79,6 +84,9 @@ export const BioSlide: SlideDefinition = {
             !isRevealed(item) && 'bio-item--hidden',
             isRevealed(item) && next && isRevealed(next) && 'bio-item--linked',
             revealStage === PATH_START + item.order && 'bio-item--newest',
+            // bold from the start, so it lands at its final width
+            item.focus && 'bio-item--focus',
+            focusUp && !item.focus && 'bio-item--dim',
           ];
           return (
             <li key={i} className={classes.filter(Boolean).join(' ')}>
@@ -88,7 +96,8 @@ export const BioSlide: SlideDefinition = {
         })}
       </ol>
     </div>
-  ),
+    );
+  },
   notes:
     "9 років у Grammarly, 9 днів у Preply. Шлях у Grammarly: бекенд → продуктові фічі → продуктові фреймворки → платформа → AI-first. Не затримуватись: хвилина максимум.",
 };

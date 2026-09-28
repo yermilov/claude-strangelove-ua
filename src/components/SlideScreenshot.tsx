@@ -78,8 +78,7 @@ export function SlideScreenshot({
           >
             <img src={grammarlyG} alt="Grammarly" />
           </span>
-        )}
-      </div>
+        )}      </div>
     </figure>
   );
 }

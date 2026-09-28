@@ -87,42 +87,26 @@ function Devices() {
 //   Капітошка is the CODE — it straddles the network line, covering both
 //   Processing Service and Processing API, because it is both.
 //   Вовк is ME — standing beside the code, not inside the diagram; the two
-//   more wolves are the rest of the team of three.
-const CHARACTER_SPOTS = {
-  code: { x: COL.processing.x + COL.processing.w - 10, y: Y.publicLine, w: 200, src: kapitoshkaImg, alt: 'Капітошка — код' },
-  me: { x: COL.processing.x + COL.processing.w + 210, y: Y.publicLine - 10, w: 220, src: wolfImg, alt: 'Вовк — я' },
-  mateAbove: { x: COL.processing.x + COL.processing.w + 210, y: Y.services - 170, w: 200, src: wolfImg, alt: 'Вовк — колега' },
-  mateBelow: { x: COL.processing.x + COL.processing.w + 210, y: Y.lb + 120, w: 200, src: wolfImg, alt: 'Вовк — колега' },
-  models: { x: COL.processing.x + COL.processing.w + 10, y: Y.models + ROW_H / 2, w: 112, src: '', alt: 'HAL 9000' },
+//   more wolves are the rest of the team of three. As in the original 2023
+//   slide, the three surround the code — upper left (mirrored, so it faces
+//   in), upper right, lower right — and the code sits in front of them.
+type Spot = { x: number; y: number; w: number; src: string; alt: string; flip?: boolean };
+
+const CODE = { x: COL.processing.x + COL.processing.w - 10, y: Y.publicLine };
+const WOLF_W = 210;
+
+const CHARACTER_SPOTS: Record<'code' | 'me' | 'mateLeft' | 'mateBelow', Spot> = {
+  code: { ...CODE, w: 200, src: kapitoshkaImg, alt: 'Капітошка — код' },
+  me: { x: CODE.x + 170, y: CODE.y - 110, w: WOLF_W, src: wolfImg, alt: 'Вовк — я' },
+  mateLeft: { x: CODE.x - 170, y: CODE.y - 110, w: WOLF_W, src: wolfImg, alt: 'Вовк — колега', flip: true },
+  mateBelow: { x: CODE.x + 170, y: CODE.y + 120, w: WOLF_W, src: wolfImg, alt: 'Вовк — колега' },
 };
 
-export type Wolf = 'me' | 'mateAbove' | 'mateBelow';
-
-// HAL 9000's lens for the models behind Specialized Processing Services —
-// the deck's one red, where it means what it means in "2001". Drawn rather
-// than generated: it is concentric circles, and it has to stay crisp.
-function HalEye({ x, y, r = 56 }: { x: number; y: number; r?: number }) {
-  return (
-    <g className="arch__hal" aria-label="HAL 9000">
-      <defs>
-        <radialGradient id="arch-hal-lens">
-          <stop offset="0" stopColor="var(--kubrick-white)" />
-          <stop offset="0.12" stopColor="var(--kubrick-red)" />
-          <stop offset="0.55" stopColor="var(--kubrick-red)" stopOpacity="0.55" />
-          <stop offset="1" stopColor="var(--kubrick-ink)" />
-        </radialGradient>
-      </defs>
-      <circle className="arch__hal-rim" cx={x} cy={y} r={r} />
-      <circle className="arch__hal-bezel" cx={x} cy={y} r={r * 0.8} />
-      <circle cx={x} cy={y} r={r * 0.66} fill="url(#arch-hal-lens)" />
-    </g>
-  );
-}
+export type Wolf = Exclude<keyof typeof CHARACTER_SPOTS, 'code'>;
 
 function Character({ spot }: { spot: keyof typeof CHARACTER_SPOTS }) {
   const s = CHARACTER_SPOTS[spot];
-  if (spot === 'models') return <HalEye x={s.x} y={s.y} r={s.w / 2} />;
-  return (
+  const image = (
     <image
       className="arch__character"
       href={s.src}
@@ -135,6 +119,9 @@ function Character({ spot }: { spot: keyof typeof CHARACTER_SPOTS }) {
       <title>{s.alt}</title>
     </image>
   );
+  // Mirror on a wrapping <g>: the fade-in keyframes set `transform` on the
+  // image itself and would override a flip placed there.
+  return s.flip ? <g transform={`translate(${2 * s.x} 0) scale(-1 1)`}>{image}</g> : image;
 }
 
 export interface ArchitectureDiagramProps {
@@ -144,14 +131,12 @@ export interface ArchitectureDiagramProps {
   code?: boolean;
   /** which wolves stand beside the code */
   wolves?: Wolf[];
-  /** HAL on Specialized Processing Services */
-  hal?: boolean;
 }
 
 /** The 2017 Grammarly architecture from the Berlin 2023 talk, redrawn as one
  * scaling SVG — its labels scale with it, like the text in an image. Layers
  * are switched on by props so a slide can build it up reveal by reveal. */
-export function ArchitectureDiagram({ clients, code, wolves = [], hal }: ArchitectureDiagramProps) {
+export function ArchitectureDiagram({ clients, code, wolves = [] }: ArchitectureDiagramProps) {
   const p = COL.processing;
   return (
     <svg className="arch__diagram" viewBox={`0 0 ${W + 330} ${H}`} role="img" aria-label="Архітектура Grammarly, 2017">
@@ -187,11 +172,10 @@ export function ArchitectureDiagram({ clients, code, wolves = [], hal }: Archite
           </text>
         </g>
       )}
-      {code && <Character spot="code" />}
       {wolves.map((w) => (
         <Character key={w} spot={w} />
       ))}
-      {hal && <Character spot="models" />}
+      {code && <Character spot="code" />}
     </svg>
   );
 }

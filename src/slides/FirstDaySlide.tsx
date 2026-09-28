@@ -11,8 +11,9 @@ import { SlideScreenshot } from '../components/SlideScreenshot';
  * One slide, one scene per reveal:
  *   0–1    how a new engineer finds out what the product is: Gmail, then
  *          DevTools beside it (the websocket)
- *   2–6    the architecture, built up: bare → client apps → the code
- *          (Капітошка) → me (Вовк) → the models behind it (HAL)
+ *   2–4    the architecture, built up: bare → client apps + the code
+ *          (Капітошка, together — the client calling in is the code running)
+ *          → me (Вовк)
  *
  * The diagram is redrawn in the Kubrick register rather than pasted: an
  * inline SVG that scales as one picture, so its labels scale with it like the
@@ -26,19 +27,18 @@ const SCENES: Scene[] = [
   'screens', // 0: Gmail, the Grammarly button spinning
   'screens', // 1: + DevTools on the right, and both red marks at once
   'diagram', // 2: the architecture, bare
-  'diagram', // 3: + client apps
-  'diagram', // 4: + the code (Капітошка)
-  'diagram', // 5: + me (Вовк)
-  'diagram', // 6: + the models (HAL)
+  'diagram', // 3: + client apps and the code (Капітошка), together
+  'diagram', // 4: + me (Вовк)
 ];
 
 // The reveal that brings DevTools and the red marks.
 const DEVTOOLS_AT = 1;
-// The first reveal that shows each layer of the diagram.
+// The first reveal that shows each layer of the diagram. Clients and the
+// code land on the same reveal (Yarik, 28.09.2026) — a client alone was a
+// beat not worth its own step.
 const CLIENTS_AT = 3;
-const CODE_AT = 4;
-const ME_AT = 5;
-const MODELS_AT = 6;
+const CODE_AT = 3;
+const ME_AT = 4;
 
 export const FirstDaySlide: SlideDefinition = {
   id: 'first-day',
@@ -77,12 +77,11 @@ export const FirstDaySlide: SlideDefinition = {
             clients={revealStage >= CLIENTS_AT}
             code={revealStage >= CODE_AT}
             wolves={revealStage >= ME_AT ? ['me'] : []}
-            hal={revealStage >= MODELS_AT}
           />
         )}
       </div>
     );
   },
   notes:
-    "Перший день у Grammarly (2017). Відкриваю Gmail — крутиться кнопка Grammarly; поруч DevTools — вебсокет на capi.grammarly.com/freews. Ось де він живе — архітектура, мене беруть у Processing Service / Processing API: клієнти → LB/WAF → API → сервіси → спеціалізовані processing-сервіси. Капітошка — це код (і Service, і API), Вовк — це я поруч; HAL — моделі за Specialized Processing Services.",
+    "Перший день у Grammarly (2017). Відкриваю Gmail — крутиться кнопка Grammarly; поруч DevTools — вебсокет на capi.grammarly.com/freews. Ось де він живе — архітектура, мене беруть у Processing Service / Processing API: клієнти → LB/WAF → API → сервіси → спеціалізовані processing-сервіси. Капітошка — це код (і Service, і API), Вовк — це я поруч.",
 };
