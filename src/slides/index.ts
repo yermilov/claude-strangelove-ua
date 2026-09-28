@@ -6,6 +6,7 @@ import { TeamOfThreeSlide } from './TeamOfThreeSlide';
 import { ContributorsSlide } from './ContributorsSlide';
 import { ProblemsSlide } from './ProblemsSlide';
 import { ConclusionsSlide } from './ConclusionsSlide';
+import { AgentsSlide } from './AgentsSlide';
 import { FinalSlide } from './FinalSlide';
 
 export const slides = [
@@ -17,5 +18,6 @@ export const slides = [
   ContributorsSlide,
   ProblemsSlide,
   ConclusionsSlide,
+  AgentsSlide,
   FinalSlide,
 ];

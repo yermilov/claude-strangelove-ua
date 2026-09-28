@@ -127,6 +127,36 @@ const CROWD: Spot[] = (
   ] as [number, number, boolean?][]
 ).map(([x, y, flip]) => ({ x, y, flip, w: CROWD_W, src: wolfImg, alt: 'Вовк — контриб’ютор' }));
 
+// «а що з агентами тепер?»: the contributors' crowd and then a swarm on top,
+// smaller and denser — a jittered grid over the whole diagram so no box is
+// left clear. A fixed seed keeps the scatter the same on every render.
+const SWARM_W = 140;
+const SWARM: Spot[] = (() => {
+  let seed = 42;
+  const rand = () => {
+    seed = (seed * 1664525 + 1013904223) % 4294967296;
+    return seed / 4294967296;
+  };
+  const cols = 9;
+  const rows = 5;
+  const [x0, x1, y0, y1] = [410, 1950, 80, 610];
+  const spots: Spot[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      spots.push({
+        x: x0 + ((c + 0.5) / cols) * (x1 - x0) + (rand() - 0.5) * 90,
+        y: y0 + ((r + 0.5) / rows) * (y1 - y0) + (rand() - 0.5) * 70,
+        w: SWARM_W,
+        flip: rand() < 0.5,
+        src: wolfImg,
+        alt: 'Вовк — агент',
+      });
+    }
+  }
+  // arrive in a shuffled order rather than row by row
+  return spots.sort(() => rand() - 0.5);
+})();
+
 function Character({ spot, delayMs }: { spot: Spot; delayMs?: number }) {
   const s = spot;
   const image = (
@@ -157,12 +187,14 @@ export interface ArchitectureDiagramProps {
   wolves?: Wolf[];
   /** the whole crowd of contributors over the diagram, arriving one by one */
   crowd?: boolean;
+  /** a denser swarm on top of the crowd — the agents */
+  swarm?: boolean;
 }
 
 /** The 2017 Grammarly architecture from the Berlin 2023 talk, redrawn as one
  * scaling SVG — its labels scale with it, like the text in an image. Layers
  * are switched on by props so a slide can build it up reveal by reveal. */
-export function ArchitectureDiagram({ clients, code, wolves = [], crowd }: ArchitectureDiagramProps) {
+export function ArchitectureDiagram({ clients, code, wolves = [], crowd, swarm }: ArchitectureDiagramProps) {
   const p = COL.processing;
   return (
     <svg className="arch__diagram" viewBox={`0 0 ${W + 330} ${H}`} role="img" aria-label="Архітектура Grammarly, 2017">
@@ -198,7 +230,8 @@ export function ArchitectureDiagram({ clients, code, wolves = [], crowd }: Archi
           </text>
         </g>
       )}
-      {crowd && CROWD.map((s, i) => <Character key={i} spot={s} delayMs={300 + i * 120} />)}
+      {crowd && CROWD.map((s, i) => <Character key={i} spot={s} delayMs={swarm ? 0 : 300 + i * 120} />)}
+      {swarm && SWARM.map((s, i) => <Character key={`s${i}`} spot={s} delayMs={300 + i * 45} />)}
       {wolves.map((w) => (
         <Character key={w} spot={CHARACTER_SPOTS[w]} />
       ))}
