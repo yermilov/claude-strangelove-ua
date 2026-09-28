@@ -89,11 +89,15 @@ export function FlightTrack({ elapsedSeconds, progress, onOpenCommand }: FlightT
       </div>
 
       <div className="flight-track__meta">
-        {contextPercent < 33 && (
-          <span className="flight-track__label">
-            context left until auto-compact {contextPercent}%
-          </span>
-        )}
+        {/* Always laid out, only shown under a third: its line is taller than
+          * the clock's, so mounting it late grew the strip by 3px and nudged
+          * whatever slide was on screen. */}
+        <span
+          className={`flight-track__label${contextPercent < 33 ? '' : ' flight-track__label--idle'}`}
+          aria-hidden={contextPercent >= 33}
+        >
+          context left until auto-compact {contextPercent}%
+        </span>
         <button
           type="button"
           className="flight-track__clock"

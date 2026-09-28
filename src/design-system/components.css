@@ -132,6 +132,10 @@
   white-space: nowrap;
 }
 
+.flight-track__label--idle {
+  visibility: hidden;
+}
+
 .flight-track__clock {
   font-variant-numeric: tabular-nums;
   background: none;
