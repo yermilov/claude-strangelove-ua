@@ -1,5 +1,8 @@
 import { ReactNode } from 'react';
 import { SlideDefinition } from '../types/slides';
+import grammarlyLogo from '../assets/first-day-grammarly-g.png';
+// Preply's own emblem, as served by static.preply.com (the 2023 rebrand)
+import preplyLogo from '../assets/preply-logo.svg';
 
 /* "Хто я" — the same career path as the bio in the recent decks
  * (dou-days-2026, ai-first-code-review-agent-ua, revenge-of-the-skill-en),
@@ -14,12 +17,16 @@ type Level = 'past' | 'then' | 'now';
 // Grammarly (the nine years behind it), then the Grammarly path on the right.
 // `dimOnFocus`: steps back with the path once the focused step is up.
 const TENURE = [
-  { figure: '9 років', company: 'у Grammarly', stage: 1 },
-  { figure: '9 днів', company: 'у Preply', stage: 0, dimOnFocus: true },
+  { figure: '9 років', company: 'у Grammarly', stage: 1, logo: grammarlyLogo },
+  { figure: '9 днів', company: 'у Preply', stage: 0, dimOnFocus: true, logo: preplyLogo },
 ];
 
 // The first path step lands on the reveal after the last tenure row.
 const PATH_START = Math.max(...TENURE.map((t) => t.stage)) + 1;
+// "now" is red only while it is the news; once the path starts filling in
+// between (the step after «…Java backend-інженер»), it steps back to the
+// same grey as the first step, so the eye stays on the step being told.
+const NOW_PLAIN_FROM = PATH_START + 2;
 
 // Listed top to bottom; `order` is the reveal order within the path — "now"
 // first (it stays at the bottom), then the path from the start.
@@ -65,6 +72,9 @@ export const BioSlide: SlideDefinition = {
             style={revealStage >= t.stage ? undefined : { visibility: 'hidden' }}
           >
             <dt className="bio-tenure__figure">{t.figure}</dt>
+            <dd className="bio-tenure__logo">
+              <img src={t.logo} alt={t.company.replace('у ', '')} />
+            </dd>
             <dd className="bio-tenure__company">{t.company}</dd>
           </div>
         ))}
@@ -80,7 +90,7 @@ export const BioSlide: SlideDefinition = {
           const next = BIO_ITEMS[i + 1];
           const classes = [
             'bio-item',
-            `bio-item--${item.level}`,
+            `bio-item--${item.level === 'now' && revealStage >= NOW_PLAIN_FROM ? 'past' : item.level}`,
             !isRevealed(item) && 'bio-item--hidden',
             isRevealed(item) && next && isRevealed(next) && 'bio-item--linked',
             revealStage === PATH_START + item.order && 'bio-item--newest',

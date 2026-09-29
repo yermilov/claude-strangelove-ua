@@ -37,9 +37,29 @@
 }
 
 .bio-tenure__row {
+  /* the company's emblem on the left, as tall as the two lines beside it */
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas: 'logo figure' 'logo company';
+  column-gap: var(--space-lg);
+  row-gap: var(--space-xs);
+  align-items: center;
+}
+.bio-tenure__figure { grid-area: figure; }
+.bio-tenure__company { grid-area: company; }
+.slide .bio-tenure__logo {
+  grid-area: logo;
+  margin: 0;
+  height: calc(var(--font-size-text) * var(--line-height-tight) * 2 + var(--space-xs));
+  aspect-ratio: 1;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
+  align-items: center;
+  justify-content: center;
+}
+.bio-tenure__logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .slide .bio-tenure__figure {
@@ -139,6 +159,10 @@
 .slide .bio-item--dim::before { background: transparent; }
 /* the Preply figure steps back a notch with them; its company line is
  * already at muted grey, the floor for text on the stream */
+.slide .bio-tenure__row--dim .bio-tenure__logo {
+  opacity: 0.6;
+  transition: opacity var(--transition-normal) var(--ease);
+}
 .slide .bio-tenure__row--dim .bio-tenure__figure {
   color: var(--kubrick-grey-1);
   transition: color var(--transition-normal) var(--ease);
@@ -403,9 +427,9 @@
   height: 100%;
   width: 100%;
   display: grid;
-  /* the asks take exactly their longest line — none wraps — and the
-   * screenshot gets everything else */
-  grid-template-columns: max-content minmax(0, 1fr);
+  /* a fixed split: the attempts change what is in the column, so sizing it
+   * to its content would resize the screenshot on every new attempt */
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
   gap: var(--space-xl);
 }
 /* The screenshot sits mid-height, clear of the conference mark in the
@@ -426,6 +450,11 @@
   line-height: var(--line-height-tight);
   animation: slideItemFadeIn 600ms var(--ease) both;
 }
+/* every slot is two lines tall, filled or not, so the slots sit in the
+ * same places whatever each attempt says */
+.slide .team__asks li { min-height: calc(var(--font-size-text) * var(--line-height-tight) * 2); }
+/* why the attempt did not hold — the deck's red, which means danger */
+.slide .team__asks li.team__ask--sad { color: var(--kubrick-red); }
 .slide .team__asks li.team__ask--hidden {
   visibility: hidden;
   animation: none;
@@ -1117,6 +1146,13 @@
  * The organiser's own branded opener, rendered verbatim at 16:9. It is their
  * artwork, so it is never recoloured, cropped or overlaid — `contain` keeps
  * it whole whatever the window does. */
+/* It takes the whole window: no flight track under it and no stage padding
+ * around it. Done from `.presentation:has(...)` because the strip and the
+ * padding belong to ancestors a slide cannot style from inside. */
+.presentation:has(.fwdays-title-slide) .deck-chrome { display: none; }
+.presentation:has(.fwdays-title-slide) .slide-container { padding: 0; }
+.slide:has(.fwdays-title-slide) { padding: 0; max-width: none; }
+
 .fwdays-title-slide {
   display: grid;
   /* `minmax(0, 1fr)`, not the implicit `auto` row: an auto row is sized by its
@@ -1134,10 +1170,10 @@
  * would overflow the stage. `slide--fill` (set by `fullBleed` on the slide
  * definition) gives the chain a definite height to measure against. */
 
+/* fills the window — scaled up past its own 1600×900 too — and `contain`
+ * keeps it whole on a window that is not 16:9 */
 .fwdays-title-slide img {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
 }

@@ -18,14 +18,49 @@ import intellijImg from '../assets/team-intellij.png';
  *   0      the team: Капітошка (the code) with three wolves
  *   1      spaces vs tabs
  *   2      two diffs that are nothing but import churn, flipping every second
- *   3–6    «як пофіксимо?» — the four ways to ask people to format, one per
- *          reveal; IntelliJ «Reformat Code» arrives with the first
- *   7      TL;DR: choice is counter-productive
- *   8      TL;DR: … and don't rely on an engineer's action */
+ *   3–11   «що робимо?» — four attempts to keep the style, one line per
+ *          reveal, each ending in why it failed; IntelliJ «Reformat Code»
+ *          arrives with the first line
+ *   12     TL;DR: choice is counter-productive
+ *   13     TL;DR: … and don't rely on an engineer's action */
 
 type Scene = 'team' | 'tabs' | 'diff' | 'intellij' | 'tldr';
 
-const SCENES: Scene[] = ['team', 'tabs', 'diff', 'intellij', 'intellij', 'intellij', 'intellij', 'tldr', 'tldr'];
+// Four attempts to keep the style — each an engineer's action, each ending
+// in why it did not hold (`sad`), which is the point of the TL;DR after.
+type AskLine = { text: ReactNode; sad?: boolean };
+const ATTEMPTS: AskLine[][] = [
+  [
+    { text: <>під час обіду всі домовилися форматувати код після кожної зміни</> },
+    { text: <>шкода, що форматування у всіх по-різному налаштоване :'(</>, sad: true },
+  ],
+  [
+    { text: <>через місяць, як помітили, налаштували у всіх однаково</> },
+    { text: <>і домовилися не забувати ввімкнути Reformat on save</> },
+    { text: <>шкода, що забули ввімкнути Reformat on save :'(</>, sad: true },
+  ],
+  [
+    { text: <>додали в чекліст код-рев'ю перевіряти це</> },
+    { text: <>шкода, що рев'ю тепер застрягають на коментах про стиль коду :'(</>, sad: true },
+  ],
+  [
+    { text: <>написали документ на конфлуенсі</> },
+    { text: <>шкода, що його ніхто не читає :'(</>, sad: true },
+  ],
+];
+// one reveal per line, in order
+const ASK_STEPS = ATTEMPTS.flatMap((lines, attempt) => lines.map((_, line) => ({ attempt, line })));
+// the attempt's lines sit in fixed slots, so none moves as the next arrives
+const ASK_SLOTS = Math.max(...ATTEMPTS.map((a) => a.length));
+
+const SCENES: Scene[] = [
+  'team',
+  'tabs',
+  'diff',
+  ...ASK_STEPS.map((): Scene => 'intellij'),
+  'tldr',
+  'tldr',
+];
 const FIRST_ASK_AT = SCENES.indexOf('intellij');
 
 // Transcribed from the 2023 deck's MR screenshots, cut to the `java.util`
@@ -75,15 +110,6 @@ function DiffPingPong() {
   return <TerminalDiff diff={DIFFS[i]} rows={DIFF_ROWS} />;
 }
 
-// The ways a team asks people to keep the style — each one an engineer's
-// action, which is the point of the TL;DR that follows.
-const ASKS: ReactNode[] = [
-  <>Будь ласка, відформатуй код перед MR?</>,
-  <>Увімкни «Reformat code on save»?</>,
-  <>Не забудь перевірити код-стайл на рев'ю?</>,
-  <>Документація? Домовленість?</>,
-];
-
 // also recapped on «compacting the conversation» after «що ще може піти не так?»
 export const TLDR: ReactNode[] = [
   <>Вибір непродуктивний, зафіксуйте одну непогану опцію замість пошуку найкращої</>,
@@ -102,7 +128,7 @@ const TITLES: Record<Scene, ReactNode> = {
   team: <>команда з трьох</>,
   tabs: <>команда з трьох</>,
   diff: <>команда з трьох</>,
-  intellij: <>як пофіксимо?</>,
+  intellij: <>що робимо?</>,
   tldr: COMPACTING_TITLE,
 };
 
@@ -131,21 +157,31 @@ export const TeamOfThreeSlide: SlideDefinition = {
 
         {scene === 'diff' && <DiffPingPong />}
 
-        {scene === 'intellij' && (
-          // Asks down the left, spread over the full height; IntelliJ on the
-          // right. Every ask is laid out from the start, hidden until its
-          // reveal, so nothing moves as they arrive.
+        {scene === 'intellij' &&
+          (() => {
+            // One attempt at a time, in fixed slots spread over the full
+            // height: lines of the current attempt land in order, and a new
+            // attempt clears the old one — the spoken ones have done their job.
+            const { attempt, line } = ASK_STEPS[revealStage - FIRST_ASK_AT];
+            return (
           <div className="team__intellij">
             <ul className="team__asks">
-              {ASKS.map((ask, i) => (
-                <li key={i} className={revealStage >= FIRST_ASK_AT + i ? undefined : 'team__ask--hidden'}>
-                  {ask}
-                </li>
-              ))}
+              {Array.from({ length: ASK_SLOTS }, (_, slot) => {
+                const ask = ATTEMPTS[attempt][slot];
+                const classes = [!ask || slot > line ? 'team__ask--hidden' : '', ask?.sad ? 'team__ask--sad' : '']
+                  .filter(Boolean)
+                  .join(' ');
+                return (
+                  <li key={`${attempt}-${slot}`} className={classes || undefined}>
+                    {ask?.text ?? ' '}
+                  </li>
+                );
+              })}
             </ul>
             <SlideScreenshot src={intellijImg} alt="IntelliJ IDEA: Reformat Code" ratio={1724 / 842} />
           </div>
-        )}
+            );
+          })()}
 
         {scene === 'tldr' && (
           <ul className="team__tldr">
@@ -167,5 +203,5 @@ export const TeamOfThreeSlide: SlideDefinition = {
     );
   },
   notes:
-    "Команда з трьох на одному коді (Капітошка — код, вовки — ми). Spaces vs tabs — і от диффи, де половина змін — переставлені імпорти. IntelliJ вміє Reformat Code, тож просимо: форматувати перед MR, вмикати reformat on save, дивитися код-стайл на рев'ю, писати документацію — все це дії інженера. TL;DR: вибір контрпродуктивний; не покладайся на дії інженера.",
+    "Команда з трьох на одному коді (Капітошка — код, вовки — ми). Spaces vs tabs — і от диффи, де половина змін — переставлені імпорти. Що робимо? Домовились форматувати — у всіх по-різному налаштовано. Налаштували однаково й домовились вмикати reformat on save — забули. Додали в чекліст рев'ю — рев'ю застрягають на стилі. Написали документ — ніхто не читає. Кожна спроба — дія інженера. TL;DR: вибір непродуктивний; не покладайся на дії інженера.",
 };
