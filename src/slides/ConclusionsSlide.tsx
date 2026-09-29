@@ -12,8 +12,8 @@ import { COMPACTING_TITLE } from './compacting';
 // Any `beyonce.*` in src/assets is picked up; without one the slide simply
 // has no picture. The one there is a collage: Beyoncé performing «Single
 // Ladies» on GMA, 2011 (Asterio Tecson, CC BY-SA 2.0, Wikimedia Commons),
-// cut out onto black, with a MacBook Air (public domain, Commons) pasted in
-// front of her and a green CI run on its screen.
+// set behind a MacBook on a dark desk («Apple laptop lid», CC0, Commons),
+// toned to the room and clipped at the desk's far edge.
 const BEYONCE = Object.values(
   import.meta.glob('../assets/beyonce.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 )[0] as string | undefined;
@@ -26,7 +26,7 @@ export function BeyoncePicture() {
       <img
         className="conclusions__picture"
         src={BEYONCE}
-        alt="Beyoncé (Single Ladies, GMA 2011) behind a MacBook with a green CI run"
+        alt="Beyoncé (Single Ladies, GMA 2011) behind a MacBook"
       />
       <figcaption className="conclusions__credit">
         колаж за{' '}
