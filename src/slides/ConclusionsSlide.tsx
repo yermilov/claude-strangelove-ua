@@ -10,7 +10,9 @@ import { COMPACTING_TITLE } from './compacting';
  * ("Single Ladies"). */
 
 // Any `beyonce.*` in src/assets is picked up; without one the slide simply
-// has no picture.
+// has no picture. The one there is a still from «Life Is But a Dream» (HBO,
+// 2013): at a MacBook in a helicopter, the ring on her hand — upscaled 4×
+// (4xRealWebPhoto_v4 DAT2) from a 720×529 frame, shadows lifted a little.
 const BEYONCE = Object.values(
   import.meta.glob('../assets/beyonce.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 )[0] as string | undefined;
@@ -18,7 +20,7 @@ const BEYONCE = Object.values(
 // Beside every CI-gate line: the photo, or a frame of its size until it lands.
 export function BeyoncePicture() {
   return BEYONCE ? (
-    <img className="conclusions__picture" src={BEYONCE} alt="Beyoncé — Single Ladies (Put a Ring on It)" />
+    <img className="conclusions__picture" src={BEYONCE} alt="Beyoncé at a laptop, a ring on her hand — Life Is But a Dream (2013)" />
   ) : (
     // stands in until src/assets/beyonce.* exists
     <div className="conclusions__picture conclusions__placeholder">Beyoncé</div>
