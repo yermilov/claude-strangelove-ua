@@ -7,6 +7,16 @@ import { ContributorsSlide } from './ContributorsSlide';
 import { ProblemsSlide } from './ProblemsSlide';
 import { ConclusionsSlide } from './ConclusionsSlide';
 import { AgentsSlide } from './AgentsSlide';
+import { AgentsConclusionsSlide } from './AgentsConclusionsSlide';
+import { RecipeWatchAgentSlide } from './RecipeWatchAgentSlide';
+import { RecipeAgentDocsSlide } from './RecipeAgentDocsSlide';
+import { RecipesConclusionsSlide } from './RecipesConclusionsSlide';
+import { RecipeDeterministicChecksSlide } from './RecipeDeterministicChecksSlide';
+import { RecipeCodeReviewSlide } from './RecipeCodeReviewSlide';
+import { RecipeAutoReviewSlide } from './RecipeAutoReviewSlide';
+import { RecipeAgentAsDeveloperSlide } from './RecipeAgentAsDeveloperSlide';
+import { RecipeLearningAgentSlide } from './RecipeLearningAgentSlide';
+import { RecipeBoyScoutAgentsSlide } from './RecipeBoyScoutAgentsSlide';
 import { FinalSlide } from './FinalSlide';
 
 export const slides = [
@@ -19,5 +29,15 @@ export const slides = [
   ProblemsSlide,
   ConclusionsSlide,
   AgentsSlide,
+  AgentsConclusionsSlide,
+  RecipeWatchAgentSlide,
+  RecipeAgentDocsSlide,
+  RecipesConclusionsSlide,
+  RecipeDeterministicChecksSlide,
+  RecipeCodeReviewSlide,
+  RecipeAutoReviewSlide,
+  RecipeAgentAsDeveloperSlide,
+  RecipeLearningAgentSlide,
+  RecipeBoyScoutAgentsSlide,
   FinalSlide,
 ];

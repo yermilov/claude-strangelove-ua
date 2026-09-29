@@ -2,6 +2,11 @@ import { SlideDefinition } from '../types/slides';
 import linkedinQr from '/linkedin-qr.jpeg?url';
 import { COMPACTING_TITLE } from './compacting';
 import { POINTS } from './ConclusionsSlide';
+import { AGENTS_POINT } from './AgentsConclusionsSlide';
+
+// every conclusion in its latest wording: the agents recap restates the
+// second one («…інженера» → «…агентів»), so that version takes its place
+const ALL_POINTS = POINTS.map((point, i) => (i === 1 ? AGENTS_POINT : point));
 
 /* The last «compacting the conversation»: every conclusion of the talk at
  * once, and the LinkedIn QR beside them. */
@@ -31,7 +36,7 @@ export const FinalSlide: SlideDefinition = {
       }}
     >
       <ul className="final__points">
-        {POINTS.map((point, i) => (
+        {ALL_POINTS.map((point, i) => (
           <li key={i}>{point}</li>
         ))}
       </ul>

@@ -15,6 +15,16 @@ const BEYONCE = Object.values(
   import.meta.glob('../assets/beyonce.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 )[0] as string | undefined;
 
+// Beside every CI-gate line: the photo, or a frame of its size until it lands.
+export function BeyoncePicture() {
+  return BEYONCE ? (
+    <img className="conclusions__picture" src={BEYONCE} alt="Beyoncé — Single Ladies (Put a Ring on It)" />
+  ) : (
+    // stands in until src/assets/beyonce.* exists
+    <div className="conclusions__picture conclusions__placeholder">Beyoncé</div>
+  );
+}
+
 const NEW_POINTS: ReactNode[] = [
   <span lang="en">If You Liked It, Then You Shoulda Put a CI Gate on It</span>,
   <>Найпотворніший ad-hoc скрипт кращий за найкрасивішу документацію</>,
@@ -53,13 +63,7 @@ export const ConclusionsSlide: SlideDefinition = {
               </li>
             ))}
           </ul>
-          {revealStage === BEYONCE_AT &&
-            (BEYONCE ? (
-              <img className="conclusions__picture" src={BEYONCE} alt="Beyoncé — Single Ladies (Put a Ring on It)" />
-            ) : (
-              // stands in until src/assets/beyonce.* exists
-              <div className="conclusions__picture conclusions__placeholder">Beyoncé</div>
-            ))}
+          {revealStage === BEYONCE_AT && <BeyoncePicture />}
         </div>
       </div>
     );

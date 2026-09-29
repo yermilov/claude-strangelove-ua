@@ -457,6 +457,11 @@
   visibility: hidden;
   animation: none;
 }
+/* the one word a recap turns on («агентів») — the deck's red, which clears
+ * AA on the stream; it stays red when its point steps back to grey */
+.slide .team__tldr .accent-red,
+.slide .final__points .accent-red { color: var(--kubrick-red); }
+
 /* A note on the current point, set as a pull-quote right under its text:
  * the deck's one red as a bar, the note in white italic at body weight so
  * it reads as the aside to the bold point above. */
