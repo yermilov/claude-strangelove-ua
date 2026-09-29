@@ -1,19 +1,24 @@
 import { ReactNode } from 'react';
 import { SlideDefinition } from '../types/slides';
 
-/* "Які можуть бути проблеми?" — after «500 MR від 50 контриб'юторів»: what
- * goes wrong once the code has fifty authors. One problem per reveal; the
- * «…» is on purpose — the list is said out loud, not finished on screen. */
+/* "Що ще може піти не так?" — after «500 MR від 50 контриб'юторів»: what
+ * goes wrong once the code has fifty authors. One problem per reveal. */
 
 const PROBLEMS: ReactNode[] = [
-  <>використання методів / бібліотек, якими ви не хочете, щоб люди користувалися</>,
-  <>старі / транзитивні / непотрібні залежності</>,
-  <>…</>,
+  <>додавання старих / непотрібних залежностей / бібліотек</>,
+  <>використання небажаних транзитивних залежностей / бібліотек</>,
+  <>використання патернів коду, якими ви не хочете, щоб люди користувалися</>,
+  <>недостатнє / неправильне логування чи метрики</>,
+  <>тести, які насправді не запускаються</>,
+  <>
+    зламане версіонування / <span lang="en">compatibility guarantees</span>
+  </>,
+  <>ігнорування конвенцій</>,
 ];
 
 export const ProblemsSlide: SlideDefinition = {
   id: 'problems',
-  title: <>які можуть бути проблеми?</>,
+  title: <>що ще може піти не так?</>,
   maxRevealStages: PROBLEMS.length - 1,
   content: ({ revealStage }) => (
     // Every point is laid out from the start, hidden until its reveal, so
@@ -26,5 +31,6 @@ export const ProblemsSlide: SlideDefinition = {
       ))}
     </ul>
   ),
-  notes: 'Що ламається, коли код пишуть 50 людей: заборонені методи й бібліотеки, старі й транзитивні залежності, і так далі.',
+  notes:
+    'Що ламається, коли код пишуть 50 людей: старі й зайві залежності, небажані транзитивні, заборонені патерни, логування й метрики, тести, що не запускаються, зламане версіонування, ігнорування конвенцій.',
 };

@@ -84,13 +84,19 @@ const ASKS: ReactNode[] = [
   <>Документація? Домовленість?</>,
 ];
 
-// also recapped on «проміжні висновки» after «які можуть бути проблеми?»
+// also recapped on «compacting the conversation» after «що ще може піти не так?»
 export const TLDR: ReactNode[] = [
   <>Вибір непродуктивний, зафіксуйте одну непогану опцію замість пошуку найкращої</>,
-  <>Не покладайся на дії інженера</>,
+  <>Не покладайся на дії інженера — він чи вона їх не зроблять</>,
 ];
-// said under the first point only, gone once the second one arrives
-const FIRST_POINT_NOTE = <>єдиний поганий варіант у суперечці між пробілами і табами — це не змусити всіх прийняти щось одне</>;
+// one per point, said under it only while it is the newest
+const TLDR_NOTES: ReactNode[] = [
+  <>єдиний поганий варіант у суперечці між пробілами і табами — це не змусити всіх прийняти щось одне</>,
+  <>
+    Автор не прочитає інструкцію в документації, ревювер забуде її перевірити, ви домовились не забувати, але є
+    термінова задача…
+  </>,
+];
 
 const TITLES: Record<Scene, ReactNode> = {
   team: <>команда з трьох</>,
@@ -151,8 +157,8 @@ export const TeamOfThreeSlide: SlideDefinition = {
                 {point}
                 {/* Right under its point while it is the newest. On the next
                   * reveal it goes and the new point lands in its place — the
-                  * first point itself does not move. */}
-                {i === 0 && tldrCount === 1 && <span className="team__tldr-note">{FIRST_POINT_NOTE}</span>}
+                  * points above do not move. */}
+                {i === tldrCount - 1 && <span className="team__tldr-note">{TLDR_NOTES[i]}</span>}
               </li>
             ))}
           </ul>
