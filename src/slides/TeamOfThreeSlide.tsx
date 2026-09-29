@@ -3,6 +3,7 @@ import { SlideDefinition } from '../types/slides';
 import { ArchitectureDiagram } from '../components/ArchitectureDiagram';
 import { SlideScreenshot } from '../components/SlideScreenshot';
 import { Diff, TerminalDiff } from '../components/TerminalDiff';
+import { COMPACTING_TITLE } from './compacting';
 import spacesTabsImg from '../assets/team-spaces-tabs.png';
 import intellijImg from '../assets/team-intellij.png';
 
@@ -84,14 +85,19 @@ const ASKS: ReactNode[] = [
 ];
 
 // also recapped on «проміжні висновки» after «які можуть бути проблеми?»
-export const TLDR: ReactNode[] = [<>Вибір — контрпродуктивний</>, <>Не покладайся на дії інженера</>];
+export const TLDR: ReactNode[] = [
+  <>Вибір непродуктивний, зафіксуйте одну непогану опцію замість пошуку найкращої</>,
+  <>Не покладайся на дії інженера</>,
+];
+// said under the first point only, gone once the second one arrives
+const FIRST_POINT_NOTE = <>єдиний поганий варіант у суперечці між пробілами і табами — це не змусити всіх прийняти щось одне</>;
 
 const TITLES: Record<Scene, ReactNode> = {
   team: <>команда з трьох</>,
   tabs: <>команда з трьох</>,
   diff: <>команда з трьох</>,
   intellij: <>як пофіксимо?</>,
-  tldr: <>проміжні висновки</>,
+  tldr: COMPACTING_TITLE,
 };
 
 const sceneAt = (stage: number) => SCENES[Math.min(stage, SCENES.length - 1)];
@@ -143,6 +149,10 @@ export const TeamOfThreeSlide: SlideDefinition = {
                 className={i >= tldrCount ? 'team__tldr--hidden' : i < tldrCount - 1 ? 'team__tldr--said' : undefined}
               >
                 {point}
+                {/* Right under its point while it is the newest. On the next
+                  * reveal it goes and the new point lands in its place — the
+                  * first point itself does not move. */}
+                {i === 0 && tldrCount === 1 && <span className="team__tldr-note">{FIRST_POINT_NOTE}</span>}
               </li>
             ))}
           </ul>

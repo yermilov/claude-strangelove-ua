@@ -1,8 +1,9 @@
 import { ReactNode } from 'react';
 import { SlideDefinition } from '../types/slides';
 import { TLDR } from './TeamOfThreeSlide';
+import { COMPACTING_TITLE } from './compacting';
 
-/* The second «проміжні висновки», after «які можуть бути проблеми?». It opens
+/* The second «compacting the conversation», after «які можуть бути проблеми?». It opens
  * as the copy of the first — both earlier points up — and adds the two new
  * ones, one per reveal; the point just made is white, the earlier ones grey.
  * Beyoncé stands beside the CI-gate line, which stays in English on purpose
@@ -18,12 +19,13 @@ const NEW_POINTS: ReactNode[] = [
   <span lang="en">If You Liked It, Then You Shoulda Put a CI Gate on It</span>,
   <>Найпотворніший ad-hoc скрипт кращий за найкрасивішу документацію</>,
 ];
-const POINTS = [...TLDR, ...NEW_POINTS];
+// every conclusion so far — the final slide shows them all
+export const POINTS = [...TLDR, ...NEW_POINTS];
 const BEYONCE_AT = 1;
 
 export const ConclusionsSlide: SlideDefinition = {
   id: 'conclusions-2',
-  title: <>проміжні висновки</>,
+  title: COMPACTING_TITLE,
   maxRevealStages: NEW_POINTS.length,
   content: ({ revealStage }) => {
     const shown = TLDR.length + revealStage;

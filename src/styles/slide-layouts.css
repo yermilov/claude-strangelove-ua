@@ -457,6 +457,21 @@
   visibility: hidden;
   animation: none;
 }
+/* A note on the current point, set as a pull-quote right under its text:
+ * the deck's one red as a bar, the note in white italic at body weight so
+ * it reads as the aside to the bold point above. */
+.slide .team__tldr-note {
+  display: block;
+  margin: var(--space-md) 0 var(--space-sm);
+  padding: var(--space-xs) 0 var(--space-xs) var(--space-lg);
+  border-left: 4px solid var(--kubrick-red);
+  font-size: var(--font-size-text);
+  font-weight: 400;
+  font-style: italic;
+  line-height: var(--line-height-tight);
+  color: var(--kubrick-white);
+  animation: slideItemFadeIn 600ms var(--ease) 300ms both;
+}
 
 /* === CONCLUSIONS (the second «проміжні висновки») ===
  * The TL;DR list top-left, with the picture beside it on the right. */
@@ -488,6 +503,20 @@
   border: 2px dashed var(--kubrick-rule);
   color: var(--kubrick-grey-2);
   font-size: var(--font-size-text);
+}
+
+/* === FINAL ===
+ * Every conclusion at once, beside the LinkedIn QR. */
+.slide .final__points {
+  flex: 1;
+  max-width: 900px;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+.slide .final__points li {
+  margin-bottom: var(--space-md);
+  line-height: var(--line-height-tight);
 }
 
 /* === PROBLEMS ===
