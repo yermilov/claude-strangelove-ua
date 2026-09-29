@@ -436,6 +436,28 @@
  * bottom corner, so this scene takes back the gutter kept for it. */
 .first-day:has(.team__intellij) { padding-right: 0; }
 .team__intellij .shot { height: 100%; min-height: 0; }
+/* spaces vs tabs: the one image on the stage, as large as the slide allows.
+ * It takes back the stage's bottom padding and reaches into half the gap
+ * under the title and half the container's padding above the bar. */
+.first-day:has(.team__tabs) {
+  padding-bottom: 0;
+  margin-top: calc(var(--space-lg) - var(--space-2xl));
+  margin-bottom: calc(-1 * var(--space-md));
+}
+/* On a large 16:9 screen (the stream) the image is height-bound, and the
+ * one-sided gutter only pushes it off-centre and narrows it. So it drops
+ * the gutter there and is capped instead at the screen less the mark's
+ * inset on BOTH sides: the mark hangs `--conference-mark-inset` in from the
+ * screen's right edge and the image is centred on the screen, so the cap
+ * keeps it clear of the mark. On smaller or squarer screens the image is
+ * width-bound, and the gutter leaves it larger than that cap would. */
+@media (min-aspect-ratio: 16/9) and (min-width: 1600px) {
+  .first-day:has(.team__tabs) { padding-right: 0; }
+  .team__tabs .shot__frame {
+    width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
+  }
+}
+.team__tabs { width: 100%; height: 100%; display: flex; }
 .slide .team__asks {
   display: flex;
   flex-direction: column;

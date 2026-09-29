@@ -4,7 +4,7 @@ import { ArchitectureDiagram } from '../components/ArchitectureDiagram';
 import { SlideScreenshot } from '../components/SlideScreenshot';
 import { Diff, TerminalDiff } from '../components/TerminalDiff';
 import { COMPACTING_TITLE } from './compacting';
-import spacesTabsImg from '../assets/team-spaces-tabs.png';
+import spacesTabsImg from '../assets/team-spaces-tabs.jpg';
 import intellijImg from '../assets/team-intellij.png';
 
 /* "Команда з трьох" — the second detour out of «Хто я» (see BioSlide
@@ -147,12 +147,16 @@ export const TeamOfThreeSlide: SlideDefinition = {
       <div className="first-day" key={scene}>
         {scene === 'team' && <ArchitectureDiagram clients code wolves={['me', 'mateLeft', 'mateBelow']} />}
 
+        {/* A 480×268 GIF frame upscaled 4× (Real-ESRGAN-family DAT2,
+          * 4xRealWebPhoto_v4) so it holds up at the size it is drawn. */}
         {scene === 'tabs' && (
-          <SlideScreenshot
-            src={spacesTabsImg}
-            alt="Silicon Valley: I'm not hiring him, he uses spaces not tabs."
-            ratio={480 / 268}
-          />
+          <div className="team__tabs">
+            <SlideScreenshot
+              src={spacesTabsImg}
+              alt="Silicon Valley: I'm not hiring him, he uses spaces not tabs."
+              ratio={1920 / 1072}
+            />
+          </div>
         )}
 
         {scene === 'diff' && <DiffPingPong />}
