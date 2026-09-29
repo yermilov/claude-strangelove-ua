@@ -1,5 +1,6 @@
 import kapitoshkaImg from '../assets/first-day-kapitoshka.png';
 import wolfImg from '../assets/first-day-wolf.png';
+import roboWolfImg from '../assets/agents-robo-wolf.png';
 
 // The diagram's own coordinate system. Columns: auth / document editor /
 // processing, right of the zone labels.
@@ -129,7 +130,8 @@ const CROWD: Spot[] = (
 
 // «а що з агентами тепер?»: the contributors' crowd and then a swarm on top,
 // smaller and denser — a jittered grid over the whole diagram so no box is
-// left clear. A fixed seed keeps the scatter the same on every render.
+// left clear. The agents are robo-wolves (steel, one HAL-red eye), so they
+// read apart from the human crowd they pour in over. A fixed seed keeps the scatter the same on every render.
 const SWARM_W = 140;
 const SWARM: Spot[] = (() => {
   let seed = 42;
@@ -148,8 +150,8 @@ const SWARM: Spot[] = (() => {
         y: y0 + ((r + 0.5) / rows) * (y1 - y0) + (rand() - 0.5) * 70,
         w: SWARM_W,
         flip: rand() < 0.5,
-        src: wolfImg,
-        alt: 'Вовк — агент',
+        src: roboWolfImg,
+        alt: 'Робововк — агент',
       });
     }
   }
