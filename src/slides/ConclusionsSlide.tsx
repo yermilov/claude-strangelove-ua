@@ -10,9 +10,10 @@ import { COMPACTING_TITLE } from './compacting';
  * ("Single Ladies"). */
 
 // Any `beyonce.*` in src/assets is picked up; without one the slide simply
-// has no picture. The one there is a still from «Life Is But a Dream» (HBO,
-// 2013): at a MacBook in a helicopter, the ring on her hand — upscaled 4×
-// (4xRealWebPhoto_v4 DAT2) from a 720×529 frame, shadows lifted a little.
+// has no picture. The one there is a collage: Beyoncé performing «Single
+// Ladies» on GMA, 2011 (Asterio Tecson, CC BY-SA 2.0, Wikimedia Commons),
+// cut out onto black, with a MacBook Air (public domain, Commons) pasted in
+// front of her and a green CI run on its screen.
 const BEYONCE = Object.values(
   import.meta.glob('../assets/beyonce.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 )[0] as string | undefined;
@@ -20,7 +21,21 @@ const BEYONCE = Object.values(
 // Beside every CI-gate line: the photo, or a frame of its size until it lands.
 export function BeyoncePicture() {
   return BEYONCE ? (
-    <img className="conclusions__picture" src={BEYONCE} alt="Beyoncé at a laptop, a ring on her hand — Life Is But a Dream (2013)" />
+    // CC BY-SA asks for a visible credit, so it rides under the picture
+    <figure className="conclusions__figure">
+      <img
+        className="conclusions__picture"
+        src={BEYONCE}
+        alt="Beyoncé (Single Ladies, GMA 2011) behind a MacBook with a green CI run"
+      />
+      <figcaption className="conclusions__credit">
+        колаж за{' '}
+        <a href="https://commons.wikimedia.org/wiki/File:Beyonc%C3%A9_Knowles_GMA_Single_Ladies_(Put_a_Ring_on_It).jpg">
+          фото Asterio Tecson
+        </a>{' '}
+        · <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
+      </figcaption>
+    </figure>
   ) : (
     // stands in until src/assets/beyonce.* exists
     <div className="conclusions__picture conclusions__placeholder">Beyoncé</div>
