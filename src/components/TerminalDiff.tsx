@@ -15,13 +15,17 @@ export interface Diff {
   lines: string[];
 }
 
-const F = 32; // code font size
+// The window is drawn at 1:1 and capped at its own size (see the `style`
+// below), so on a 1920×1080 stage one unit is one pixel and the code sets at
+// the deck's 40px text tier — the organiser asked for big code. It only ever
+// scales DOWN, on a stage too small to hold it.
+const F = 40; // code font size = --font-size-text at 1920
 const CH = F * 0.6; // JetBrains Mono advance
 const LH = 48;
-const PAD_X = 40;
-const PAD_Y = 28;
-const BAR_H = 64;
-const COLS = 50;
+const PAD_X = 36;
+const PAD_Y = 20;
+const BAR_H = 56;
+const COLS = 52; // the longest line, a hunk header, is 51
 const W = PAD_X * 2 + COLS * CH;
 
 const shortPath = (file: string) => {
@@ -48,6 +52,7 @@ export function TerminalDiff({ diff, rows }: { diff: Diff; rows?: number }) {
     <svg
       className="diff-term"
       viewBox={`0 0 ${W} ${H}`}
+      style={{ maxWidth: W, maxHeight: H }}
       role="img"
       aria-label={`git show ${diff.commit}: ${file}, +${diff.added} −${diff.removed}`}
     >

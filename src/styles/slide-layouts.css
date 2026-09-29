@@ -349,9 +349,10 @@
 /* === TERMINAL DIFF ===
  * <TerminalDiff> (components/TerminalDiff.tsx): a `git show` as one scaling
  * SVG. The machine talking, so it reads the `--terminal-*` aliases that the
- * `.machine` group hands back. Sizes are SVG user units, not slide type — the
- * whole window scales as a picture. Bands are 18% tints: fainter ones band on
- * the stream. */
+ * `.machine` group hands back. Sizes are SVG user units, drawn 1:1 and capped
+ * at the window's own size, so at 1920×1080 the code is 40px — the text tier,
+ * like any code on a slide. The title bar is window chrome, as in <CodeBlock>.
+ * Bands are 18% tints: fainter ones band on the stream. */
 .diff-term {
   width: 100%;
   height: 100%;
@@ -374,7 +375,7 @@
 }
 .diff-term__title { fill: var(--terminal-white-muted); text-anchor: middle; }
 .diff-term__stat { text-anchor: end; font-weight: 600; }
-.diff-term__line { font-size: 32px; fill: var(--terminal-white); }
+.diff-term__line { font-size: 40px; fill: var(--terminal-white); }
 .diff-term__prompt { fill: var(--terminal-orange); font-weight: 700; }
 .diff-term__hunk { fill: var(--terminal-cyan); }
 .diff-term .diff-term__ctx { fill: var(--terminal-white-dim); }
