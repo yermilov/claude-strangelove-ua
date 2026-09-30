@@ -1233,25 +1233,24 @@
 }
 
 /* === RECIPE 1 — the interrupt replay ===
- * One video on the stage, as large as the slide allows — the same width cap
- * as the spaces-vs-tabs screenshot (see `.team__tabs` above), but it keeps
- * the stage's own top and bottom: the terminal's title bar and input box are
- * part of the picture and must not slide under the title band or the edge. */
+ * Two columns on the stage (`.shot-pair`): the Claude Code replay on the left,
+ * the «ааа, точно» clip on the right. The terminal is rendered 4:3 so that at
+ * column width its text is as large as it was full-width at 16:9, and it gets
+ * the larger share; the clip sits mid-height beside it. The stage drops its
+ * right gutter: the clip ends well above the conference mark in the corner,
+ * and the gutter would only take width from the terminal. */
 .shot__frame > video,
 .shot__frame > img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 /* The two-line title's darkening band (.slide-title::before) reaches ~30px
- * below the title itself, and the video's window bar must clear it. */
+ * below the title itself, and the terminal's window bar must clear it. */
 .first-day.recipe-video {
   padding-top: var(--space-xl);
   padding-bottom: 0;
+  padding-right: 0;
 }
-@media (min-aspect-ratio: 16/9) and (min-width: 1600px) {
-  .first-day.recipe-video { padding-right: 0; }
-  .recipe-video .shot__frame {
-    width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
-  }
-}
+.recipe-video .shot--terminal { flex-grow: 1.6; }

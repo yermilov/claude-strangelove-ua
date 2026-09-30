@@ -273,7 +273,7 @@ export const InterruptSession: React.FC = () => {
             <Row style={{ marginTop: 14 }}>Do you want to proceed?</Row>
             {[
               'Yes',
-              "Yes, and don't ask again for juggernaut review commands",
+              "Yes, and don't ask again for …",
               'No, and tell Claude what to do differently (esc)',
             ].map((o, i) => (
               <Row key={o} style={{ color: choice === i + 1 ? C.permission : C.text }}>
@@ -323,7 +323,7 @@ export const InterruptSession: React.FC = () => {
             <Tool name="Write" arg="apps/cli/src/features/statusline-usage.ts" dot={C.ok} />
             <Result
               lines={[
-                "// … Claude Code's statusLine command, used ONLY to feed the",
+                "// … statusLine command, used ONLY to feed the",
                 '// usage cache. It prints nothing.',
               ]}
             />
@@ -334,7 +334,7 @@ export const InterruptSession: React.FC = () => {
           <Block>
             <Tool
               name="Bash"
-              arg="npx tsc --noEmit -p . 2>&1 | head; bun test 2>&1 | grep …"
+              arg="npx tsc --noEmit -p . …; bun test 2>&1 | grep …"
               dot={at(T.testDone) ? C.ok : C.dim}
               blink={!at(T.testDone)}
             />
