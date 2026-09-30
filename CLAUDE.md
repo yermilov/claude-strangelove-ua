@@ -162,6 +162,26 @@ import myVideo from '/my-video.mp4?url';
 
 GIF vs MP4: `petermobile.gif` was 5 MB → `petermobile.mp4` is 306 KB.
 
+### Remotion videos (`video/`)
+
+Code-rendered videos (the Claude Code session replay on «рецепт 1», `#slide-41`) are a separate
+Remotion project in `video/` with its own `package.json` — Vite never sees it. Re-render:
+
+```bash
+cd video && bun install
+npx remotion render src/index.ts InterruptSession out/interrupt-raw.mp4
+# Remotion writes full-range yuvj420p, which browsers refuse — transcode into the deck:
+ffmpeg -y -i out/interrupt-raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" \
+  -c:v libx264 -profile:v high -crf 21 -color_range tv -colorspace bt709 -movflags +faststart -an \
+  ../src/assets/recipe-1-interrupt.mp4
+# the PDF export shows a still instead of the video's first frame:
+npx remotion still src/index.ts InterruptSession ../src/assets/recipe-1-interrupt-still.png --frame=572
+```
+
+A session replay is a factual claim: every command, output and user message in
+`InterruptSession.tsx` is quoted from a real transcript named in its header comment. Abridge with
+«…», never invent a line. Videos in `src/assets/` are warmed by `utils/preloadAssets.ts`.
+
 **No personal photos in this deck** (Yarik, 23.09.2026 — family, concert, badge shots were removed
 from the bio slide). The bio is text-only until a new layout is agreed; do not re-add them.
 

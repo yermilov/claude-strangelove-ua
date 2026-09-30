@@ -14,10 +14,21 @@ const audioModules = import.meta.glob('../assets/**/*.{wav,mp3}', {
   import: 'default',
 }) as Record<string, string>;
 
+const videoModules = import.meta.glob('../assets/**/*.mp4', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
+
 export function preloadSlideAssets(): void {
   for (const url of Object.values(imageModules)) {
     const img = new Image();
     img.src = url;
+  }
+  // A detached <video preload="auto"> is not guaranteed to fetch; a plain
+  // GET warms the HTTP cache the slide's <video> then plays from.
+  for (const url of Object.values(videoModules)) {
+    fetch(url).catch(() => {});
   }
   for (const url of Object.values(audioModules)) {
     const audio = new Audio();
