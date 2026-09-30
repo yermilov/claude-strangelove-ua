@@ -17,7 +17,7 @@ export const FwdaysTitleSlide: SlideDefinition = {
     <div className="fwdays-title-slide">
       <img
         src={fwdaysTitle}
-        alt="Fwdays Tech Summit — Клод Стрейнджлав, або як я перестав хвилюватися і читати код, згенерований AI. Ярослав Єрмілов, Superhuman. 3 жовтня 2026, онлайн-конференція."
+        alt="Fwdays Tech Summit — Клод Стрейнджлав, або як я перестав хвилюватися і читати код, згенерований AI. Ярослав Єрмілов, Preply. 3 жовтня 2026, онлайн-конференція."
       />
     </div>
   ),
