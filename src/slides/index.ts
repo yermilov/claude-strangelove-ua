@@ -10,6 +10,7 @@ import { AgentsSlide } from './AgentsSlide';
 import { AgentsConclusionsSlide } from './AgentsConclusionsSlide';
 import { RecipeWatchAgentSlide } from './RecipeWatchAgentSlide';
 import { RecipeAgentDocsSlide } from './RecipeAgentDocsSlide';
+import { RecipeAgentDocsLimitsSlide } from './RecipeAgentDocsLimitsSlide';
 import { RecipesConclusionsSlide } from './RecipesConclusionsSlide';
 import { RecipeDeterministicChecksSlide } from './RecipeDeterministicChecksSlide';
 import { RecipeCodeReviewSlide } from './RecipeCodeReviewSlide';
@@ -32,6 +33,7 @@ export const slides = [
   AgentsConclusionsSlide,
   RecipeWatchAgentSlide,
   RecipeAgentDocsSlide,
+  RecipeAgentDocsLimitsSlide,
   RecipesConclusionsSlide,
   RecipeDeterministicChecksSlide,
   RecipeCodeReviewSlide,
