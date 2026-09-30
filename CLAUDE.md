@@ -178,6 +178,13 @@ ffmpeg -y -i out/interrupt-raw.mp4 -vf "scale=in_range=full:out_range=tv,format=
 npx remotion still src/index.ts InterruptSession ../src/assets/recipe-1-interrupt-still.png --frame=572
 ```
 
+«рецепт 2» (`#slide-42`) is the `RememberRule` composition, rendered and transcoded the same way
+(`--crf 25 -preset slow` keeps it under 4 MB) to `src/assets/recipe-2-remember-rule.mp4`, with
+its last frame (`--frame=1040`) as the export still. Its VS Code views come from juggernaut's git
+history: `python3 video/scripts/claude-md-steps.py ~/src/juggernaut` regenerates
+`video/src/claude-md-steps.json`. The terminal is shared by both compositions
+(`video/src/claude-code.tsx`).
+
 A session replay is a factual claim: every command, output and user message in
 `InterruptSession.tsx` is quoted from a real transcript named in its header comment. Abridge with
 «…», never invent a line. Videos in `src/assets/` are warmed by `utils/preloadAssets.ts`.

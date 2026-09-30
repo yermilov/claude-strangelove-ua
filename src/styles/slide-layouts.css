@@ -1254,3 +1254,15 @@
   padding-right: 0;
 }
 .recipe-video .shot--terminal { flex-grow: 1.6; }
+/* «рецепт 2»: the video already draws two windows on the slide's own black, so
+ * the frame drops its border — a box round both would read as a third window. */
+.shot__frame--bare { border: 0; border-radius: 0; }
+/* It spans the whole stage, so without a cap its bottom-right corner — where
+ * the rule counter sits — runs under the conference mark. Centred on the
+ * screen and capped clear of the mark's inset on both sides, as `.team__tabs`. */
+/* Its title is one line, so the band that `.recipe-video`'s top padding clears
+ * is not there. */
+.first-day.recipe-video:has(.shot__frame--bare) { padding-top: 0; }
+.recipe-video .shot__frame--bare {
+  width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
+}
