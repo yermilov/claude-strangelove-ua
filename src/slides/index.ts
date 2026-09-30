@@ -11,6 +11,7 @@ import { AgentsConclusionsSlide } from './AgentsConclusionsSlide';
 import { RecipeWatchAgentSlide } from './RecipeWatchAgentSlide';
 import { RecipeAgentDocsSlide } from './RecipeAgentDocsSlide';
 import { RecipeAgentDocsLimitsSlide } from './RecipeAgentDocsLimitsSlide';
+import { RecipeAgentDocsSkillsSlide } from './RecipeAgentDocsSkillsSlide';
 import { RecipesConclusionsSlide } from './RecipesConclusionsSlide';
 import { RecipeDeterministicChecksSlide } from './RecipeDeterministicChecksSlide';
 import { RecipeCodeReviewSlide } from './RecipeCodeReviewSlide';
@@ -34,6 +35,7 @@ export const slides = [
   RecipeWatchAgentSlide,
   RecipeAgentDocsSlide,
   RecipeAgentDocsLimitsSlide,
+  RecipeAgentDocsSkillsSlide,
   RecipesConclusionsSlide,
   RecipeDeterministicChecksSlide,
   RecipeCodeReviewSlide,
