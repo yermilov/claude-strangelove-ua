@@ -1460,6 +1460,8 @@
   color: var(--kubrick-red);
 }
 .slide .skills-example__body--session { font-size: 0.75em; line-height: 1.15; padding-top: var(--space-sm); }
+/* «рецепт 4»: a step smaller than the frontmatter, so the longest command fits */
+.slide .skills-example__body--review { font-size: 0.85em; line-height: 1.15; }
 .skills-example__line { animation: slideItemFadeIn 400ms var(--ease) both; }
 
 /* === GOOD AGENTS.MD ===
