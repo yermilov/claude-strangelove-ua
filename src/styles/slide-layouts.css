@@ -1272,3 +1272,50 @@
 .recipe-video .shot__frame--bare {
   width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
 }
+
+/* === AUTO-REVIEW («рецепт 5») ===
+ * Points on the left, the condensed review skill on the right. The panel's
+ * column is reserved from the first point (visibility, not display) so the
+ * points never re-wrap when it appears on the last one. The panel is the
+ * machine's text — `.machine` gives it the CRT palette and the code size. */
+.auto-review {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: var(--space-xl);
+  align-items: start;
+  /* the panel sits clear of the conference mark in the bottom-right corner */
+  padding-right: calc(var(--conference-mark-inset) - var(--space-lg));
+}
+.slide .auto-review__skill {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .auto-review__skill--hidden {
+  visibility: hidden;
+  animation: none;
+}
+.slide .auto-review__file {
+  background: var(--terminal-bg-elevated);
+  border-bottom: 1px solid var(--terminal-border);
+  color: var(--terminal-white-muted);
+  padding: var(--space-sm) var(--space-lg);
+}
+.slide .auto-review__body {
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  background: transparent;
+  border: 0;
+  font-size: inherit;
+  line-height: var(--line-height-tight);
+  white-space: pre;
+  color: var(--terminal-white);
+}
+.slide .auto-review__body .k { color: var(--terminal-green); }
+.slide .auto-review__body .n { color: var(--terminal-orange); }
+/* Narrow portrait screens: one column, the panel under the points, no mark
+ * gutter. Landscape phones keep two columns — stacked, they run out of height. */
+@media (max-width: 900px) and (orientation: portrait) {
+  .auto-review { grid-template-columns: minmax(0, 1fr); padding-right: 0; }
+}
