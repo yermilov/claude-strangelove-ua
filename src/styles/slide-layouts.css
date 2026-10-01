@@ -622,6 +622,9 @@
   visibility: hidden;
   animation: none;
 }
+/* Under a two-line title (рецепт 4) the title's darkening band reaches ~30px
+ * below it and would swallow the first point — clear it, as .recipe-video does. */
+.slide .problems.problems--two-line-title { padding-top: var(--space-xl); }
 
 /* === TOOL TAKES GRID ===
  * 4×2 grid of tool cards. Each card holds a silhouetted logo, a hidden
