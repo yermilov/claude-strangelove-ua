@@ -1416,7 +1416,8 @@
   border: 0;
   font-size: inherit;
   line-height: var(--line-height-tight);
-  white-space: pre;
+  /* wraps rather than clipping under the file's overflow on a narrow screen */
+  white-space: pre-wrap;
   color: var(--terminal-white);
 }
 .slide .skills-example__body .dim { color: var(--terminal-white-muted); }
@@ -1498,7 +1499,9 @@
   border: 0;
   font-size: inherit;
   line-height: var(--line-height-tight);
-  white-space: pre;
+  /* wraps instead of being clipped by the file's overflow when a narrow
+   * landscape screen keeps two columns (≈1024px); on a projector nothing wraps */
+  white-space: pre-wrap;
   color: var(--terminal-white);
   animation: slideItemFadeIn 600ms var(--ease) both;
 }
