@@ -1,6 +1,7 @@
 import { Composition } from 'remotion';
 import { InterruptSession, DURATION, FPS } from './InterruptSession';
 import * as Remember from './RememberRule';
+import * as Lint from './LintGuard';
 
 export const RemotionRoot: React.FC = () => (
   <>
@@ -12,6 +13,14 @@ export const RemotionRoot: React.FC = () => (
       fps={Remember.FPS}
       width={Remember.WIDTH}
       height={Remember.HEIGHT}
+    />
+    <Composition
+      id="LintGuard"
+      component={Lint.LintGuard}
+      durationInFrames={Lint.DURATION}
+      fps={Lint.FPS}
+      width={Lint.WIDTH}
+      height={Lint.HEIGHT}
     />
   </>
 );

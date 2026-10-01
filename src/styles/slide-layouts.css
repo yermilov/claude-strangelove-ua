@@ -1264,6 +1264,8 @@
 /* Its title is one line, so the band that `.recipe-video`'s top padding clears
  * is not there. */
 .first-day.recipe-video:has(.shot__frame--bare) { padding-top: 0; }
+/* «рецепт 3» is bare too, but its title wraps to two lines — so the band is back. */
+.first-day.recipe-video.recipe-video--two-line-title { padding-top: var(--space-xl); }
 .recipe-video .shot__frame--bare {
   width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
 }

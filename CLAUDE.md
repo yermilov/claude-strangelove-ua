@@ -185,6 +185,14 @@ history: `python3 video/scripts/claude-md-steps.py ~/src/juggernaut` regenerates
 `video/src/claude-md-steps.json`. The terminal is shared by both compositions
 (`video/src/claude-code.tsx`).
 
+«рецепт 3» (`#slide-51`) is the `LintGuard` composition (2140×1040, 37 s; Claude Code left, GitHub
+Actions right), rendered the same way with `--crf 25 -preset slow` to
+`src/assets/recipe-3-lint-guard.mp4`, export still `--frame=1100`. **It is the one STAGED scene**
+(Yarik asked for it, 01.10.2026): the mistake (juggernaut `db618758`), the guard
+(`scripts/check-plugin-manifests.ts` from `faeed26c`) and every check output are real, but the prompt,
+the workflow file and the Actions page are not — juggernaut runs that gate locally and has no CI.
+The header comment of `LintGuard.tsx` says which is which; keep it that way if you edit the scene.
+
 A session replay is a factual claim: every command, output and user message in
 `InterruptSession.tsx` is quoted from a real transcript named in its header comment. Abridge with
 «…», never invent a line. Videos in `src/assets/` are warmed by `utils/preloadAssets.ts`.
