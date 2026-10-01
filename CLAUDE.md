@@ -164,34 +164,44 @@ GIF vs MP4: `petermobile.gif` was 5 MB → `petermobile.mp4` is 306 KB.
 
 ### Remotion videos (`video/`)
 
-Code-rendered videos (the Claude Code session replay on «рецепт 1», `#slide-41`) are a separate
-Remotion project in `video/` with its own `package.json` — Vite never sees it. Re-render:
+Code-rendered videos (the Claude Code session on «рецепт 1») are a separate Remotion project in
+`video/` with its own `package.json` — Vite never sees it. Re-render:
 
 ```bash
 cd video && bun install
-npx remotion render src/index.ts InterruptSession out/interrupt-raw.mp4
+npx remotion render src/index.ts ImportAliasSession out/import-alias-raw.mp4
 # Remotion writes full-range yuvj420p, which browsers refuse — transcode into the deck:
-ffmpeg -y -i out/interrupt-raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" \
+ffmpeg -y -i out/import-alias-raw.mp4 -vf "scale=in_range=full:out_range=tv,format=yuv420p" \
   -c:v libx264 -profile:v high -crf 21 -color_range tv -colorspace bt709 -movflags +faststart -an \
-  ../src/assets/recipe-1-interrupt.mp4
+  ../src/assets/recipe-1-import-alias.mp4
 # the PDF export shows a still instead of the video's first frame:
-npx remotion still src/index.ts InterruptSession ../src/assets/recipe-1-interrupt-still.png --frame=572
+npx remotion still src/index.ts ImportAliasSession ../src/assets/recipe-1-import-alias-still.png --frame=400
 ```
 
-«рецепт 2» (`#slide-42`) is the `RememberRule` composition, rendered and transcoded the same way
-(`--crf 25 -preset slow` keeps it under 4 MB) to `src/assets/recipe-2-remember-rule.mp4`, with
-its last frame (`--frame=1040`) as the export still. Its VS Code views come from juggernaut's git
-history: `python3 video/scripts/claude-md-steps.py ~/src/juggernaut` regenerates
-`video/src/claude-md-steps.json`. The terminal is shared by both compositions
-(`video/src/claude-code.tsx`).
+«рецепт 1» is **STAGED** (Yarik asked for a simpler example, 02.10.2026): the agent is about to
+create a file importing through `../../` although the project imports via the `@/` alias; the human
+presses esc and states the rule — a simple convention the later recipes write down and then lint.
+Its header comment says so. It replaced `InterruptSession`, the real statusLine replay, which
+stays in `video/` but is no longer rendered into the deck.
 
-«рецепт 3» (`#slide-51`) is the `LintGuard` composition (2140×1040, 37 s; Claude Code left, GitHub
-Actions right), rendered the same way with `--crf 25 -preset slow` to
-`src/assets/recipe-3-lint-guard.mp4`, export still `--frame=1100`. **It is the one STAGED scene**
-(Yarik asked for it, 01.10.2026): the mistake (juggernaut `db618758`), the guard
-(`scripts/check-plugin-manifests.ts` from `faeed26c`) and every check output are real, but the prompt,
-the workflow file and the Actions page are not — juggernaut runs that gate locally and has no CI.
-The header comment of `LintGuard.tsx` says which is which; keep it that way if you edit the scene.
+«рецепт 2» is two STAGED compositions, rendered and transcoded the same way: `RememberAliasSession`
+(the «рецепт 1» scene with `remember` — the correction also asks to remember the rule in AGENTS.md)
+→ `src/assets/recipe-2-remember-alias.mp4`, export still `--frame=839`; and `AgentsMdGrowth`
+(AGENTS.md in VS Code, rules landing one by one) → `src/assets/recipe-2-agents-md.mp4`, export still
+`--frame=525`, shown on the slide's second reveal. The skills slide after it opens on a third
+variant, `SkillAliasSession` (the rule goes into the frontend-conventions skill instead of
+AGENTS.md) → `src/assets/recipe-2-skill-alias.mp4`, export still `--frame=899`. The older `RememberRule` composition (a real
+CLAUDE.md growing through juggernaut's history, `video/scripts/claude-md-steps.py`) stays in
+`video/` but is no longer rendered into the deck; its VS Code palette is shared from there. The
+terminal is shared by every composition (`video/src/claude-code.tsx`).
+
+«рецепт 3» is the `AliasGuard` composition (2140×1040, 37 s; Claude Code left, GitHub Actions
+right), rendered the same way with `--crf 25 -preset slow` to `src/assets/recipe-3-alias-guard.mp4`,
+export still `--frame=1100`. It closes the STAGED `@/` alias story of recipes 1–2: the agent breaks
+the rule a second time although AGENTS.md and the skill both state it, and asks for a lint script
+in GitHub Actions; the first run fails on the two imports, the second goes green. It is built on the
+older `LintGuard` composition (the real plugin-manifest drift, juggernaut `db618758`), which stays in
+`video/` with its header saying what was real, but is no longer rendered into the deck.
 
 A session replay is a factual claim: every command, output and user message in
 `InterruptSession.tsx` is quoted from a real transcript named in its header comment. Abridge with

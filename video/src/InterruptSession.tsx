@@ -207,14 +207,16 @@ export const InterruptSession: React.FC = () => {
           </Block>
         )}
 
-        {/* input box */}
+        {/* input box — never shrunk: the column is bottom-anchored and overflows
+            while the session is long, and a flex item with an explicit min-height
+            gets squeezed to it (border-box), leaving the empty prompt half a line tall */}
         <div
           style={{
             marginTop: FONT * 0.8,
             border: `2px solid ${C.dim}`,
             borderRadius: 10,
             padding: '8px 20px',
-            minHeight: FONT * LINE,
+            flexShrink: 0,
           }}
         >
           <Row>

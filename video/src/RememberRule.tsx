@@ -155,7 +155,7 @@ const Terminal: React.FC = () => {
 };
 
 // ---------- VS Code (right) ----------
-const V = {
+export const V = {
   bg: '#1f1f1f',
   bar: '#181818',
   border: '#2b2b2b',
@@ -175,7 +175,7 @@ const EFONT = 25;
 const ELINE = 35;
 
 // Minimal markdown colouring, the way VS Code's Dark Modern paints a .md file.
-const MdLine: React.FC<{ t: string }> = ({ t }) => {
+export const MdLine: React.FC<{ t: string }> = ({ t }) => {
   if (/^#{1,6} /.test(t)) return <span style={{ color: V.heading, fontWeight: 700 }}>{t}</span>;
   const parts = t.split(/(\*\*[^*]+\*\*|`[^`]+`)/g);
   return (

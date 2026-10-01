@@ -5,11 +5,13 @@ import { FirstDaySlide } from './FirstDaySlide';
 import { TeamOfThreeSlide } from './TeamOfThreeSlide';
 import { ContributorsSlide } from './ContributorsSlide';
 import { ProblemsSlide } from './ProblemsSlide';
+import { SameProblemsSlide } from './SameProblemsSlide';
 import { ConclusionsSlide } from './ConclusionsSlide';
 import { AgentsSlide } from './AgentsSlide';
 import { AgentsConclusionsSlide } from './AgentsConclusionsSlide';
 import { RecipeWatchAgentSlide } from './RecipeWatchAgentSlide';
 import { RecipeAgentDocsSlide } from './RecipeAgentDocsSlide';
+import { GoodAgentsMdSlide } from './GoodAgentsMdSlide';
 import { RecipeAgentDocsLimitsSlide } from './RecipeAgentDocsLimitsSlide';
 import { RecipeAgentDocsSkillsSlide } from './RecipeAgentDocsSkillsSlide';
 import { RecipesConclusionsSlide } from './RecipesConclusionsSlide';
@@ -29,12 +31,14 @@ export const slides = [
   TeamOfThreeSlide,
   ContributorsSlide,
   ProblemsSlide,
+  SameProblemsSlide,
   ConclusionsSlide,
   AgentsSlide,
   AgentsConclusionsSlide,
   RecipeWatchAgentSlide,
   RecipeAgentDocsSlide,
   RecipeAgentDocsLimitsSlide,
+  GoodAgentsMdSlide,
   RecipeAgentDocsSkillsSlide,
   RecipesConclusionsSlide,
   RecipeDeterministicChecksSlide,

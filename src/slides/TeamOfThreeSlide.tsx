@@ -110,7 +110,7 @@ function DiffPingPong() {
   return <TerminalDiff diff={DIFFS[i]} rows={DIFF_ROWS} />;
 }
 
-// also recapped on «compacting the conversation» after «що ще може піти не так?»
+// also recapped on the second «compacting the conversation»
 export const TLDR: ReactNode[] = [
   <>Вибір непродуктивний, зафіксуйте одну непогану опцію замість пошуку найкращої</>,
   <>Не покладайся на дії інженера — він чи вона їх не зроблять</>,

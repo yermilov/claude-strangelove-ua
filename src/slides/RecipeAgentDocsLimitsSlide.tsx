@@ -1,11 +1,12 @@
 import { ReactNode } from 'react';
 import { SlideDefinition } from '../types/slides';
 
-/* The turn after the CLAUDE.md replay on «рецепт 2»: why agent docs work, and
- * where they stop working. Same title — it is the same recipe, one step on.
+/* The turn after the AGENTS.md scene on «рецепт 2»: why agent docs work, where
+ * they stop working, and so what belongs in AGENTS.md — the lead-in to
+ * «а як виглядає хороший AGENTS.md?». Same title — it is the same recipe, one step on.
  * One point per reveal, laid out from the start so nothing moves (the
  * `.problems` list from «що ще може піти не так?»); the one red goes to the
- * danger in the last point. */
+ * danger in the third point, «втрачати нитку». */
 
 const POINTS: ReactNode[] = [
   <>люди не люблять читати документацію і ненавидять її писати</>,
@@ -14,6 +15,7 @@ const POINTS: ReactNode[] = [
     але коли AGENTS.md виростають до тисяч токенів, агенти починають{' '}
     <span className="accent-red">втрачати нитку</span>
   </>,
+  <>в AGENTS.md має бути тільки найважливіша інформація</>,
 ];
 
 export const RecipeAgentDocsLimitsSlide: SlideDefinition = {
@@ -30,5 +32,5 @@ export const RecipeAgentDocsLimitsSlide: SlideDefinition = {
     </ul>
   ),
   notes:
-    'Люди не люблять читати документацію і ненавидять її писати. Агенти обожнюють і те, і те — вони ж побудовані на LLM. Але коли AGENTS.md розростається до тисяч токенів, агенти починають втрачати нитку.',
+    'Люди не люблять читати документацію і ненавидять її писати. Агенти обожнюють і те, і те — вони ж побудовані на LLM. Але коли AGENTS.md розростається до тисяч токенів, агенти починають втрачати нитку. Тому в AGENTS.md має бути тільки найважливіша інформація.',
 };

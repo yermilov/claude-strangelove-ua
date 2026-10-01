@@ -3,17 +3,20 @@ import { SlideDefinition } from '../types/slides';
 import { TLDR } from './TeamOfThreeSlide';
 import { COMPACTING_TITLE } from './compacting';
 
-/* The second «compacting the conversation», after «що ще може піти не так?». It opens
+/* The second «compacting the conversation», after «що ще може піти не так?» and
+ * «і знову ж ті самі проблеми». It opens
  * straight on the first new point — the two earlier ones already up in grey
  * — and adds the second on the next reveal; the point just made is white.
  * Beyoncé stands beside the CI-gate line, which stays in English on purpose
  * ("Single Ladies"). */
 
 // Any `beyonce.*` in src/assets is picked up; without one the slide simply
-// has no picture. The one there is a collage: Beyoncé on stage in Madrid,
-// 2008, looking down (Noemi Nuñez, CC BY-SA 2.0, Wikimedia Commons), set
-// behind a MacBook on a dark desk («Apple laptop lid», CC0, Commons) so she
-// reads as looking at its screen; clipped at the desk's far edge.
+// has no picture. The one there is Beyoncé dancing «Single Ladies (Put a
+// Ring on It)» — the song the CI-gate line puns on — at the O2, London, on
+// the I Am… Tour, 2009 (idrewuk, CC BY 2.0, Wikimedia Commons), cropped to
+// 4:5. The standing desk with a MacBook to her right is painted in: only the
+// empty stage strip beside her was sent to an image model (gpt-image-2 via
+// Codex), and only its changed pixels were pasted back — she is untouched.
 const BEYONCE = Object.values(
   import.meta.glob('../assets/beyonce.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' }),
 )[0] as string | undefined;
@@ -21,19 +24,17 @@ const BEYONCE = Object.values(
 // Beside every CI-gate line: the photo, or a frame of its size until it lands.
 export function BeyoncePicture() {
   return BEYONCE ? (
-    // CC BY-SA asks for a visible credit, so it rides under the picture
+    // CC BY asks for a visible credit and a note of what was changed, so
+    // both ride under the picture
     <figure className="conclusions__figure">
       <img
         className="conclusions__picture"
         src={BEYONCE}
-        alt="Beyoncé behind a MacBook, looking at its screen"
+        alt="Beyoncé dancing «Single Ladies» on stage, a MacBook on a standing desk beside her"
       />
       <figcaption className="conclusions__credit">
-        колаж за{' '}
-        <a href="https://commons.wikimedia.org/wiki/File:Beyonce-2008.jpg">
-          фото Noemi Nuñez
-        </a>{' '}
-        · <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC BY-SA 2.0</a>
+        <a href="https://commons.wikimedia.org/wiki/File:I_Am..._Tour_11.jpg">фото idrewuk</a>, стіл домальовано{' '}
+        · <a href="https://creativecommons.org/licenses/by/2.0/">CC BY 2.0</a>
       </figcaption>
     </figure>
   ) : (

@@ -240,7 +240,14 @@ export function Presentation({ slides, initialSlide = 0 }: PresentationProps) {
           * export mode, because the PDF is what actually gets sent to them.
           * The stage, not the frame: the mark is bottom-anchored, and the
           * frame's bottom edge is the input bar, which the PDF does not have. */}
-        {!activeSlide.hideConferenceMark && <FwdaysLogo className="fwdays-mark" />}
+        {!activeSlide.hideConferenceMark && (
+          <>
+            {/* a blurred dark pad under the mark, for the slides whose content
+              * is allowed to run under it (styled off unless one of them is up) */}
+            <div className="fwdays-mark-backdrop" aria-hidden="true" />
+            <FwdaysLogo className="fwdays-mark" />
+          </>
+        )}
         <Slide
           isActive
           notes={activeSlide.notes}

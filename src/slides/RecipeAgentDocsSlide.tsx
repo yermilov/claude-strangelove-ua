@@ -1,43 +1,60 @@
 import { SlideDefinition } from '../types/slides';
-import rememberVideo from '../assets/recipe-2-remember-rule.mp4';
-import rememberStill from '../assets/recipe-2-remember-rule-still.png';
+import rememberVideo from '../assets/recipe-2-remember-alias.mp4';
+import rememberStill from '../assets/recipe-2-remember-alias-still.png';
+import agentsMdVideo from '../assets/recipe-2-agents-md.mp4';
+import agentsMdStill from '../assets/recipe-2-agents-md-still.png';
 
-/* «рецепт 2: агентська документація» — Claude Code on the left is asked to write
- * a rule into CLAUDE.md; VS Code on the right shows the rule land, then the file
- * keeps growing, commit by commit, from 17 rules on 06.06 to 109 on 26.09.
+/* «рецепт 2: агентська документація» — the same situation as «рецепт 1» (the
+ * agent imports through `../../`, the human presses esc), but this time the
+ * correction ends with «запам'ятай це правило в AGENTS.md», and the agent writes
+ * the rule there. On the next reveal AGENTS.md opens in VS Code on that rule, and
+ * more rules of the same kind land one by one until the file outgrows the view.
  *
- * Both columns are ONE video (video/src/RememberRule.tsx), so the rule appears
- * in the editor at the frame the agent writes it. Real sources: the prompt is
- * Yarik's own from 06.06.2026 (~/.claude/history.jsonl), the edit is commit
- * bd712975, and every editor view is juggernaut's CLAUDE.md at a real commit —
- * see the composition's header comment. It is CLAUDE.md rather than AGENTS.md
- * because that is the file Claude Code reads, and the file the real prompt names.
- *
- * Played once and held on the last frame; the PDF export gets that last frame
- * (26.09, 109 rules, 748 lines) as a still. */
+ * Both videos are STAGED Remotion scenes in `video/`: RememberAliasSession (the
+ * «рецепт 1» scene with `remember`) and AgentsMdGrowth — see their header
+ * comments. The terminal plays once and holds its last frame; AGENTS.md is
+ * mounted on its reveal, so it starts from its first rule. The PDF export shows
+ * each video's last frame as a still. */
 
 const isExportMode =
   typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('export') === '1';
 
 const ALT =
-  'Ліворуч Claude Code: користувач просить записати правило в CLAUDE.md, агент дописує «UI design rule» і «Development procedure». Праворуч CLAUDE.md у VS Code росте з 17 правил 6 червня до 109 правил 26 вересня';
+  "Claude Code: агент хоче імпортувати через ../../, користувач натискає esc і пише, що імпорти йдуть через аліас @/, і просить запам'ятати це в AGENTS.md; агент переписує імпорти й дописує правило в AGENTS.md";
+const AGENTS_MD_ALT =
+  'AGENTS.md у VS Code: після правила про аліас @/ одне за одним додаються нові подібні правила, і файл перестає вміщатися на екран';
 
 export const RecipeAgentDocsSlide: SlideDefinition = {
   id: 'recipe-2-agent-docs',
   title: <>рецепт 2: агентська документація</>,
-  content: (
+  maxRevealStages: 1,
+  content: ({ revealStage }) => (
     <div className="first-day recipe-video">
-      <figure className="shot">
-        <div className="shot__frame shot__frame--bare" style={{ ['--ratio' as string]: 2140 / 1040 }}>
-          {isExportMode ? (
-            <img src={rememberStill} alt={ALT} />
-          ) : (
-            <video src={rememberVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
-          )}
-        </div>
-      </figure>
+      <div className="shot-pair">
+        <figure className="shot shot--terminal">
+          <div className="shot__frame" style={{ ['--ratio' as string]: 1200 / 900 }}>
+            {isExportMode ? (
+              <img src={rememberStill} alt={ALT} />
+            ) : (
+              <video src={rememberVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
+            )}
+          </div>
+        </figure>
+        <figure className={`shot shot--above-mark shot--agents-md${revealStage >= 1 ? '' : ' shot--hidden'}`}>
+          <div className="shot__frame" style={{ ['--ratio' as string]: 1200 / 900 }}>
+            {isExportMode ? (
+              <img src={agentsMdStill} alt={AGENTS_MD_ALT} />
+            ) : (
+              // mounted on its reveal, so the file opens on its first rule
+              revealStage >= 1 && (
+                <video src={agentsMdVideo} autoPlay muted playsInline preload="auto" aria-label={AGENTS_MD_ALT} />
+              )
+            )}
+          </div>
+        </figure>
+      </div>
     </div>
   ),
   notes:
-    'Шосте червня: «додай у CLAUDE.md інструкцію завжди робити UI через frontend-design» — і сім кроків процесу. Агент записав. А потім кожна помилка, яку агент зробив двічі, ставала ще одним правилом: 17 правил у червні, 109 наприкінці вересня, 748 рядків.',
+    "Та сама ситуація, що й у першому рецепті: агент імпортує через ../../, я тисну esc. Але цього разу я не тільки кажу, як треба, а й прошу запам'ятати це в AGENTS.md — і агент записує правило. А далі таких правил стає все більше: логер замість console, date-fns замість moment, гроші в копійках, named exports… Кожне правило, яке довелося сказати двічі, потрапляє в AGENTS.md.",
 };

@@ -218,7 +218,9 @@
 
 /* === ARCHITECTURE DIAGRAM ===
  * <ArchitectureDiagram> (components/ArchitectureDiagram.tsx), shared by «мій
- * перший день» and «команда з трьох». */
+ * перший день», «команда з трьох», the contributors and the agents slides.
+ * Everything but the Processing column is drawn muted in grey-2, so the
+ * column the story is about is the only lit thing on the diagram. */
 .arch__diagram {
   width: 100%;
   height: 100%;
@@ -228,11 +230,11 @@
 
 .arch__box rect {
   fill: none;
-  stroke: var(--kubrick-grey-1);
+  stroke: var(--kubrick-grey-2);
   stroke-width: 2;
 }
 .arch__box text {
-  fill: var(--kubrick-white);
+  fill: var(--kubrick-grey-2);
   font-size: 30px;
   text-anchor: middle;
   dominant-baseline: central;
@@ -241,8 +243,8 @@
 .arch__box--strong rect { stroke: var(--kubrick-white); stroke-width: 4; }
 .arch__box--strong text { fill: var(--kubrick-white); font-weight: 600; }
 
-.arch__arrow line { stroke: var(--kubrick-grey-1); stroke-width: 3; }
-.arch__arrow path { fill: var(--kubrick-grey-1); }
+.arch__arrow line { stroke: var(--kubrick-grey-2); stroke-width: 3; }
+.arch__arrow path { fill: var(--kubrick-grey-2); }
 
 .arch__zone line {
   stroke: var(--kubrick-grey-2);
@@ -250,7 +252,7 @@
   stroke-dasharray: 6 10;
 }
 .arch__zone text {
-  fill: var(--kubrick-grey-1);
+  fill: var(--kubrick-grey-2);
   font-size: 22px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -259,7 +261,7 @@
 .arch__devices rect,
 .arch__devices path {
   fill: none;
-  stroke: var(--kubrick-white);
+  stroke: var(--kubrick-grey-2);
   stroke-width: 3;
   animation: slideItemFadeIn 600ms var(--ease) both;
 }
@@ -1191,6 +1193,27 @@
   z-index: 4;
 }
 
+/* Under the mark, a blurred dark pad — shown only where a slide lets its
+ * content run under the corner («рецепт 2»'s AGENTS.md), so the mark stays
+ * legible over it. A radial mask fades its edges, so it reads as a shadow,
+ * not a box. Same anchor as the mark, a little larger. */
+.fwdays-mark-backdrop {
+  display: none;
+  position: absolute;
+  bottom: calc(var(--space-xl) - var(--space-lg));
+  right: calc(var(--space-xl) - var(--space-lg));
+  width: calc(var(--conference-mark-height) * 1.4 + 2 * var(--space-lg));
+  height: calc(var(--conference-mark-height) + 2 * var(--space-lg));
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  mask-image: radial-gradient(closest-side, #000 60%, transparent);
+  -webkit-mask-image: radial-gradient(closest-side, #000 60%, transparent);
+  pointer-events: none;
+  z-index: 3;
+}
+.slide-container:has(.shot--agents-md:not(.shot--hidden)) .fwdays-mark-backdrop { display: block; }
+
 /* The height itself halves via `--conference-mark-height` in tokens.css, so
  * that the inset a slide reserves shrinks with it. Only the offsets are here. */
 @media (max-width: 900px) {
@@ -1258,6 +1281,19 @@
   padding-right: 0;
 }
 .recipe-video .shot--terminal { flex-grow: 1.6; }
+/* «рецепт 2»: two columns of the same width, laid out from the start, so the
+ * terminal does not move when AGENTS.md arrives. AGENTS.md takes the full
+ * column height — it may run under the conference mark, which gets a blurred
+ * pad (.fwdays-mark-backdrop) to stay legible over it. */
+.recipe-video .shot--above-mark.shot--agents-md { padding-bottom: 0; }
+.recipe-video:has(.shot--agents-md) .shot--terminal { flex-grow: 1; }
+/* The right-hand shot («ааа, точно» on «рецепт 1», AGENTS.md on «рецепт 2»)
+ * centres in the room above the conference mark, not in the whole column —
+ * centred on the full height its bottom edge ran into the mark. */
+.recipe-video .shot--above-mark {
+  /* the mark's own height plus its bottom offset, and a gap */
+  padding-bottom: calc(var(--conference-mark-height) + var(--space-xl));
+}
 /* «рецепт 2»: the video already draws two windows on the slide's own black, so
  * the frame drops its border — a box round both would read as a third window. */
 .shot__frame--bare { border: 0; border-radius: 0; }
@@ -1318,4 +1354,159 @@
  * gutter. Landscape phones keep two columns — stacked, they run out of height. */
 @media (max-width: 900px) and (orientation: portrait) {
   .auto-review { grid-template-columns: minmax(0, 1fr); padding-right: 0; }
+}
+
+/* === RECIPE 2 — SKILLS ===
+ * «рецепт 2» after the good AGENTS.md: one point at a time at the top, its
+ * example filling the room under it — a session video, the skill's
+ * frontmatter, or the hook's session. The examples sit clear of the
+ * conference mark on the right. */
+.skills-example {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  height: 100%;
+  min-height: 0;
+  padding-right: calc(var(--conference-mark-inset) - var(--space-lg));
+}
+/* «рецепт 4»'s title wraps to two lines; its darkening band reaches below it */
+.skills-example--two-line-title { padding-top: var(--space-xl); }
+.skills-example__stage {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+.skills-example__video { flex: 1 1 0; }
+.slide .skills-example__file {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--terminal-border);
+  border-radius: var(--radius-card);
+  background: var(--terminal-bg);
+  font-size: calc(var(--font-size-text) * 0.8);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .skills-example__bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xs) var(--space-md);
+  background: var(--terminal-bg-elevated);
+  border-bottom: 1px solid var(--terminal-border);
+  color: var(--terminal-white-muted);
+  font-size: 0.6em;
+}
+/* the three window dots, drawn as one shadowed circle */
+.skills-example__dots {
+  width: 0.7em;
+  height: 0.7em;
+  border-radius: 50%;
+  background: #ff5f57;
+  box-shadow: 1.1em 0 #febc2e, 2.2em 0 #28c840;
+  margin-right: 2.4em;
+  flex-shrink: 0;
+}
+.slide .skills-example__body {
+  margin: 0;
+  padding: var(--space-sm) var(--space-lg);
+  background: transparent;
+  border: 0;
+  font-size: inherit;
+  line-height: var(--line-height-tight);
+  white-space: pre;
+  color: var(--terminal-white);
+}
+.slide .skills-example__body .dim { color: var(--terminal-white-muted); }
+/* the description: lit like the line a reader should look at */
+.slide .skills-example__body .lit {
+  display: block;
+  margin: var(--space-xs) calc(-1 * var(--space-lg));
+  padding: var(--space-xs) var(--space-lg) var(--space-xs) calc(var(--space-lg) - 4px);
+  border-left: 4px solid var(--terminal-orange);
+  background: color-mix(in srgb, var(--terminal-orange) 14%, transparent);
+  color: var(--terminal-orange);
+}
+.slide .skills-example__body .lit b { color: var(--terminal-orange-bright); }
+.slide .skills-example__body .err { color: var(--terminal-red); }
+.slide .skills-example__body .ok { color: var(--terminal-green); }
+.slide .skills-example__body .hl { color: var(--terminal-orange); }
+/* the description's rules, under its file: the slide's own register */
+.skills-example__described {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.slide .skills-example__rules {
+  margin: 0;
+  padding: 0 0 0 var(--space-lg);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: var(--font-size-text);
+  line-height: var(--line-height-tight);
+  color: var(--kubrick-grey-1);
+}
+.slide .skills-example__rules li {
+  margin: 0;
+  padding: 0 0 0 1.2em;
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .skills-example__rules li::before {
+  content: '— ';
+  color: var(--kubrick-red);
+}
+.slide .skills-example__body--session { font-size: 0.75em; line-height: 1.15; padding-top: var(--space-sm); }
+.skills-example__line { animation: slideItemFadeIn 400ms var(--ease) both; }
+
+/* === GOOD AGENTS.MD ===
+ * «а як виглядає хороший AGENTS.md?»: the points on the left, the example file
+ * on the right, one section per point. Every section is laid out from the
+ * start and hidden until its reveal, so the file does not reflow as it grows.
+ * Same chrome as `.auto-review__skill`. */
+.good-agents-md {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--space-xl);
+  align-items: start;
+  /* the file sits clear of the conference mark in the bottom-right corner */
+  padding-right: calc(var(--conference-mark-inset) - var(--space-lg));
+}
+.slide .good-agents-md__file {
+  margin: 0;
+  padding: 0 0 var(--space-sm);
+  overflow: hidden;
+  /* the deck's text size, one step down: mono runs wide (inline code takes
+   * the same kind of step) */
+  font-size: calc(var(--font-size-text) * 0.8);
+}
+.slide .good-agents-md__name {
+  background: var(--terminal-bg-elevated);
+  border-bottom: 1px solid var(--terminal-border);
+  color: var(--terminal-white-muted);
+  padding: var(--space-sm) var(--space-lg);
+}
+.slide .good-agents-md__section {
+  margin: 0;
+  padding: var(--space-xs) var(--space-lg) 0;
+  background: transparent;
+  border: 0;
+  font-size: inherit;
+  line-height: var(--line-height-tight);
+  white-space: pre;
+  color: var(--terminal-white);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .good-agents-md__section .h { color: var(--terminal-green); }
+.slide .good-agents-md__file { animation: slideItemFadeIn 600ms var(--ease) both; }
+.slide .good-agents-md__file--hidden { visibility: hidden; animation: none; }
+.slide .good-agents-md__section--hidden {
+  visibility: hidden;
+  animation: none;
+}
+@media (max-width: 900px) and (orientation: portrait) {
+  .good-agents-md { grid-template-columns: minmax(0, 1fr); padding-right: 0; }
 }
