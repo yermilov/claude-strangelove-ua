@@ -175,7 +175,7 @@ ffmpeg -y -i out/import-alias-raw.mp4 -vf "scale=in_range=full:out_range=tv,form
   -c:v libx264 -profile:v high -crf 21 -color_range tv -colorspace bt709 -movflags +faststart -an \
   ../src/assets/recipe-1-import-alias.mp4
 # the PDF export shows a still instead of the video's first frame:
-npx remotion still src/index.ts ImportAliasSession ../src/assets/recipe-1-import-alias-still.png --frame=400
+npx remotion still src/index.ts ImportAliasSession ../src/assets/recipe-1-import-alias-still.png --frame=376
 ```
 
 «рецепт 1» is **STAGED** (Yarik asked for a simpler example, 02.10.2026): the agent is about to
@@ -186,22 +186,35 @@ stays in `video/` but is no longer rendered into the deck.
 
 «рецепт 2» is two STAGED compositions, rendered and transcoded the same way: `RememberAliasSession`
 (the «рецепт 1» scene with `remember` — the correction also asks to remember the rule in AGENTS.md)
-→ `src/assets/recipe-2-remember-alias.mp4`, export still `--frame=839`; and `AgentsMdGrowth`
+→ `src/assets/recipe-2-remember-alias.mp4`, rendered from the prompt onward with
+`--frames=240-805` (the audience has just seen everything before it on «рецепт 1»), export still
+`--frame=805`; and `AgentsMdGrowth`
 (AGENTS.md in VS Code, rules landing one by one) → `src/assets/recipe-2-agents-md.mp4`, export still
 `--frame=525`, shown on the slide's second reveal. The skills slide after it opens on a third
 variant, `SkillAliasSession` (the rule goes into the frontend-conventions skill instead of
-AGENTS.md) → `src/assets/recipe-2-skill-alias.mp4`, export still `--frame=899`. The older `RememberRule` composition (a real
+AGENTS.md) → `src/assets/recipe-2-skill-alias.mp4`, also rendered from the prompt onward
+(`--frames=240-787`), with its correction typed faster still (`SKILL_TYPING_SPEEDUP`, 1.5×), export still `--frame=787`. The older `RememberRule` composition (a real
 CLAUDE.md growing through juggernaut's history, `video/scripts/claude-md-steps.py`) stays in
 `video/` but is no longer rendered into the deck; its VS Code palette is shared from there. The
 terminal is shared by every composition (`video/src/claude-code.tsx`).
 
-«рецепт 3» is the `AliasGuard` composition (2140×1040, 37 s; Claude Code left, GitHub Actions
-right), rendered the same way with `--crf 25 -preset slow` to `src/assets/recipe-3-alias-guard.mp4`,
-export still `--frame=1100`. It closes the STAGED `@/` alias story of recipes 1–2: the agent breaks
-the rule a second time although AGENTS.md and the skill both state it, and asks for a lint script
-in GitHub Actions; the first run fails on the two imports, the second goes green. It is built on the
-older `LintGuard` composition (the real plugin-manifest drift, juggernaut `db618758`), which stays in
-`video/` with its header saying what was real, but is no longer rendered into the deck.
+«рецепт 3» is the `AliasGuardTerminal` composition (1200×900, the terminal alone), rendered with
+`--crf 21` to `src/assets/recipe-3-terminal.mp4`, export still `--frame=1057`
+(`recipe-3-terminal-still.png`). The GitHub Actions page beside it is **live DOM**
+(`src/components/GitHubActionsPanel.tsx`) following the video's clock, so the two fill the slide's
+width together at any window size (Yarik's sketch, 02.10.2026). Its run frames copy
+`RUN_FRAMES` from `video/src/AliasGuard.tsx`; if the terminal's timeline changes, update both. It
+closes the STAGED `@/` alias story of recipes 1–2: the agent breaks the rule a second time although
+AGENTS.md and the skill both state it, and asks for a lint script in GitHub Actions; the first run
+fails on the two imports, the second goes green. The full two-window `AliasGuard` composition and
+the older `LintGuard` (the real plugin-manifest drift, juggernaut `db618758`) stay in `video/` but
+are no longer rendered into the deck.
+
+The user's typing in these four sessions is 20% faster than first staged: each timeline is written at
+the old pace and passed through `quickenTyping` (`video/src/claude-code.tsx`, `TYPING_SPEEDUP`),
+which shortens the typing and moves everything after it up — so durations and the still frames
+above follow from it (each composition exports its `STILL_FRAME`). In the deck the four replays
+also play at 1.2× (`src/utils/sessionPlayback.ts`).
 
 A session replay is a factual claim: every command, output and user message in
 `InterruptSession.tsx` is quoted from a real transcript named in its header comment. Abridge with

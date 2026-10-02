@@ -15,7 +15,7 @@ const POINTS: ReactNode[] = [
     але коли AGENTS.md виростають до тисяч токенів, агенти починають{' '}
     <span className="accent-red">втрачати нитку</span>
   </>,
-  <>в AGENTS.md має бути тільки найважливіша інформація</>,
+  <>тому в AGENTS.md має бути тільки найважливіша інформація</>,
 ];
 
 export const RecipeAgentDocsLimitsSlide: SlideDefinition = {

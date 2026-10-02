@@ -1,4 +1,5 @@
 import { SlideDefinition } from '../types/slides';
+import { atAgentsMdSpeed, atSessionSpeed } from '../utils/sessionPlayback';
 import rememberVideo from '../assets/recipe-2-remember-alias.mp4';
 import rememberStill from '../assets/recipe-2-remember-alias-still.png';
 import agentsMdVideo from '../assets/recipe-2-agents-md.mp4';
@@ -36,7 +37,7 @@ export const RecipeAgentDocsSlide: SlideDefinition = {
             {isExportMode ? (
               <img src={rememberStill} alt={ALT} />
             ) : (
-              <video src={rememberVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
+              <video ref={atSessionSpeed} src={rememberVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
             )}
           </div>
         </figure>
@@ -47,7 +48,7 @@ export const RecipeAgentDocsSlide: SlideDefinition = {
             ) : (
               // mounted on its reveal, so the file opens on its first rule
               revealStage >= 1 && (
-                <video src={agentsMdVideo} autoPlay muted playsInline preload="auto" aria-label={AGENTS_MD_ALT} />
+                <video ref={atAgentsMdSpeed} src={agentsMdVideo} autoPlay muted playsInline preload="auto" aria-label={AGENTS_MD_ALT} />
               )
             )}
           </div>

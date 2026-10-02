@@ -152,3 +152,20 @@ export const KeyCap: React.FC<{ at: number; label: string }> = ({ at, label }) =
   );
 };
 
+
+// The user types their prompt 20% faster than first staged (Yarik, 02.10.2026).
+// A timeline is written at the old pace; `quickenTyping` shortens its
+// typeStart→typeEnd window by this factor and moves every later event up by
+// what was saved, so nothing waits after the prompt is typed.
+export const TYPING_SPEEDUP = 1.2;
+
+/** frames saved by typing faster, for a timeline's duration and still frame */
+export const typingSaved = (t: { typeStart: number; typeEnd: number }, speedup = TYPING_SPEEDUP) =>
+  t.typeEnd - t.typeStart - Math.round((t.typeEnd - t.typeStart) / speedup);
+
+export const quickenTyping = <T extends { typeStart: number; typeEnd: number }>(t: T, speedup = TYPING_SPEEDUP): T => {
+  const saved = typingSaved(t, speedup);
+  return Object.fromEntries(
+    Object.entries(t).map(([k, v]) => [k, typeof v === 'number' && v >= t.typeEnd ? v - saved : v]),
+  ) as T;
+};

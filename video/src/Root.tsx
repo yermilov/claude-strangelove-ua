@@ -60,6 +60,14 @@ export const RemotionRoot: React.FC = () => (
       height={Lint.HEIGHT}
     />
     <Composition
+      id="AliasGuardTerminal"
+      component={Alias.AliasGuardTerminal}
+      durationInFrames={Alias.DURATION}
+      fps={Alias.FPS}
+      width={Alias.TERMINAL_WIDTH}
+      height={Alias.HEIGHT}
+    />
+    <Composition
       id="AliasGuard"
       component={Alias.AliasGuard}
       durationInFrames={Alias.DURATION}

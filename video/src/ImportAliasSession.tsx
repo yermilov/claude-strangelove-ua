@@ -12,7 +12,7 @@ import React from 'react';
  * CLI. Frame is the clock — no timers, no CSS animation. */
 
 import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
-import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontFamily } from './claude-code';
+import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontFamily, quickenTyping, TYPING_SPEEDUP, typingSaved } from './claude-code';
 
 /* «рецепт 2: агентська документація» plays the SAME situation with one change
  * (`remember`): the correction also asks the agent to remember the rule — in
@@ -22,17 +22,9 @@ import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontF
  * re-running the checks. */
 
 export const FPS = 30;
-export const DURATION = 780;
-export const REMEMBER_DURATION = 840;
-export const SKILL_DURATION = 900;
-// the frame the PDF export shows instead of the video: the climbing imports
-// marked, «Interrupted», and the correction typed out
-export const STILL_FRAME = 400;
-// «рецепт 2»'s still is its last frame: the rule written into AGENTS.md
-export const REMEMBER_STILL_FRAME = REMEMBER_DURATION - 1;
 
-// ---------- timeline (frames) ----------
-const T_FIX = {
+// ---------- timeline (frames), written at the original typing pace ----------
+const T_FIX_SLOW = {
   read: 24,
   create: 70,
   mark1: 112,
@@ -49,13 +41,31 @@ const T_FIX = {
   checkDone: 610,
 };
 // the longer correction takes longer to type; everything after it moves on
-const T_REMEMBER = { ...T_FIX, typeEnd: 440, enter: 470, think: 478, write: 540, remember: 620 };
-const T_SKILL = { ...T_FIX, typeEnd: 490, enter: 520, think: 528, write: 590, remember: 670 };
+const T_REMEMBER_SLOW = { ...T_FIX_SLOW, typeEnd: 440, enter: 470, think: 478, write: 540, remember: 620 };
+const T_SKILL_SLOW = { ...T_FIX_SLOW, typeEnd: 449, enter: 479, think: 487, write: 549, remember: 629 };
+// …played with the faster typing (see claude-code.tsx)
+const T_FIX = quickenTyping(T_FIX_SLOW);
+const T_REMEMBER = quickenTyping(T_REMEMBER_SLOW);
+// the skill correction is the longest of the three and is typed faster still
+// (Yarik, 02.10.2026: «ще трохи швидше»)
+const SKILL_TYPING_SPEEDUP = TYPING_SPEEDUP * 1.25;
+const T_SKILL = quickenTyping(T_SKILL_SLOW, SKILL_TYPING_SPEEDUP);
+
+// each video is shorter by the frames the faster typing saves
+export const DURATION = 780 - typingSaved(T_FIX_SLOW);
+export const REMEMBER_DURATION = 840 - typingSaved(T_REMEMBER_SLOW);
+export const SKILL_DURATION = 859 - typingSaved(T_SKILL_SLOW, SKILL_TYPING_SPEEDUP);
+// the frame the PDF export shows instead of the video: the climbing imports
+// marked, «Interrupted», and the correction typed out — 20 frames after typing ends
+export const STILL_FRAME = T_FIX.typeEnd + 20;
+// «рецепт 2»'s still is its last frame: the rule written into AGENTS.md
+export const REMEMBER_STILL_FRAME = REMEMBER_DURATION - 1;
+export const SKILL_STILL_FRAME = SKILL_DURATION - 1;
 
 const REQUEST = 'додай кнопку «експорт у CSV» на сторінку транзакцій';
 const FIX = 'ніяких ../../ — у нас усі імпорти через аліас @/';
 const REMEMBER = `${FIX}. запам'ятай це правило в AGENTS.md`;
-const REMEMBER_SKILL = `${FIX}. додай це правило в скіл frontend-conventions, а не в AGENTS.md`;
+const REMEMBER_SKILL = `${FIX}. додай це правило в скіл frontend-conventions`;
 const SKILL_FILE = '.claude/skills/frontend-conventions/SKILL.md';
 export const ALIAS_RULE = '- Imports go through the `@/` alias, never `../../`.';
 

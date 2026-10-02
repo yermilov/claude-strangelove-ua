@@ -1,4 +1,5 @@
 import { SlideDefinition } from '../types/slides';
+import { atSessionSpeed } from '../utils/sessionPlayback';
 import interruptVideo from '../assets/recipe-1-import-alias.mp4';
 import interruptStill from '../assets/recipe-1-import-alias-still.png';
 import ohOfCourseVideo from '../assets/recipe-1-oh-of-course.mp4';
@@ -49,7 +50,7 @@ export const RecipeWatchAgentSlide: SlideDefinition = {
             {isExportMode ? (
               <img src={interruptStill} alt={ALT} />
             ) : (
-              <video src={interruptVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
+              <video ref={atSessionSpeed} src={interruptVideo} autoPlay muted playsInline preload="auto" aria-label={ALT} />
             )}
           </div>
         </figure>

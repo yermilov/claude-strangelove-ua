@@ -1,6 +1,6 @@
 import React from 'react';
 import { AbsoluteFill, interpolate, spring, useCurrentFrame, useVideoConfig } from 'remotion';
-import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontFamily } from './claude-code';
+import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontFamily, quickenTyping, typingSaved } from './claude-code';
 
 /* «рецепт 3: агентські детерміновані перевірки» — Claude Code on the left is asked for
  * a lint script that runs in GitHub Actions on every push, so the mistake the agent
@@ -17,15 +17,19 @@ import { Block, C, FONT, KeyCap, LINE, Marked, Result, Row, Spinner, Tool, fontF
  * Long lines are cut with «…»; time is compressed. */
 
 export const FPS = 30;
-export const DURATION = 1110;
+
 export const WIDTH = 2140;
-export const HEIGHT = 1040;
+// 900 tall, like «рецепт 1/2»'s 1200×900 terminal, so on the slide the
+// terminal sets at the same size as on those (Yarik, 02.10.2026: it looked
+// smaller). The terminal scrolls from the bottom, so it only loses old lines.
+export const HEIGHT = 900;
 
 const PROMPT =
   'ти знову імпортуєш через ../../ — правило є і в AGENTS.md, і в скілі, а це вже вдруге.\n' +
   'згенеруй лінт-скрипт, який кожен раз у github action перевірятиме, що ця помилка не виникає знову';
 
-const T = {
+// written at the original typing pace, played with the faster typing (claude-code.tsx)
+const T_SLOW = {
   markDrift: 34,
   typeStart: 70,
   typeEnd: 330,
@@ -44,6 +48,11 @@ const T = {
   run2: 935,
   run2Done: 1005,
 };
+const T = quickenTyping(T_SLOW);
+// shorter by the frames the faster typing saves
+export const DURATION = 1110 - typingSaved(T_SLOW);
+// the export still: the green second run, held near the end (was frame 1100 of 1110)
+export const STILL_FRAME = DURATION - 10;
 
 const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } as const;
 
@@ -53,9 +62,10 @@ const FAIL = [
   'import check FAILED — 2 relative import(s); use @/',
 ];
 const OK = 'import check OK — 214 files, 0 relative imports';
+// the same script prints the same lines in CI as in the terminal
 const CI_FAIL = [
-  "✗ apps/web/src/pages/budget/BudgetChart.tsx:2  '../../lib/money'",
-  "✗ apps/web/src/pages/budget/BudgetChart.tsx:3  '../../components/ui/card'",
+  FAIL[0],
+  FAIL[1],
   'import check FAILED — 2 relative import(s); use @/ (see AGENTS.md)',
 ];
 const CI_OK = OK;
@@ -260,6 +270,10 @@ const G = {
 };
 const GH_X = TERM_W + 40;
 const GH_W = WIDTH - GH_X;
+// Shorter than the terminal: on the slide the Fwdays mark tucks into the
+// panel's bottom-right corner, overlapping only that corner (Yarik's sketch, 02.10.2026).
+// Tuned for the talk laptop in full screen, 1512×982: ~20px of overlap.
+const GH_H = 736;
 const SANS = '-apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif';
 
 type RunState = 'running' | 'fail' | 'ok';
@@ -366,7 +380,7 @@ const Actions: React.FC = () => {
         left: GH_X,
         top: 0,
         width: GH_W,
-        height: HEIGHT,
+        height: GH_H,
         background: G.bg,
         borderRadius: 14,
         overflow: 'hidden',
@@ -435,5 +449,17 @@ export const AliasGuard: React.FC = () => (
   <AbsoluteFill style={{ background: '#0a0a0a', fontFamily, fontSize: FONT, lineHeight: LINE, color: C.text }}>
     <Terminal />
     <Actions />
+  </AbsoluteFill>
+);
+
+// The terminal alone, on the same clock (Yarik, 02.10.2026). On the slide the
+// GitHub Actions panel is live DOM beside it, synced to this video's time, so
+// the two can fill the slide's width together at any window size — a single
+// video of a fixed shape could not. The deck's panel reads these frames.
+export const TERMINAL_WIDTH = TERM_W;
+export const RUN_FRAMES = { run1: T.run1, run1Done: T.run1Done, run2: T.run2, run2Done: T.run2Done };
+export const AliasGuardTerminal: React.FC = () => (
+  <AbsoluteFill style={{ background: C.bg, fontFamily, fontSize: FONT, lineHeight: LINE, color: C.text }}>
+    <Terminal />
   </AbsoluteFill>
 );

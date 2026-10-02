@@ -1297,6 +1297,13 @@
 /* «рецепт 2»: the video already draws two windows on the slide's own black, so
  * the frame drops its border — a box round both would read as a third window. */
 .shot__frame--bare { border: 0; border-radius: 0; }
+/* A bare video draws its windows on black, but H.264 turns the composition's
+ * #0a0a0a into a slightly darker, greener black (#030605) — a visible box on
+ * the slide. `lighten` lets the slide's own black show wherever the video is
+ * darker than it, so the video's edges vanish; the windows are lighter and
+ * stay as they are. */
+.shot__frame--bare { background: var(--kubrick-black); }
+.shot__frame--bare video { mix-blend-mode: lighten; }
 /* It spans the whole stage, so without a cap its bottom-right corner — where
  * the rule counter sits — runs under the conference mark. Centred on the
  * screen and capped clear of the mark's inset on both sides, as `.team__tabs`. */
@@ -1307,6 +1314,169 @@
 .first-day.recipe-video.recipe-video--two-line-title { padding-top: var(--space-xl); }
 .recipe-video .shot__frame--bare {
   width: min(100cqw, 100cqh * var(--ratio), 100vw - 2 * var(--conference-mark-inset));
+}
+/* === «рецепт 3» ===
+ * Yarik's sketch (02.10.2026): the terminal on the left at the stage's full
+ * height, the GitHub Actions page on the right taking all the width left, out
+ * to the window's edge, with the conference mark tucked into its bottom-right
+ * corner. The page is live DOM (components/GitHubActionsPanel.tsx), so the two
+ * fill the width together at any window size. */
+.slide:has(.recipe3) { overflow: visible; }
+.first-day.recipe3 {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: var(--space-lg);
+  /* out to the window's edge (less a sliver), whatever the window: the slide
+   * is at most 1600px wide and centred in a container padded by --space-xl */
+  margin-right: calc(-1 * ((100vw - min(1600px, 100vw - 2 * var(--space-xl))) / 2 - var(--space-md)));
+}
+.recipe3__terminal {
+  margin: 0;
+  /* a little narrower than the GitHub page (Yarik, 02.10.2026: «гітхаб
+   * вікно ще трохи більшим»), 45:55. No fill of its
+   * own: the video is the window, top-aligned with the page, and where the
+   * stage's height caps it the slide's black shows, not a second panel. */
+  flex: 1 1 0;
+  min-width: 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+}
+.recipe3__terminal video,
+.recipe3__terminal img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: left top;
+  border-radius: var(--radius-card);
+}
+/* The page runs the stage's full height, like the terminal, with the mark
+ * over its bottom-right corner; its content is sized to stay above the mark
+ * (see --u below). */
+.recipe3__github {
+  flex: 1.22 1 0;
+  min-width: 0;
+  container-type: size;
+}
+
+/* GitHub's own dark palette — a screenshot of a real UI, kept as is. Its type
+ * scales with the room it gets: one unit is 1/900 of the page's width, capped
+ * by its height so the fullest moment (two runs and a log) still fits.
+ * Vertical padding is tighter than GitHub's, so the type can be larger. */
+.gh-actions {
+  /* the room above the mark: the column's height less the mark's own height
+   * (the mark's bottom sits ~17px above the stage's) */
+  --u: min(100cqw / 600, (100cqh - var(--conference-mark-height) + 17px) / 470);
+  height: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  background: #0d1117;
+  border-radius: var(--radius-card);
+  color: #f0f6fc;
+  font-family: -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.4;
+  text-align: left;
+}
+.gh-actions__header {
+  background: #151b23;
+  border-bottom: 1px solid #3d444d;
+  padding: calc(14 * var(--u)) calc(28 * var(--u)) 0;
+}
+.gh-actions__repo { font-size: calc(26 * var(--u)); }
+.gh-actions__muted { color: #9198a1; }
+.gh-actions__tabs {
+  display: flex;
+  gap: calc(34 * var(--u));
+  margin-top: calc(10 * var(--u));
+  font-size: calc(22 * var(--u));
+  color: #9198a1;
+}
+.gh-actions__tabs span { padding-bottom: calc(8 * var(--u)); }
+.gh-actions__tabs .gh-actions__tab--on {
+  color: #f0f6fc;
+  font-weight: 600;
+  border-bottom: calc(3 * var(--u)) solid #f78166;
+}
+.gh-actions__workflow {
+  display: flex;
+  align-items: baseline;
+  gap: calc(18 * var(--u));
+  padding: calc(12 * var(--u)) calc(28 * var(--u));
+  font-size: calc(32 * var(--u));
+  font-weight: 600;
+  line-height: 1.2;
+}
+.gh-actions__file { font-size: calc(21 * var(--u)); font-weight: 400; color: #9198a1; }
+.gh-actions__runs {
+  margin: 0 calc(28 * var(--u));
+  border: 1px solid #3d444d;
+  border-radius: calc(10 * var(--u));
+  overflow: hidden;
+}
+.gh-actions__empty {
+  border-top: 1px solid #3d444d;
+  padding: calc(40 * var(--u)) calc(28 * var(--u));
+  font-size: calc(23 * var(--u));
+  color: #9198a1;
+  text-align: center;
+}
+.gh-actions__run {
+  border-top: 1px solid #3d444d;
+  padding: calc(14 * var(--u)) calc(28 * var(--u));
+  animation: slideItemFadeIn 500ms var(--ease) both;
+}
+.gh-actions__run-head { display: flex; gap: calc(18 * var(--u)); align-items: flex-start; }
+.gh-actions__status {
+  flex-shrink: 0;
+  margin-top: calc(4 * var(--u));
+  width: calc(30 * var(--u));
+  height: calc(30 * var(--u));
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(21 * var(--u));
+  font-weight: 900;
+  color: #0d1117;
+  box-sizing: border-box;
+}
+.gh-actions__status--ok { background: #3fb950; }
+.gh-actions__status--fail { background: #f85149; }
+.gh-actions__status--running {
+  border: calc(4 * var(--u)) solid #d29922;
+  border-top-color: transparent;
+  animation: gh-actions-spin 0.8s linear infinite;
+}
+@keyframes gh-actions-spin { to { transform: rotate(360deg); } }
+.gh-actions__run-title { font-size: calc(27 * var(--u)); font-weight: 600; line-height: 1.3; }
+.gh-actions__run-meta { font-size: calc(21 * var(--u)); color: #9198a1; margin-top: calc(2 * var(--u)); }
+.gh-actions__branch {
+  color: #4493f8;
+  background: rgba(56, 139, 253, 0.15);
+  padding: calc(1 * var(--u)) calc(8 * var(--u));
+  border-radius: calc(6 * var(--u));
+}
+.gh-actions__log {
+  margin: calc(10 * var(--u)) 0 0;
+  background: #010409;
+  border: 1px solid #3d444d;
+  border-radius: calc(8 * var(--u));
+  padding: calc(10 * var(--u)) calc(18 * var(--u));
+  font-family: var(--font-mono);
+  /* a notch under the page's text, so each log line stays on one line */
+  font-size: calc(15.5 * var(--u));
+  line-height: 1.4;
+}
+.gh-actions__log-head { color: #9198a1; }
+.gh-actions__log-fail,
+.gh-actions__log-ok { padding-left: calc(18 * var(--u)); white-space: pre-wrap; }
+.gh-actions__log-fail { color: #f85149; }
+.gh-actions__log-ok { color: #3fb950; }
+@media (prefers-reduced-motion: reduce) {
+  .gh-actions__status--running { animation: none; }
 }
 
 /* === AUTO-REVIEW («рецепт 5») ===
@@ -1455,6 +1625,12 @@
   margin: 0;
   padding: 0 0 0 1.2em;
   animation: slideItemFadeIn 600ms var(--ease) both;
+}
+/* laid out from the start, shown on its own reveal — and only then does its
+ * fade-in play */
+.slide .skills-example--hidden {
+  visibility: hidden;
+  animation: none;
 }
 .slide .skills-example__rules li::before {
   content: '— ';
