@@ -12,14 +12,16 @@ import { Beat, NEXT_MS, RUN_MS, START_MS, SessionBeats } from '../components/Ses
  * and under them one example, one step better each time:
  *  0. one reviewer, its prompt, its finding;
  *  1. many reviewers, one goal (one question) each — and in parallel;
- *  2–4. cheaper models, three ways: Codex on gpt-6-luna; Jev as a fuzzy linter
- *     in an after-edit hook; opencode on a free OpenRouter model.
+ *  2–4. cheaper models, three ways: Codex on gpt-6-luna; opencode on a free
+ *     OpenRouter model; Jev as a fuzzy linter in an after-edit hook.
  *
  * Where the commands come from: `-m <model> -c model_reasoning_effort=…` is how
  * juggernaut launches codex (apps/cli/src/agent-role.ts), `gpt-6-luna` is its
  * catalogue id; the Jev hook follows @MichaelThiessen's «fuzzy linter» (quoted by
  * @mattpocockuk, 26.09.2026; juggernaut task 3601159e) — the edit's diff only,
- * one-sentence rules, a confidence per rule, high = block; `opencode run --model
+ * one-sentence rules, a confidence per rule, high = block — and calls Jev the
+ * way juggernaut does (the decisions endpoint, `state` + `choice` questions,
+ * see JEV below); `opencode run --model
  * openrouter/qwen/qwen3.8-27b:free` is a command actually run on 30.09 (that run
  * hit a free-tier rate limit). Everything else — the code, prompts, findings,
  * timings — is STAGED to show the shape. It is the machine's text, so it keeps
@@ -146,9 +148,13 @@ const ManyReviewers = () => {
             <span key={r.desc}>
               {'   '}
               <span className="dim">{last ? '└─' : '├─'}</span> Review: {r.desc} <span className="dim">· {r.tools} tool uses</span>
-              {'\n'}
-              {'   '}
-              <span className="dim">{last ? '  ' : '│ '}</span> <span className="dim">⎿</span>{' '}
+              {/* its status on a row of its own; a short window (CSS) keeps it on the agent's row */}
+              <span className="review-break">
+                {'\n'}
+                {'   '}
+                <span className="dim">{last ? '  ' : '│ '}</span>
+              </span>{' '}
+              <span className="dim">⎿</span>{' '}
               {done ? <span className="dim">Done</span> : r.work}
               {'\n'}
             </span>
@@ -236,37 +242,80 @@ const LUNA: Beat[] = [
 ];
 const Luna = () => <SessionBeats beats={LUNA} />;
 
-// one hook call answers all three questions at once
-const JEV: Beat[] = [
-  {
-    kind: 'call',
-    lines: (
-      <>
-        <span className="ok">●</span> <b>Update</b>(BudgetSummary.tsx){'\n'}
-      </>
-    ),
-  },
-  {
-    kind: 'result',
-    lines: (
-      <>
-        {'  '}└ PostToolUse hook → <span className="hl">jev-1.13.0</span> · the diff only · 1 call{'\n'}
-        {'    '}
-        {`"${PROMPTS.money}"`.padEnd(32)}
-        <span className="err">yes 0.94 → block</span>
-        {'\n'}
-        {'    '}
-        {`"${PROMPTS.privacy}"`.padEnd(32)}
-        <span className="ok">no  0.97</span>
-        {'\n'}
-        {'    '}
-        {`"${PROMPTS.errors}"`.padEnd(32)}
-        <span className="dim">yes 0.61 → ask the agent to check</span>
-      </>
-    ),
-  },
+// The after-edit hook's one call to Jev, in the shape juggernaut really uses
+// (miniapps/attack/src/telegram-classifier.ts): Jev is not a chat model, it is
+// not in OpenRouter's chat catalogue — it sits on the alpha decisions endpoint,
+// takes a `state` plus named `choice` questions whose `criteria` describe each
+// option, and answers every question with a calibrated probability per option.
+// The diff and the criteria texts are STAGED; the endpoint, model id and the
+// request/answer shapes are juggernaut's.
+// One line per reveal (Yarik, 02.10.2026) so the talk can walk through the
+// request and the answer; every line is laid out from the start, hidden until
+// its reveal, so the panel does not reflow as it fills.
+const JEV_LINES: ReactNode[] = [
+  <>
+    <span className="ok">●</span> <b>Update</b>(BudgetSummary.tsx)
+  </>,
+  <>
+    {'  '}└ PostToolUse hook: POST <span className="hl">openrouter.ai/api/alpha/decisions</span>
+  </>,
+  <>
+    {'    '}
+    {'{'} {k('model')}: <span className="hl">"typesafe/jev-1.13"</span>,
+  </>,
+  <>
+    {'      '}
+    {k('state')}: {'{'} {k('diff')}: "…sum + r.amountMinor / 100…" {'}'},
+  </>,
+  <>
+    {'      '}
+    {k('questions')}: {'{'} {k('money')}: {'{'} {k('type')}: "choice",
+  </>,
+  <>
+    {'        '}
+    {k('instructions')}: "{PROMPTS.money}",
+  </>,
+  <>
+    {'        '}
+    {k('criteria')}: {'{'} {k('yes')}: "kopecks become a float",
+  </>,
+  <>
+    {'                    '}
+    {k('no')}: "sums stay integer kopecks" {'}'} {'}'} {'}'} {'}'}
+  </>,
+  <>
+    {'  '}← {'{'} {k('answers')}: {'{'} {k('money')}: {'{'} {k('choice')}: <span className="err">"yes"</span>,
+  </>,
+  <>
+    {'      '}
+    {k('confidence')}: <span className="err">0.94</span>,
+  </>,
+  <>
+    {k('probabilities')}: {'{'} {k('yes')}: 0.94, {k('no')}: 0.06 {'}'} {'}'} {'}'} {'}'}
+  </>,
+  <>
+    {'  '}└ <span className="err">0.94 ≥ 0.9 → exit 2: float math on money, :15</span>
+  </>,
 ];
-const Jev = () => <SessionBeats beats={JEV} />;
+// `probabilities` gets its own row where the height allows; a short window
+// (CSS, `.jev-break`) puts it after `confidence` on one row — still its own reveal
+const JEV_JOINED = JEV_LINES.length - 2;
+const Jev = ({ sub }: { sub: number }) => (
+  <>
+    {JEV_LINES.map((line, i) => (
+      <span key={i} className={i <= sub ? 'skills-example__line' : 'skills-example--hidden'}>
+        {i === JEV_JOINED && (
+          <>
+            <span className="jev-break">{'      '}</span>
+            <span className="jev-join"> </span>
+          </>
+        )}
+        {line}
+        {i < JEV_LINES.length - 1 && <span className={i === JEV_JOINED - 1 ? 'jev-break' : undefined}>{'\n'}</span>}
+      </span>
+    ))}
+  </>
+);
 
 // the same hand-off to opencode on a free OpenRouter model: its JSON output
 // goes to a file, Claude reads it and acts on the finding
@@ -329,7 +378,15 @@ const OPENCODE: Beat[] = [
 ];
 const OpenCode = () => <SessionBeats beats={OPENCODE} />;
 
-const STEPS: { points: ReactNode[]; bar: string; example: () => JSX.Element }[] = [
+type Step = {
+  points: ReactNode[];
+  bar: string;
+  example: (props: { sub: number }) => JSX.Element;
+  // reveals this step takes; its example gets the current one as `sub`
+  reveals?: number;
+  bodyClass?: string;
+};
+const STEPS: Step[] = [
   {
     points: [<>для перевірок, які стають занадто складними для написання скрипта, використовуйте код рев'ю агентів</>],
     bar: '~/src/money-app — claude',
@@ -344,28 +401,44 @@ const STEPS: { points: ReactNode[]; bar: string; example: () => JSX.Element }[] 
     example: ManyReviewers,
   },
   ...[
-    { bar: '~/src/money-app — claude', example: Luna },
-    { bar: 'Jev · after every edit', example: Jev },
-    { bar: '~/src/money-app — claude', example: OpenCode },
-  ].map((s) => ({
+    { bar: '~/src/money-app — claude', example: Luna, model: 'GPT-6 Luna' },
+    { bar: '~/src/money-app — claude', example: OpenCode, model: 'безкоштовна модель з OpenRouter' },
+    {
+      bar: 'Jev · after every edit',
+      example: Jev,
+      model: 'Jev',
+      reveals: JEV_LINES.length,
+      // a step larger than the other reviews: its lines are shorter, and the
+      // talk walks through them one by one
+      bodyClass: 'skills-example__body--jev',
+    },
+  ].map(({ model, ...s }) => ({
+    // the same point on all three, naming the model its example runs on
     points: [
-      <>також можна економити гроші, запускаючи кожну невелику перевірку на невеликій моделі</>,
+      <>також можна економити гроші, запускаючи кожну невелику перевірку на невеликій моделі ({model})</>,
     ],
     ...s,
   })),
 ];
+// every reveal of the slide: which step, and which reveal inside it
+const STAGES = STEPS.flatMap((step, index) =>
+  Array.from({ length: step.reveals ?? 1 }, (_, sub) => ({ index, sub })),
+);
 
 export const RecipeCodeReviewSlide: SlideDefinition = {
   id: 'recipe-4-code-review',
   title: <>рецепт 4: агентські недетерміновані перевірки (код рев'ю)</>,
-  maxRevealStages: STEPS.length - 1,
+  maxRevealStages: STAGES.length - 1,
   content: ({ revealStage }) => {
-    const step = STEPS[Math.min(revealStage, STEPS.length - 1)];
+    const { index, sub } = STAGES[Math.min(revealStage, STAGES.length - 1)];
+    const step = STEPS[index];
     const Example = step.example;
     // the cheaper-models trio shares its points: keep them still, swap only the
     // example. The keys are prefixed: the list and the example are siblings, and
-    // equal keys made React keep the previous step's points on screen.
-    const pointsKey = `points-${revealStage >= 2 ? 'models' : revealStage}`;
+    // equal keys made React keep the previous step's points on screen. The
+    // example is keyed by its step, not the reveal, so Jev's lines add up
+    // instead of the panel remounting on every one.
+    const pointsKey = `points-${index >= 2 ? 'models' : index}`;
     return (
       <div className="skills-example skills-example--two-line-title">
         <ul className="problems" key={pointsKey}>
@@ -373,14 +446,14 @@ export const RecipeCodeReviewSlide: SlideDefinition = {
             <li key={i}>{p}</li>
           ))}
         </ul>
-        <div className="skills-example__stage" key={`example-${revealStage}`}>
+        <div className="skills-example__stage" key={`example-${index}`}>
           <figure className="skills-example__file machine" aria-label={`Код рев'ю агентами: ${step.bar}`}>
             <figcaption className="skills-example__bar">
               <span className="skills-example__dots" aria-hidden="true" />
               {step.bar}
             </figcaption>
-            <pre className="skills-example__body skills-example__body--review">
-              <Example />
+            <pre className={`skills-example__body skills-example__body--review ${step.bodyClass ?? ''}`}>
+              <Example sub={sub} />
             </pre>
           </figure>
         </div>
@@ -388,5 +461,5 @@ export const RecipeCodeReviewSlide: SlideDefinition = {
     );
   },
   notes:
-    'Наступне правило з AGENTS.md — гроші в копійках, ніколи не float. Лінтом його не перевірити: скрипт не знає, що amountMinor / 100 — це гроші, які перетворили на дробові гривні перед сумою. А агент код рев’ю з простим промптом бачить. Запускайте багато окремих агентів, у кожного одне питання, на яке скрипт не відповість: гроші, чи не переписали існуючий хелпер, чи не проковтнули помилку, чи не пишуть персональні дані в лог, чи тести перевіряють щось, крім моків; вони працюють паралельно, тож чекаєте ви на найдовшого, а не на суму. І кожного можна запустити на меншій моделі: codex з GPT-6 Luna; Jev як «нечіткий лінтер» у хуку після кожної правки — він бачить лише дифф, відповідає на одне питання з упевненістю і блокує, коли впевнений; або opencode з безкоштовною моделлю на OpenRouter.',
+    'Наступне правило з AGENTS.md — гроші в копійках, ніколи не float. Лінтом його не перевірити: скрипт не знає, що amountMinor / 100 — це гроші, які перетворили на дробові гривні перед сумою. А агент код рев’ю з простим промптом бачить. Запускайте багато окремих агентів, у кожного одне питання, на яке скрипт не відповість: гроші, чи не переписали існуючий хелпер, чи не проковтнули помилку, чи не пишуть персональні дані в лог, чи тести перевіряють щось, крім моків; вони працюють паралельно, тож чекаєте ви на найдовшого, а не на суму. І кожного можна запустити на меншій моделі: codex з GPT-6 Luna; opencode з безкоштовною моделлю на OpenRouter; або Jev як «нечіткий лінтер» у хуку після кожної правки — це не чат-модель: хук шле на окремий ендпоінт рішень OpenRouter дифф як state і питання з критеріями для кожної відповіді, а Jev повертає вибір і відкалібровану ймовірність кожного варіанта, тож хук блокує лише тоді, коли модель справді впевнена.',
 };

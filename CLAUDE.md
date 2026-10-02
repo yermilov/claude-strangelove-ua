@@ -210,6 +210,14 @@ fails on the two imports, the second goes green. The full two-window `AliasGuard
 the older `LintGuard` (the real plugin-manifest drift, juggernaut `db618758`) stay in `video/` but
 are no longer rendered into the deck.
 
+«рецепт 5» ends on the `HerdrReview` composition (2100×900): the auto-review gate in a herdr window —
+the author's Claude Code on the left splitting a pane with plain herdr commands (`pane split`,
+`agent start --kind codex`, `agent prompt … /review`; no juggernaut in it, Yarik 03.10.2026), 2 findings
+→ one fixed with a test, one argued away with another `agent prompt` → re-review → 0 → commit. Rendered and transcoded the same way to `src/assets/recipe-5-herdr-review.mp4`, export still
+`--frame=1095` (`recipe-5-herdr-review-still.png`). STAGED like the money-app story; herdr's look is
+taken from the UI mock on herdr.dev (Catppuccin Mocha) and the gate's mechanics from juggernaut's
+`apps/cli/src/review.ts`. It plays at the session speed, 1.2×.
+
 The user's typing in these four sessions is 20% faster than first staged: each timeline is written at
 the old pace and passed through `quickenTyping` (`video/src/claude-code.tsx`, `TYPING_SPEEDUP`),
 which shortens the typing and moves everything after it up — so durations and the still frames

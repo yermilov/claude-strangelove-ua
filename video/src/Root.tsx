@@ -5,6 +5,7 @@ import * as Lint from './LintGuard';
 import * as Alias from './AliasGuard';
 import * as ImportAlias from './ImportAliasSession';
 import * as AgentsMd from './AgentsMdGrowth';
+import * as HerdrReviewComp from './HerdrReview';
 
 export const RemotionRoot: React.FC = () => (
   <>
@@ -42,6 +43,14 @@ export const RemotionRoot: React.FC = () => (
       fps={AgentsMd.FPS}
       width={AgentsMd.WIDTH}
       height={AgentsMd.HEIGHT}
+    />
+    <Composition
+      id="HerdrReview"
+      component={HerdrReviewComp.HerdrReview}
+      durationInFrames={HerdrReviewComp.DURATION}
+      fps={HerdrReviewComp.FPS}
+      width={HerdrReviewComp.WIDTH}
+      height={HerdrReviewComp.HEIGHT}
     />
     <Composition
       id="RememberRule"

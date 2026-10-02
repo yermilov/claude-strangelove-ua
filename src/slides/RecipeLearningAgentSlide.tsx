@@ -1,16 +1,24 @@
 import { ReactNode } from 'react';
 import { SlideDefinition } from '../types/slides';
 
-/* «рецепт 7: агент, що навчається» — a hook that makes every use of a skill
- * end with updating that skill from what was just learned, shipped in the same
- * commit as the work. Same `.problems` list as the recipes before it, so more
- * points can be appended and will reveal one per stage. */
+/* «рецепт 7: агент, що навчається» — AGENTS.md tells the agent to reflect on
+ * the session after every commit and feed what it learned back: fix a skill
+ * that was wrong, fill one that was thin, repair the description and the hook
+ * when the right skill did not trigger, write a new skill when one is missing,
+ * and turn whatever slipped past the local checks into a linter or a review
+ * agent (Yarik, 03.10.2026). Same `.problems` list as the recipes before it,
+ * one point per reveal. */
 
 const POINTS: ReactNode[] = [
+  <>додайте інструкції в AGENTS.md після кожного коміту рефлексувати над поточною сесією</>,
+  <>якщо в застосованому скілі була неправильна інформація — виправити</>,
+  <>якщо інформації не вистачало — додати</>,
   <>
-    додайте хук: після кожного використання скіла треба оновлювати його на основі свіжого
-    досвіду (в{' '}одному коміті/PR-і з основними змінами)
+    якщо потрібний скіл не тригернувся — виправити description і хук, який тригерить
+    скіли
   </>,
+  <>якщо є потреба — створити новий скіл</>,
+  <>якщо якась проблема не була зловлена локально — створити на неї лінтер чи рев'ю агента</>,
 ];
 
 export const RecipeLearningAgentSlide: SlideDefinition = {
@@ -27,5 +35,5 @@ export const RecipeLearningAgentSlide: SlideDefinition = {
     </ul>
   ),
   notes:
-    'Додайте хук: щоразу, коли агент скористався скілом, він оновлює цей скіл тим, що щойно дізнався. І робить це в тому самому коміті чи PR, що й основні зміни, — тоді досвід не губиться і проходить рев’ю разом із кодом.',
+    'Агент, що навчається. В AGENTS.md — інструкція: після кожного коміту порефлексуй над цією сесією. Якщо в скілі, яким ти скористався, була неправильна інформація — виправ. Якщо її не вистачало — допиши. Якщо потрібний скіл не спрацював — виправ його description і хук, який вмикає скіли. Якщо треба — створи новий скіл. А якщо якась проблема проскочила повз локальні перевірки — зроби на неї лінтер чи рев’ю агента, щоб наступного разу її зловили.',
 };

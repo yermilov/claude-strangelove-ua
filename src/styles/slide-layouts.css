@@ -606,6 +606,47 @@
   margin-bottom: var(--space-md);
   line-height: var(--line-height-tight);
 }
+/* «рецепт N:» a step quieter than the recipe's name */
+.slide .final__recipe { color: var(--kubrick-grey-2); }
+/* each point fades in on its reveal; the sliding window drops the oldest.
+ * The list hangs from the top, so a new point does not shift the others. */
+.slide .final .final__points { align-self: flex-start; }
+.slide .final__point { animation: slideItemFadeIn 600ms var(--ease) both; }
+/* the LinkedIn QR and the line under it: a full-height column on the right,
+ * laid out from the start (so the points never reflow) and shown on the last
+ * reveal */
+.slide .final__contact {
+  flex-shrink: 0;
+  width: clamp(220px, 26vw, 520px);
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  animation: slideItemFadeIn 600ms var(--ease) both;
+}
+.slide .final__contact--hidden { visibility: hidden; animation: none; }
+/* the QR is the largest square the room above the caption allows */
+.slide .final__qr-box {
+  flex: 1 1 0;
+  min-height: 0;
+  width: 100%;
+  container-type: size;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+.slide .final__qr-box .final-qr {
+  width: min(100cqw, 100cqh);
+  height: auto;
+  border: 1px solid var(--kubrick-grey-2);
+}
+.slide .final__contact figcaption {
+  font-size: var(--font-size-text);
+  text-align: center;
+  line-height: var(--line-height-tight);
+}
 
 /* === PROBLEMS ===
  * «що ще може піти не так?»: one point per reveal, top-left under the
@@ -1485,45 +1526,31 @@
  * points never re-wrap when it appears on the last one. The panel is the
  * machine's text — `.machine` gives it the CRT palette and the code size. */
 .auto-review {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
-  gap: var(--space-xl);
-  align-items: start;
-  /* the panel sits clear of the conference mark in the bottom-right corner */
-  padding-right: calc(var(--conference-mark-inset) - var(--space-lg));
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  height: 100%;
+  min-height: 0;
 }
-.slide .auto-review__skill {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  animation: slideItemFadeIn 600ms var(--ease) both;
+/* the herdr replay after the last principle: the room under the point, clear
+ * of the conference mark */
+.auto-review__video {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  margin-right: calc(var(--conference-mark-inset) - var(--space-lg));
 }
-.slide .auto-review__skill--hidden {
-  visibility: hidden;
-  animation: none;
+.slide .good-agents-md__section .n { color: var(--terminal-orange); }
+/* the last point's principles: no red chevron, a step under the point */
+.auto-review__gate {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
 }
-.slide .auto-review__file {
-  background: var(--terminal-bg-elevated);
-  border-bottom: 1px solid var(--terminal-border);
-  color: var(--terminal-white-muted);
-  padding: var(--space-sm) var(--space-lg);
-}
-.slide .auto-review__body {
-  margin: 0;
-  padding: var(--space-md) var(--space-lg);
-  background: transparent;
-  border: 0;
-  font-size: inherit;
-  line-height: var(--line-height-tight);
-  white-space: pre;
-  color: var(--terminal-white);
-}
-.slide .auto-review__body .k { color: var(--terminal-green); }
-.slide .auto-review__body .n { color: var(--terminal-orange); }
-/* Narrow portrait screens: one column, the panel under the points, no mark
- * gutter. Landscape phones keep two columns — stacked, they run out of height. */
-@media (max-width: 900px) and (orientation: portrait) {
-  .auto-review { grid-template-columns: minmax(0, 1fr); padding-right: 0; }
+.auto-review__gate .skills-example__rules { padding-left: var(--space-lg); }
+/* the skill's text runs the width, clear of the conference mark */
+.slide .auto-review__gate .good-agents-md__file {
+  margin-right: calc(var(--conference-mark-inset) - var(--space-lg));
 }
 
 /* === RECIPE 2 — SKILLS ===
@@ -1639,13 +1666,29 @@
 .slide .skills-example__body--session { font-size: 0.75em; line-height: 1.15; padding-top: var(--space-sm); }
 /* «рецепт 4»: a step smaller than the frontmatter, so the longest command fits */
 .slide .skills-example__body--review { font-size: 0.85em; line-height: 1.15; }
+/* Jev's lines are revealed one by one and talked through: a step larger than
+ * the other reviews wherever the height allows — a short window (≤ 880px,
+ * e.g. 1280×720) keeps the reviews' size and joins two lines, so it fits */
+.slide .skills-example__body--jev { font-size: 1em; }
+.slide .skills-example__body--jev .jev-join { display: none; }
+@media (max-height: 880px) {
+  .slide .skills-example__body--jev { font-size: 0.85em; }
+  /* the reviews' twelve rows fit a short window (1280×720) only a little
+   * tighter — the line height gives, the font size does not */
+  .slide .skills-example__body--review { line-height: 1.05; }
+  /* five parallel agents: each one's status beside it, not under it */
+  .slide .skills-example__body--review .review-break { display: none; }
+  /* …and `probabilities` joins `confidence` on one row */
+  .slide .skills-example__body--jev .jev-break { display: none; }
+  .slide .skills-example__body--jev .jev-join { display: inline; }
+}
 .skills-example__line { animation: slideItemFadeIn 400ms var(--ease) both; }
 
 /* === GOOD AGENTS.MD ===
  * «а як виглядає хороший AGENTS.md?»: the points on the left, the example file
  * on the right, one section per point. Every section is laid out from the
  * start and hidden until its reveal, so the file does not reflow as it grows.
- * Same chrome as `.auto-review__skill`. */
+ * «рецепт 5» reuses it for its AGENTS.md and its SKILL.md. */
 .good-agents-md {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -1682,12 +1725,16 @@
   animation: slideItemFadeIn 600ms var(--ease) both;
 }
 .slide .good-agents-md__section .h { color: var(--terminal-green); }
+/* «рецепт 5»: the sections folded to their headings */
+.slide .good-agents-md__section .dim { color: var(--terminal-white-muted); }
 .slide .good-agents-md__file { animation: slideItemFadeIn 600ms var(--ease) both; }
 .slide .good-agents-md__file--hidden { visibility: hidden; animation: none; }
 .slide .good-agents-md__section--hidden {
   visibility: hidden;
   animation: none;
 }
+/* «рецепт 8»: the /loop window keeps to its column */
+.slide .boy-scout-loop .skills-example__file { min-width: 0; }
 @media (max-width: 900px) and (orientation: portrait) {
   .good-agents-md { grid-template-columns: minmax(0, 1fr); padding-right: 0; }
 }
