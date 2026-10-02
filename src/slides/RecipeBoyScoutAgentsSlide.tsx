@@ -26,6 +26,7 @@ const POINTS: ReactNode[] = [
 
 // the first example agent; from here on, one point at a time
 const EXAMPLES_FROM = 7;
+const WINDOW = 6;
 
 // Claude Code setting each example agent up as a recurring `/loop`, by the
 // two points just before them: its instructions live in a skill, and it runs
@@ -77,14 +78,19 @@ export const RecipeBoyScoutAgentsSlide: SlideDefinition = {
   maxRevealStages: POINTS.length - 1,
   content: ({ revealStage }) => {
     // the general points: a list that grows
+    // (a sliding window, CLAUDE.md «Slide Height & Overflow»: the newest
+    // WINDOW stay, so a short screen never clips the seventh)
     if (revealStage < EXAMPLES_FROM) {
+      const first = Math.max(0, revealStage - WINDOW + 1);
       return (
         <ul className="problems">
-          {POINTS.slice(0, EXAMPLES_FROM).map((p, i) => (
-            <li key={i} className={revealStage >= i ? undefined : 'problems__item--hidden'}>
-              {p}
-            </li>
-          ))}
+          {POINTS.slice(0, EXAMPLES_FROM).map((p, i) =>
+            i < first ? null : (
+              <li key={i} className={revealStage >= i ? undefined : 'problems__item--hidden'}>
+                {p}
+              </li>
+            ),
+          )}
         </ul>
       );
     }
